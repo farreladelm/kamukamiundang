@@ -57,10 +57,10 @@ Plan dan task list sudah disetujui. Tidak ada task implementation yang boleh dim
 
 ### Checkpoint MVP-A: Foundation
 
-- [ ] `MVP-01` - `MVP-04` reviewed.
-- [ ] Empty DB migrates successfully.
-- [ ] Invalid state transitions and duplicate activation fail at database boundary.
-- [ ] Full local quality commands pass.
+- [x] `MVP-01` - `MVP-04` reviewed.
+- [x] Empty DB migrates successfully.
+- [x] Invalid state transitions and duplicate activation fail at database boundary.
+- [x] Full local quality commands pass.
 
 ## MVP Showroom
 
@@ -122,10 +122,10 @@ Plan dan task list sudah disetujui. Tidak ada task implementation yang boleh dim
 
 ### Checkpoint MVP-B: Showroom
 
-- [ ] `MVP-05` - `MVP-11` reviewed.
-- [ ] Three versioned templates pass visual/license review.
-- [ ] Catalog -> detail -> palette -> WhatsApp works without login.
-- [ ] Basic events contain no PII and cannot block conversion.
+- [x] `MVP-05` - `MVP-11` reviewed.
+- [x] Three versioned templates pass visual/license review.
+- [x] Catalog -> detail -> palette -> WhatsApp works without login.
+- [x] Basic events contain no PII and cannot block conversion.
 
 ## MVP Admin Operations and Access
 
