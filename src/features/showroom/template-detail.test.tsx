@@ -10,7 +10,6 @@ describe("TemplateDetail", () => {
       <TemplateDetail
         templateKey="template-1"
         templateVersion={1}
-        canonicalUrl="https://undango.test/templates/larasati"
       />,
     );
 
@@ -37,10 +36,7 @@ describe("TemplateDetail", () => {
     );
     expect(demo.firstElementChild).toBe(renderedTemplate);
     expect(renderedTemplate).toHaveStyle({ backgroundColor: "rgb(240, 231, 217)" });
-    expect(screen.getByRole("link", { name: "Pesan via WhatsApp" })).toHaveAttribute(
-      "href",
-      expect.stringContaining("wa.me/6282131401640"),
-    );
+    expect(screen.queryByRole("link", { name: "Pesan via WhatsApp" })).not.toBeInTheDocument();
   }, 15_000);
 
   it("renders as a mobile invitation with desktop cover and fixed palette control", () => {
@@ -48,11 +44,13 @@ describe("TemplateDetail", () => {
       <TemplateDetail
         templateKey="template-1"
         templateVersion={1}
-        canonicalUrl="https://undango.test/templates/larasati"
       />,
     );
 
     expect(screen.getByTestId("preview-cover")).toBeInTheDocument();
+    expect(screen.getByTestId("preview-cover").className).toContain("lg:h-screen");
+    expect(screen.getByTestId("preview-cover").className).toContain("lg:sticky");
+    expect(screen.getByTestId("preview-cover").className).toContain("hidden");
     expect(screen.getByTestId("invitation-frame")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Buka pilihan palet" })).toHaveAttribute(
       "aria-expanded",

@@ -2,18 +2,15 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { WhatsAppCta } from "@/features/showroom/whatsapp-cta";
 import { renderTemplate } from "@/features/templates/render-template";
 import { getTemplateDefinition } from "@/features/templates/registry";
 
 export function TemplateDetail({
   templateKey,
   templateVersion,
-  canonicalUrl,
 }: {
   templateKey: string;
   templateVersion: number;
-  canonicalUrl: string;
 }) {
   const template = getTemplateDefinition(templateKey, templateVersion);
 
@@ -51,10 +48,10 @@ export function TemplateDetail({
 
   return (
     <main className="min-h-screen bg-stone-950 text-stone-900">
-      <div className="mx-auto flex min-h-screen max-w-[120rem] flex-col lg:flex-row">
+      <div className="mx-auto flex min-h-screen max-w-[120rem] flex-col lg:h-screen lg:flex-row lg:overflow-hidden">
         <section
           data-testid="preview-cover"
-          className="relative flex min-h-[35rem] flex-1 flex-col justify-between overflow-hidden p-6 sm:p-10 lg:min-h-screen lg:p-16"
+          className="relative hidden min-h-[35rem] flex-1 flex-col justify-between overflow-hidden p-6 sm:p-10 lg:sticky lg:top-0 lg:flex lg:h-screen lg:min-h-0 lg:p-16"
           style={{ backgroundColor: selectedPalette.tokens.canvas, color: selectedPalette.tokens.ink }}
         >
           <div className="relative z-10 flex items-center justify-between gap-4">
@@ -87,24 +84,20 @@ export function TemplateDetail({
             </p>
           </div>
 
-          <div className="relative z-10 flex flex-wrap items-center justify-between gap-5 border-t pt-5" style={{ borderColor: selectedPalette.tokens.line }}>
+          <div className="relative z-10 border-t pt-5" style={{ borderColor: selectedPalette.tokens.line }}>
             <p className="max-w-xs text-xs leading-5 opacity-60">
               Invitation dirancang untuk dibaca nyaman dari layar ponsel.
             </p>
-            <WhatsAppCta
-              whatsappNumber="6282131401640"
-              canonicalUrl={canonicalUrl}
-              template={template}
-              palette={selectedPalette}
-              className="inline-flex min-h-11 items-center justify-center bg-stone-900 px-4 text-sm font-semibold text-stone-50 transition-opacity hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-4"
-            />
           </div>
 
           <div className="absolute -right-32 top-1/2 size-96 -translate-y-1/2 rounded-full border opacity-40" style={{ borderColor: selectedPalette.tokens.accent }} aria-hidden="true" />
           <div className="absolute -bottom-24 left-1/3 size-72 rounded-full border opacity-30" style={{ borderColor: selectedPalette.tokens.line }} aria-hidden="true" />
         </section>
 
-        <section className="flex w-full justify-center bg-stone-950 px-3 py-5 sm:px-6 lg:w-[30rem] lg:shrink-0 lg:px-6 lg:py-8">
+        <section
+          data-testid="invitation-scroll"
+          className="flex w-full justify-center overflow-y-visible bg-stone-950 px-3 py-5 sm:px-6 lg:h-screen lg:w-[30rem] lg:shrink-0 lg:overflow-y-auto lg:px-6 lg:py-8"
+        >
           <div
             data-testid="invitation-frame"
             className="h-fit w-full max-w-[26rem] overflow-hidden bg-white shadow-2xl shadow-black/40"

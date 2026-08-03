@@ -30,3 +30,16 @@ test("unknown template detail returns not found", async ({ page }) => {
 
   expect(response?.status()).toBe(404);
 });
+
+test("keeps cover fixed on desktop and hides it on mobile", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/templates/larasati");
+
+  await expect(page.getByTestId("preview-cover")).toBeVisible();
+  await expect(page.getByTestId("invitation-scroll")).toBeVisible();
+
+  await page.setViewportSize({ width: 390, height: 844 });
+
+  await expect(page.getByTestId("preview-cover")).toBeHidden();
+  await expect(page.getByTestId("invitation-frame")).toBeVisible();
+});
