@@ -1,9 +1,10 @@
 # PRD: MVP Undango
 
 **Status:** Approved  
-**Versi:** 0.2  
+**Versi:** 0.4  
 **Tanggal:** 2 Agustus 2026  
 **Disetujui:** 2 Agustus 2026 oleh product owner  
+**Amandemen:** 3 Agustus 2026 - delivery dua fase; admin dashboard memakai email/password  
 **Sumber visi produk:** [`docs/PRODUCT.md`](./PRODUCT.md)  
 **Target pasar:** Pasangan di Indonesia yang membutuhkan undangan pernikahan digital siap pakai.
 
@@ -40,25 +41,30 @@ Keputusan berikut sudah dikonfirmasi untuk PRD ini:
 
 | Area | Keputusan |
 |---|---|
-| Cakupan | Seluruh MVP: showroom, operasional admin, workspace pelanggan, dan invitation publik |
+| Cakupan | Dua fase: MVP Core Flow untuk validasi produk, lalu Production Readiness sebelum public launch |
 | Platform | Satu aplikasi web responsive dan mobile-first |
 | Pemesanan | Percakapan serta pembayaran ditangani manual melalui WhatsApp |
 | Pencatatan lead | Admin mencatat lead dan order secara manual; WhatsApp API tidak digunakan |
 | Publish | Hanya admin dapat publish, unpublish, atau archive invitation |
-| Edit setelah publish | Customer tetap dapat mengedit; setelah peringatan dikonfirmasi, save langsung terlihat publik |
+| Edit setelah publish | Workspace terkunci setelah publish; admin dapat membuka editing, public tetap menampilkan snapshot lama, lalu admin publish ulang |
 | RSVP dan ucapan | Form publik tanpa login dengan validasi dan proteksi abuse |
 | Target kualitas | Target minimum MVP; tidak ada ambang formal WCAG atau Core Web Vitals pada rilis awal |
 | Bahasa dan mata uang | Antarmuka utama Bahasa Indonesia dan harga Rupiah |
 | Persistence | PostgreSQL dengan Prisma ORM |
 | Asset storage | Filesystem VPS tanpa provider object storage tambahan pada MVP |
-| Passwordless access | Magic link reusable selama 24 jam; recovery memakai PIN email 6 digit yang berlaku 10 menit dan menghasilkan sesi 24 jam |
-| Order lifecycle | `requested`, `payment_pending`, `paid`, `cancelled`, dan `refunded` |
+| Passwordless access | Customer memakai magic link single-use yang ditukar menjadi revocable session 24 jam; PIN recovery ditunda |
+| Admin access | Admin login ke dashboard memakai email/password dan revocable session 24 jam; credential admin tidak berlaku untuk workspace customer |
+| Order lifecycle | `pending`, `paid`, `activated`, `cancelled`, dan `refunded` |
+| Invitation lifecycle | `draft`, `published`, dan `archived`; editing access dikelola terpisah dari status publik |
 | Template management | Implementasi template dan palette berada di source code; admin hanya dapat hide atau unhide |
+| Template versioning | Invitation menyimpan `templateKey`, `templateVersion`, `contentSchemaVersion`, dan `paletteKey`; versi aktif tidak boleh diubah breaking atau dihapus |
+| Published content | Public route membaca satu immutable published snapshot; draft tetap terpisah dan full revision history ditunda |
+| Asset lifecycle | `pending` -> `processing` -> `ready` -> `failed`/`deleted`; total ready storage maksimal 250 MB per invitation |
 | Retensi | Tidak ada expiry otomatis; invitation live sampai admin archive dan data dihapus manual |
 | Testing | Vitest dan Testing Library untuk unit/component; Playwright untuk end-to-end |
 | Target bisnis | Baseline dikumpulkan 30 hari pertama sebelum target funnel ditetapkan |
 
-Pilihan provider analytics, email delivery, backup VPS, serta detail deployment diputuskan pada Phase 2 (Plan) tanpa mengubah requirement produk.
+Customer magic link dibuat dashboard dan dikirim manual oleh admin melalui WhatsApp pada MVP. Email delivery otomatis, analytics implementation, backup, monitoring, dan deployment diputuskan pada plan sesuai fase masing-masing.
 
 ## 3. Prinsip Produk
 
@@ -71,18 +77,31 @@ Pilihan provider analytics, email delivery, backup VPS, serta detail deployment 
 | Mobile-first | Showroom, workspace, dan invitation harus usable pada ponsel |
 | Privat sampai publish | Draft tidak dapat diakses melalui route publik atau token edit permanen |
 
-## 4. Scope MVP
+## 4. Delivery Scope
 
-### 4.1 Termasuk
+### 4.1 MVP Core Flow
 
 - 3-5 template matang dengan kategori, harga, data demo realistis, dan 3-6 palette per template.
 - Katalog publik, detail template, interactive preview, dan CTA WhatsApp berkonteks.
 - Dashboard admin untuk pencatatan order manual, activation, bantuan edit, pengelolaan publish, serta pengelolaan RSVP dan ucapan.
 - Workspace pelanggan passwordless dengan form, upload foto, curated palette, dan live preview.
 - Invitation publik dengan section standar, RSVP, ucapan, wedding gift, musik opsional, dan animasi ringan.
-- Analytics dasar untuk funnel showroom, order, publish, dan penggunaan invitation.
+- Event minimum untuk mengukur detail template dan klik WhatsApp; dashboard analytics lanjutan ditunda.
+- Security minimum yang tidak boleh ditunda: server-side validation, authorization, ownership checks, hashed tokens, secure cookies, upload validation, dan idempotency.
 
-### 4.2 Tidak termasuk
+MVP dianggap selesai pada environment development/staging setelah core flow lulus. MVP belum boleh public launch.
+
+### 4.2 Production Readiness
+
+- Security hardening lengkap, authorization matrix, dependency audit, CSP, HSTS, dan production threat review.
+- Adaptive abuse protection dan CAPTCHA untuk traffic mencurigakan.
+- Advanced analytics dashboard, query hardening, dan baseline operasional.
+- Containerization, reverse proxy, TLS, CI/deployment pipeline, rollback runbook, serta secret management.
+- Automated backup, off-host copy, restore drill, disk monitoring, alerting, dan operational health checks.
+- Customer PIN recovery hanya jika kebutuhan terbukti atau menjadi syarat support sebelum public launch.
+- Full browser/device verification dan public-launch checklist.
+
+### 4.3 Tidak termasuk
 
 - Payment gateway, cart, checkout otomatis, invoice otomatis, dan subscription billing.
 - WhatsApp API, auto-reply, sinkronisasi percakapan, dan automasi order.
@@ -127,11 +146,12 @@ flowchart LR
 Kriteria journey:
 
 - Invitation dan akses workspace tidak diaktifkan sebelum pembayaran dikonfirmasi.
-- Magic link dapat digunakan berulang selama 24 jam dan hanya memberi akses ke invitation milik pelanggan terkait.
-- Setelah magic link kedaluwarsa, customer dapat meminta PIN 6 digit melalui email; PIN berlaku 10 menit dan sesi hasil verifikasi berlaku 24 jam.
-- Pelanggan dapat menyimpan perubahan dan kembali mengedit selama akses aktif.
+- Magic link hanya dapat digunakan satu kali dan ditukar menjadi session 24 jam yang dapat dicabut.
+- Jika link kedaluwarsa atau sudah dipakai, customer meminta admin mengirim link baru pada MVP.
+- Pelanggan dapat menyimpan perubahan selama editing access aktif.
 - Pelanggan tidak melihat aksi publish; kesiapan publish dikoordinasikan dengan admin melalui kanal operasional.
-- Jika invitation sudah published, workspace memperingatkan bahwa save berikutnya langsung mengubah halaman publik.
+- Setelah publish, editing access terkunci. Admin dapat membuka editing tanpa mengubah snapshot yang sedang tampil publik.
+- Publish ulang mengganti snapshot publik secara atomik; MVP hanya menyimpan current draft dan current published snapshot, bukan revision history.
 
 ### 5.3 Pengalaman Tamu
 
@@ -175,29 +195,31 @@ Kriteria journey:
 | `ADM-003` | Admin dapat mencari dan membuka customer | Admin dapat melihat seluruh order dan invitation milik customer yang sama |
 | `ADM-004` | Admin dapat mengonfirmasi pembayaran manual | Konfirmasi menyimpan waktu dan aktor; hanya order terkonfirmasi yang dapat menghasilkan invitation aktif |
 | `ADM-005` | Admin dapat membuat invitation dari order | Invitation memakai template dan palette order, memiliki customer owner, serta slug unik |
-| `ADM-006` | Admin dapat mengaktifkan akses workspace | Admin dapat membuat magic link yang reusable selama 24 jam, mengirimkannya melalui kanal yang dipilih, serta revoke atau rotate link sebelum TTL berakhir |
+| `ADM-006` | Admin dapat mengaktifkan akses workspace | Admin dapat membuat magic link single-use dengan TTL 24 jam, mengirimkannya melalui kanal yang dipilih, serta revoke atau replace link sebelum digunakan |
 | `ADM-007` | Admin dapat mengedit seluruh konten invitation | Perubahan admin memakai aturan validasi yang sama dengan perubahan pelanggan dan menyimpan waktu serta aktor terakhir |
 | `ADM-008` | Hanya admin dapat mengubah visibilitas publik | Pelanggan tidak dapat publish, unpublish, atau archive melalui UI maupun endpoint |
 | `ADM-009` | Admin dapat mengelola RSVP dan ucapan | Data dapat difilter per invitation dan menampilkan waktu submit; admin dapat hide, unhide, atau delete ucapan |
 | `ADM-010` | Admin mendapat ringkasan operasional | Dashboard menampilkan order menurut status, invitation menurut status, serta data dasar conversion dan engagement |
 | `ADM-011` | Admin dapat hide atau unhide template | Aksi hanya mengubah visibilitas katalog; kode layout, palette, demo content, dan harga tidak dapat diedit dari dashboard |
-| `ADM-012` | Order mengikuti lifecycle yang ditetapkan | Status valid adalah `requested`, `payment_pending`, `paid`, `cancelled`, dan `refunded`; activation invitation hanya tersedia dari order `paid` |
+| `ADM-012` | Order mengikuti lifecycle yang ditetapkan | Status valid adalah `pending`, `paid`, `activated`, `cancelled`, dan `refunded`; hanya `paid` dapat diaktivasi dan activation sukses menghasilkan tepat satu invitation |
+| `ADM-013` | Admin mengontrol editing setelah publish | Publish mengunci workspace; admin dapat membuka editing sambil mempertahankan snapshot publik lama, lalu publish ulang atau archive |
+| `ADM-014` | Admin login ke dashboard dengan email/password | Tidak ada registrasi admin publik; password 12-128 karakter disimpan sebagai Argon2id hash; 5 gagal login per 15 menit; reset MVP dilakukan operator |
 
 ### 6.3 Workspace Pelanggan
 
 | ID | Requirement | Acceptance criteria |
 |---|---|---|
-| `WSP-001` | Workspace memerlukan autentikasi passwordless yang sah | Magic link kuat dapat dipakai berulang selama 24 jam; setelah expiry, PIN email 6 digit berlaku 10 menit dengan maksimal 5 percobaan per 15 menit; verifikasi sukses menghasilkan secure session 24 jam |
+| `WSP-001` | Workspace memerlukan autentikasi passwordless yang sah | Magic link kuat berlaku 24 jam, single-use, disimpan hashed, dan ditukar secara atomik menjadi secure revocable session 24 jam |
 | `WSP-002` | Akses dibatasi per invitation | Customer tidak dapat membaca atau mengubah invitation milik customer lain dengan mengganti ID atau URL |
 | `WSP-003` | Pelanggan dapat mengubah konten yang diizinkan | Form mencakup nama mempelai dan orang tua, copy, quote, detail acara, venue, tautan Maps, foto, musik, palette, gift, serta konten section |
 | `WSP-004` | Struktur desain tetap dikunci | Pelanggan tidak dapat mengubah layout utama, posisi ornamen, CSS, warna di luar palette, atau font di luar opsi template |
-| `WSP-005` | Workspace menyediakan live preview | Perubahan form yang valid terlihat pada preview template yang sama; pada invitation published, save yang dikonfirmasi langsung memperbarui halaman publik |
+| `WSP-005` | Workspace menyediakan live preview | Perubahan draft yang valid terlihat pada preview template/version yang sama dan tidak mengubah published snapshot sebelum admin publish ulang |
 | `WSP-006` | Perubahan dapat disimpan dan dipulihkan | Setelah status sukses tampil, refresh atau login ulang menampilkan data terakhir yang berhasil disimpan |
-| `WSP-007` | Upload foto aman dan terikat invitation | Foto hanya JPEG, PNG, atau WebP maksimal 10 MB per file dan diproses maksimal 2560 px; audio hanya MP3 atau M4A maksimal 15 MB dan 10 menit; jumlah foto tidak boleh melebihi snapshot order |
+| `WSP-007` | Upload asset aman dan terikat invitation | Foto hanya JPEG, PNG, atau WebP maksimal 10 MB per file dan diproses maksimal 2560 px; audio hanya MP3 atau M4A maksimal 15 MB dan 10 menit; jumlah foto mengikuti order dan total ready storage maksimal 250 MB |
 | `WSP-008` | Konflik perubahan tidak menimpa diam-diam | Jika data berubah sejak form dibuka, pelanggan atau admin mendapat peringatan sebelum versi lama menimpa versi baru |
 | `WSP-009` | Pelanggan dapat meminta bantuan admin | Workspace menampilkan jalur WhatsApp yang membawa konteks invitation tanpa memberi hak publish |
 | `WSP-010` | Error tidak menghilangkan input | Kegagalan validasi atau jaringan menampilkan error yang dapat ditindaklanjuti dan mempertahankan input lokal saat aman dilakukan |
-| `WSP-011` | Edit published memerlukan peringatan eksplisit | Sebelum save pertama pada invitation published, customer harus mengonfirmasi bahwa perubahan akan langsung terlihat publik; warning tidak memberi hak publish atau unpublish |
+| `WSP-011` | Published workspace terkunci | Customer tidak dapat save setelah publish sampai admin membuka editing; selama editing, public tetap membaca snapshot lama sampai publish ulang |
 | `WSP-012` | Customer dapat mengelola respons invitation miliknya | Customer dapat melihat RSVP serta hide, unhide, atau delete ucapan pada invitation miliknya, tanpa dapat mengakses respons invitation lain |
 
 ### 6.4 Invitation Publik
@@ -214,6 +236,7 @@ Kriteria journey:
 | `INV-008` | Wedding gift menampilkan data terstruktur | Informasi rekening atau metode gift hanya tampil ketika diaktifkan dan tidak meminta data pembayaran tamu |
 | `INV-009` | Perubahan status langsung mengontrol akses | Publish membuat route tersedia; unpublish atau archive menutup route publik tanpa menghapus data invitation |
 | `INV-010` | Invitation tidak kedaluwarsa otomatis | Invitation tetap live sampai admin melakukan unpublish atau archive; tidak ada job expiry atau penghapusan otomatis pada MVP |
+| `INV-011` | Published snapshot versioned | Snapshot menyimpan template key/version, content schema version, palette key, content, dan asset references; replacement terjadi atomik saat publish ulang |
 
 ### 6.5 RSVP dan Ucapan
 
@@ -222,7 +245,7 @@ Kriteria journey:
 | `GST-001` | Tamu dapat mengirim RSVP tanpa login | Form hanya tersedia pada invitation published; nama maksimal 100 karakter, status hadir wajib, jumlah tamu dibatasi konfigurasi invitation, dan pilihan acara hanya muncul bila invitation memiliki beberapa acara |
 | `GST-002` | Tamu dapat mengirim ucapan tanpa login | Nama maksimal 100 karakter dan ucapan maksimal 1.000 karakter divalidasi, disanitasi, dan dikaitkan dengan invitation yang benar |
 | `GST-003` | Endpoint memvalidasi input di server | Payload kosong, terlalu panjang, tidak sesuai format, atau memiliki field tak diizinkan ditolak dengan pesan aman |
-| `GST-004` | Endpoint memiliki proteksi abuse | Rate limit dan honeypot aktif; CAPTCHA dapat diminta saat pola traffic mencurigakan |
+| `GST-004` | Endpoint memiliki proteksi abuse bertahap | MVP memakai server validation, basic rate limit, dan honeypot; adaptive CAPTCHA ditambahkan pada Production Readiness |
 | `GST-005` | Submit idempotent dari UI | Tombol dinonaktifkan selama request dan retry tidak membuat duplikat tanpa tindakan sadar pengguna |
 | `GST-006` | Data tamu tidak masuk payload analytics | Event hanya membawa invitation ID internal dan hasil submit, bukan nama, nomor telepon, ucapan, atau detail personal lain |
 | `GST-007` | Pemilik dan admin dapat mengelola ucapan | Hide bersifat reversible; delete memerlukan konfirmasi eksplisit dan menghapus ucapan dari tampilan serta dashboard |
@@ -233,25 +256,24 @@ Kriteria journey:
 
 | Entitas | Status | Makna | Akses |
 |---|---|---|---|
-| Order | `requested` | Lead WhatsApp sudah dicatat | Admin |
-| Order | `payment_pending` | Order menunggu konfirmasi pembayaran manual | Admin |
+| Order | `pending` | Lead/order WhatsApp sudah dicatat dan menunggu pembayaran | Admin |
 | Order | `paid` | Pembayaran dikonfirmasi dan invitation dapat dibuat | Admin |
+| Order | `activated` | Tepat satu invitation berhasil dibuat dari order | Admin |
 | Order | `cancelled` | Order dibatalkan sebelum selesai | Admin |
 | Order | `refunded` | Pembayaran dikembalikan dan tindak lanjut invitation ditangani admin | Admin |
-| Invitation | `activated` | Invitation dibuat dan workspace dapat diaktifkan | Customer terkait dan admin |
-| Invitation | `editing` | Konten sedang diisi atau direvisi | Customer terkait dan admin |
-| Invitation | `published` | Invitation tersedia melalui `/i/[slug]`; save customer langsung memperbarui versi publik setelah warning dikonfirmasi | Publik untuk membaca; customer terkait dan admin untuk workspace |
+| Invitation | `draft` | Invitation belum pernah published; editing access dapat aktif | Customer terkait dan admin |
+| Invitation | `published` | Current published snapshot tersedia melalui `/i/[slug]`; draft dapat dibuka admin untuk revisi tanpa mengubah public | Publik untuk snapshot; customer terkait dan admin untuk workspace sesuai editing access |
 | Invitation | `archived` | Invitation ditutup dari publik dan dipertahankan tanpa expiry otomatis | Admin; customer dapat mengakses kembali hanya jika admin mengaktifkan akses |
 
-Status `order_requested` dari `PRODUCT.md` dinormalkan menjadi Order `requested`. Invitation baru dibuat setelah Order berstatus `paid`, sehingga Invitation tidak memiliki status pre-payment.
+Allowed transitions: Order `pending -> paid -> activated`, `pending -> cancelled`, `paid -> refunded`, dan `activated -> refunded`; Invitation `draft -> published`, `published -> published` melalui atomic republish, `published -> draft` melalui explicit unpublish, serta `draft/published -> archived`. Editing access adalah flag terpisah dan hanya dapat diubah admin.
 
 ### 7.2 Matriks Hak Akses
 
 | Aksi | Pengunjung | Customer pemilik | Customer lain | Admin | Tamu |
 |---|---:|---:|---:|---:|---:|
 | Melihat katalog dan preview | Ya | Ya | Ya | Ya | Ya |
-| Melihat workspace | Tidak | Ya | Tidak | Ya | Tidak |
-| Mengedit konten | Tidak | Ya | Tidak | Ya | Tidak |
+| Melihat customer workspace | Tidak | Ya | Tidak | Tidak; gunakan dashboard admin | Tidak |
+| Mengedit konten | Tidak | Ya jika editing access aktif | Tidak | Ya melalui dashboard admin | Tidak |
 | Mengubah template dasar | Tidak | Tidak | Tidak | Sesuai kebijakan order | Tidak |
 | Publish, unpublish, archive | Tidak | Tidak | Tidak | Ya | Tidak |
 | Melihat invitation published | Ya | Ya | Ya | Ya | Ya |
@@ -265,46 +287,46 @@ Semua pemeriksaan authorization wajib dilakukan di server. Menyembunyikan kontro
 
 | Entitas | Data minimum | Invariant |
 |---|---|---|
-| `Template` | ID, slug, nama, kategori, deskripsi, harga aktif, status katalog, data demo | Template nonaktif tidak muncul di showroom; perubahan harga tidak mengubah order lama |
-| `TemplatePalette` | ID, template ID, nama, token warna terkurasi, status | Palette hanya valid untuk satu template |
+| `TemplateDefinition` | key, version, content schema version, slug, nama, kategori, harga, capabilities, data demo | Version immutable; breaking change membuat version baru; version yang direferensikan invitation aktif tidak boleh dihapus |
+| `TemplatePalette` | template key/version, palette key, nama, token warna terkurasi | Palette hanya valid untuk template version terkait |
 | `Customer` | ID, nama, kontak WhatsApp dan/atau email, status | Satu customer dapat memiliki banyak order dan invitation |
-| `Order` | ID, customer, template, palette, price snapshot, batas jumlah foto, status, timestamps | Status hanya `requested`, `payment_pending`, `paid`, `cancelled`, atau `refunded`; invitation aktif tidak dibuat sebelum status `paid` |
-| `Invitation` | ID, customer, order, template, palette, slug, status, publish timestamps | Slug unik; hanya `published` yang tersedia secara publik |
-| `InvitationContent` | Data terstruktur per section dan revision metadata | Konten harus mengikuti schema template dan mencatat aktor serta waktu perubahan terakhir |
-| `Asset` | ID, invitation, jenis, path internal VPS, metadata, status | File disimpan di luar direktori publik langsung; akses draft tetap invitation-scoped dan upload divalidasi |
+| `Admin` | ID, normalized unique email, Argon2id password hash, status, timestamps | Tidak ada plaintext password; hanya admin aktif dapat membuat dashboard session |
+| `Session` | ID, hashed opaque token, actor type/ID, expiry, revoke/last-used timestamps | Token raw hanya berada di secure cookie; role/ownership diverifikasi ulang pada protected operation |
+| `MagicLink` | ID, customer/invitation scope, hashed token, expiry, consumed/revoked timestamps | Single-use; atomic consume; raw token tidak disimpan/logged |
+| `Order` | ID, customer, template/palette snapshots, price snapshot, batas foto, status, timestamps | Status hanya lifecycle yang diizinkan; activation idempotent dan satu order memiliki maksimal satu invitation |
+| `Invitation` | ID, customer, unique order ID, template key/version, content schema version, palette key, slug, status, editing access, publish timestamps | Slug dan order ID unik; hanya `published` yang tersedia publik |
+| `InvitationContent` | Mutable draft data, content version, schema version, updated actor/time | Optimistic compare-and-swap; draft harus valid untuk pinned template/schema version |
+| `PublishedSnapshot` | Invitation ID, template key/version, schema version, palette key, content, asset references, published time | Satu current snapshot per invitation dan diganti atomik hanya oleh admin publish |
+| `Asset` | ID, invitation, jenis, path internal VPS, metadata, lifecycle status, byte size | Status hanya `pending`, `processing`, `ready`, `failed`, `deleted`; total ready storage <= 250 MB dan published references mencegah file cleanup |
 | `RSVP` | ID, invitation, nama, kehadiran, jumlah tamu, acara opsional, timestamp | Hanya dapat dibuat untuk invitation published dan tidak menyimpan nomor kontak |
 | `Wish` | ID, invitation, nama, isi tersanitasi, visibility, timestamp | Hanya dapat dibuat untuk invitation published; hide reversible dan delete memerlukan konfirmasi |
 
-Data model tidak boleh menyimpan harga order sebagai referensi dinamis ke harga template. Data personal dan token autentikasi tidak boleh dikirim ke analytics.
+Data model tidak boleh menyimpan harga order sebagai referensi dinamis ke harga template. Database constraints/triggers harus melindungi unique order-invitation, allowed status transitions, paid-only activation, unique slug, optimistic version, dan idempotency key. Data personal dan token autentikasi tidak boleh dikirim ke analytics.
 
 ## 9. Analytics
 
-### 9.1 Event Minimum
+### 9.1 Event Contract
 
-| Event | Dipicu saat | Properti minimum non-PII |
-|---|---|---|
-| `template_list_viewed` | Katalog berhasil tampil | Kategori aktif |
-| `template_detail_viewed` | Detail template berhasil tampil | Template ID, kategori |
-| `template_palette_selected` | Pengunjung memilih palette | Template ID, palette ID |
-| `whatsapp_cta_clicked` | CTA WhatsApp ditekan | Template ID, palette ID, price tier |
-| `order_recorded` | Admin menyimpan order | Template ID, palette ID, price tier |
-| `order_activated` | Pembayaran dikonfirmasi dan invitation aktif | Template ID, durasi dari order |
-| `workspace_saved` | Perubahan workspace berhasil disimpan | Invitation ID internal, actor role |
-| `invitation_published` | Admin publish | Invitation ID internal, durasi dari activation |
-| `invitation_viewed` | Invitation published berhasil tampil | Invitation ID internal |
-| `rsvp_submitted` | RSVP valid tersimpan | Invitation ID internal, result |
-| `wish_submitted` | Ucapan valid tersimpan | Invitation ID internal, result |
+| Event | Dipicu saat | Properti minimum non-PII | Fase |
+|---|---|---|---|
+| `template_list_viewed` | Katalog berhasil tampil | Kategori aktif | MVP |
+| `template_detail_viewed` | Detail template berhasil tampil | Template ID/version, kategori | MVP |
+| `template_palette_selected` | Pengunjung memilih palette | Template ID/version, palette ID | MVP |
+| `whatsapp_cta_clicked` | CTA WhatsApp ditekan | Template ID/version, palette ID, price tier | MVP |
+| `order_recorded` | Admin menyimpan order | Template ID/version, palette ID, price tier | Production Readiness |
+| `order_activated` | Order berhasil diaktivasi | Template ID/version, durasi dari order | Production Readiness |
+| `workspace_saved` | Perubahan workspace berhasil disimpan | Invitation ID internal, actor role | Production Readiness |
+| `invitation_published` | Admin publish | Invitation ID internal, durasi dari activation | Production Readiness |
+| `invitation_viewed` | Invitation published berhasil tampil | Invitation ID internal | Production Readiness |
+| `rsvp_submitted` | RSVP valid tersimpan | Invitation ID internal, result | Production Readiness |
+| `wish_submitted` | Ucapan valid tersimpan | Invitation ID internal, result | Production Readiness |
 
 ### 9.2 Indikator
 
-- Klik CTA WhatsApp per template dan palette.
-- Rasio detail template ke klik WhatsApp.
-- Rasio order tercatat ke activation.
-- Waktu dari order ke activation dan dari activation ke publish.
-- Jumlah save customer dibanding save admin sebagai indikator self-service.
-- View, RSVP, dan ucapan per invitation published.
+- MVP mengukur view katalog/detail, pilihan palette, klik WhatsApp, dan rasio detail ke WhatsApp.
+- Production Readiness menambahkan rasio order ke activation, waktu activation/publish, save actor, serta view/RSVP/ucapan invitation.
 
-Target angka bisnis belum ditentukan. MVP mengumpulkan baseline selama 30 hari pertama setelah launch, lalu owner produk menetapkan target detail-to-WhatsApp conversion, activation rate, dan waktu sampai publish berdasarkan data tersebut.
+Target angka bisnis belum ditentukan. Setelah public launch, sistem mengumpulkan baseline 30 hari lalu owner produk menetapkan target detail-to-WhatsApp conversion, activation rate, dan waktu sampai publish.
 
 ## 10. Non-Functional Requirements
 
@@ -327,10 +349,10 @@ Target angka bisnis belum ditentukan. MVP mengumpulkan baseline selama 30 hari p
 
 - Semua input divalidasi di server dan output buatan pengguna disanitasi sebelum dirender.
 - Authorization invitation-scoped diterapkan di server untuk setiap read dan write privat.
-- Magic link harus dapat kedaluwarsa dan dicabut; token mentah tidak disimpan dalam log atau analytics.
-- Magic link reusable memiliki accepted replay risk selama TTL 24 jam; token harus memiliki entropy tinggi, hanya dikirim melalui HTTPS, dan dapat di-rotate segera jika diduga bocor.
-- PIN email berlaku 10 menit, maksimal 5 percobaan per 15 menit, dan respons request PIN tidak boleh membocorkan apakah email terdaftar.
-- Endpoint publik RSVP dan ucapan memakai rate limit, honeypot, dan CAPTCHA adaptif bila diperlukan.
+- Magic link customer harus single-use, dapat kedaluwarsa/dicabut, dan ditukar atomik menjadi session; token mentah tidak disimpan dalam log atau analytics.
+- Admin dashboard login memakai normalized email dan password; password disimpan sebagai Argon2id hash, response login generik, dan maksimal 5 gagal login per 15 menit.
+- Tidak ada registrasi atau forgot-password admin publik pada MVP; operator mereset password melalui procedure terautentikasi tanpa menyimpan/log plaintext.
+- Endpoint publik RSVP dan ucapan memakai basic rate limit dan honeypot pada MVP; CAPTCHA adaptif wajib sebelum public launch.
 - Upload membatasi tipe, ukuran, dan jumlah file serta tidak mempercayai MIME type dari client saja.
 - Secret, credential, dan data pribadi tidak boleh masuk repository, client bundle, URL analytics, atau log publik.
 - Route draft harus gagal tertutup: error authorization tidak boleh membuat konten menjadi publik.
@@ -347,7 +369,9 @@ Target angka bisnis belum ditentukan. MVP mengumpulkan baseline selama 30 hari p
 - Foto dan musik disimpan pada filesystem VPS di luar direktori static public aplikasi.
 - Akses asset draft harus melalui pemeriksaan status invitation dan authorization; path filesystem tidak boleh menjadi public identifier.
 - Invitation published dapat menyajikan asset melalui URL terkontrol tanpa membuka asset invitation lain.
-- VPS harus memiliki monitoring kapasitas disk dan backup; frekuensi backup serta recovery objective ditetapkan pada implementation plan.
+- Asset mengikuti lifecycle eksplisit; temporary/failed files dibersihkan idempotently dan file yang direferensikan published snapshot tidak boleh dihapus.
+- Batas total ready storage adalah 250 MB per invitation, selain batas per file dan jumlah foto order.
+- Monitoring kapasitas disk, automated backup, dan restore drill adalah Production Readiness gate sebelum public launch.
 - Invitation, asset, RSVP, dan ucapan tidak memiliki expiry otomatis; penghapusan manual harus eksplisit dan terotorisasi.
 
 ### 10.6 Compatibility dan Locale
@@ -375,7 +399,7 @@ Stack yang sudah ada dan menjadi baseline repository:
 | Unit/component test | Vitest dan Testing Library | Approved, belum terpasang |
 | Browser automation | Playwright | Approved, belum terpasang |
 
-Email delivery provider, analytics provider, versi PostgreSQL, dan detail deployment VPS belum diputuskan. Object storage eksternal tidak digunakan pada MVP.
+Email provider hanya diperlukan jika recovery otomatis dipilih pada Production Readiness. Analytics provider, versi PostgreSQL, dan detail deployment VPS belum diputuskan. Object storage eksternal tidak digunakan pada MVP.
 
 ## 12. Commands
 
@@ -439,9 +463,9 @@ Vitest, Testing Library, dan Playwright sudah dipilih tetapi belum terpasang. Se
 | Level | Fokus | Lokasi target |
 |---|---|---|
 | Unit | Price snapshot, validasi, lifecycle, authorization policy, formatter, dan WhatsApp message builder dengan Vitest | Dekat source sebagai `*.test.ts` |
-| Component | Form state, palette selector, preview, warning edit live, error state, dan accessible controls dengan Testing Library | Dekat component sebagai `*.test.tsx` |
+| Component | Form state, palette selector, preview, published lock state, error state, dan accessible controls dengan Testing Library | Dekat component sebagai `*.test.tsx` |
 | Integration | Auth passwordless, invitation-scoped access, persistence, upload policy, publish visibility, RSVP, dan abuse protection | `tests/` |
-| End-to-end | Discovery ke WhatsApp, activation ke workspace, admin publish, warning edit live, akses draft ditolak, RSVP, dan ucapan dengan Playwright | `e2e/` |
+| End-to-end | Discovery ke WhatsApp, activation ke workspace, single-use auth, admin publish/republish, draft/public isolation, RSVP, dan ucapan dengan Playwright | `e2e/` |
 | Manual | Visual quality setiap template pada mobile, musik, animasi, Maps, dan WhatsApp deep link pada perangkat nyata | Checklist release |
 
 Coverage requirement:
@@ -460,7 +484,8 @@ Coverage requirement:
 - Simpan price snapshot pada order.
 - Batasi opsi pelanggan pada konfigurasi template yang dikurasi.
 - Pastikan hanya admin dapat publish, unpublish, dan archive.
-- Tampilkan warning sebelum customer menyimpan perubahan pada invitation published karena hasilnya langsung live.
+- Kunci workspace setelah publish; hanya admin dapat membuka editing dan publish ulang current draft.
+- Pertahankan pinned template/schema version dan current published snapshot saat draft diedit.
 - Batasi upload sesuai snapshot order dan simpan asset di luar direktori publik VPS.
 - Jalankan lint, test, dan build sebelum merge.
 - Perbarui PRD sebelum mengubah scope atau business rule yang sudah disetujui.
@@ -488,32 +513,44 @@ Coverage requirement:
 
 ## 17. Success Criteria
 
-MVP siap ditinjau untuk rilis ketika seluruh kondisi berikut terpenuhi:
+MVP siap ditinjau sebagai hasil validasi ketika seluruh kondisi berikut terpenuhi:
 
 - 3-5 template aktif tersedia; masing-masing memiliki kategori, data demo realistis, harga, dan 3-6 palette.
 - Pengunjung dapat browse, mencoba palette, dan membuka pesan WhatsApp lengkap tanpa login.
 - Admin dapat mencatat order manual, mengonfirmasi pembayaran, membuat invitation, dan mengaktifkan akses customer.
+- Admin dapat login hanya ke dashboard dengan email/password; customer workspace tetap hanya menerima customer session dari magic link.
 - Customer dapat mengakses hanya invitation miliknya, mengubah seluruh field yang diizinkan, upload foto, melihat preview, dan menyimpan perubahan.
 - Customer tidak dapat mengubah struktur desain atau melakukan publish melalui UI maupun direct request.
-- Customer yang mengedit invitation published menerima warning eksplisit; save terkonfirmasi langsung terlihat pada halaman publik.
+- Workspace terkunci setelah publish; ketika admin membuka editing, public tetap menampilkan current published snapshot sampai publish ulang berhasil.
 - Admin dapat membantu edit serta publish, unpublish, atau archive invitation.
 - Hanya invitation `published` yang tersedia pada `/i/[slug]`; seluruh status lain tidak membocorkan konten.
 - Invitation published menampilkan section terisi dengan benar pada mobile dan desktop modern.
 - RSVP non-PII serta ucapan valid dapat tersimpan; input invalid, spam dasar, dan request berlebih ditolak.
 - Customer pemilik dan admin dapat melihat RSVP serta hide, unhide, atau delete ucapan sesuai scope akses.
-- Asset tersimpan pada filesystem VPS dengan validasi upload, access control draft, disk monitoring, dan backup yang teruji.
+- Asset mengikuti lifecycle eksplisit, cleanup gagal/temp berjalan, dan quota 250 MB terjaga.
 - Event analytics minimum tercatat tanpa payload PII dan dapat dipakai menghitung indikator awal.
 - Journey kritis memiliki automated test; visual template, Maps, audio, animasi, dan WhatsApp diverifikasi manual pada perangkat nyata.
 - `pnpm lint`, `pnpm test`, `pnpm test:e2e`, dan `pnpm build` lulus pada revision release.
+
+### 17.1 MVP Validation Gate
+
+- Seluruh core flow dari showroom sampai guest response lulus pada development/staging.
+- Security minimum, constraints, single-use auth, template version pinning, published snapshot, dan asset lifecycle terbukti lewat automated tests.
+- Backup automation, monitoring, adaptive CAPTCHA, production deployment, dan advanced analytics tidak memblokir MVP completion.
+
+### 17.2 Production Readiness Gate
+
+- Security hardening, adaptive abuse protection, production deployment, TLS, backup/restore, monitoring, dan release verification selesai.
+- Public launch dilarang sebelum gate ini disetujui.
 
 ## 18. Open Questions
 
 Tidak ada open question produk yang tersisa. Keputusan teknis berikut sengaja didelegasikan ke Phase 2 (Plan) dan harus mengikuti requirement PRD:
 
-1. Pilih provider pengiriman email untuk PIN dengan opsi gratis yang cukup untuk MVP, delivery monitoring, dan rate limiting.
-2. Pilih analytics provider dengan opsi gratis, event contract vendor-neutral, tanpa payload PII, serta consent sesuai mekanisme tracking yang dipakai.
+1. Jika recovery otomatis disetujui pada Production Readiness, pilih provider email dengan opsi gratis, delivery monitoring, dan rate limiting.
+2. Tetapkan implementation analytics dasar MVP dan dashboard lanjutan Production Readiness tanpa payload PII.
 3. Tetapkan versi PostgreSQL dan Prisma yang kompatibel dengan VPS dan framework.
-4. Tetapkan layout direktori asset VPS, backup frequency, restore procedure, disk alert threshold, dan recovery objective.
+4. Tetapkan layout direktori asset development/VPS; backup frequency, restore procedure, disk alert threshold, dan recovery objective diselesaikan pada Production Readiness.
 5. Tetapkan deployment pipeline, HTTPS termination, secret management, dan rollback procedure pada VPS.
 6. Setelah 30 hari data produksi tersedia, tetapkan target detail-to-WhatsApp conversion, activation rate, dan waktu sampai publish.
 
@@ -523,7 +560,7 @@ Sebelum masuk Phase 2 (Plan), reviewer harus memastikan:
 
 - Objective, scope, dan non-goals sesuai visi produk.
 - Requirement serta acceptance criteria dapat diuji.
-- Keputusan admin-only publish dan implikasinya terhadap edit setelah publish sudah jelas.
+- Keputusan admin-only publish, locked workspace, dan current published snapshot sudah jelas.
 - Keputusan teknis yang didelegasikan memiliki owner dan checkpoint pada implementation plan.
 - Human reviewer telah menyatakan approval eksplisit.
 - Dokumen berstatus `Approved` dengan tanggal dan reviewer tercatat.

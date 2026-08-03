@@ -1,439 +1,456 @@
-# Implementation Plan: MVP Undango
+# Implementation Plan: Undango
 
-**Status:** Draft - menunggu review dan approval  
-**Tanggal:** 2 Agustus 2026  
-**Specification:** [`docs/PRD.md`](../docs/PRD.md) v0.2 Approved  
+**Status:** Approved - implementation paused  
+**Versi:** 0.3  
+**Tanggal:** 3 Agustus 2026  
+**Disetujui:** 3 Agustus 2026 oleh product owner  
+**Specification:** [`docs/PRD.md`](../docs/PRD.md) v0.4 Approved  
 **Task checklist:** [`tasks/todo.md`](./todo.md)  
 
 ## 1. Guardrail
 
-Dokumen ini hanya merencanakan implementasi. Approval plan wajib diperoleh sebelum task implementasi dimulai. Selama Phase 2 tidak boleh ada perubahan pada source aplikasi, dependency, lockfile, database schema, generated files, atau konfigurasi deployment.
+Dokumen ini mencakup roadmap lengkap, tetapi delivery dipisahkan menjadi dua gate:
 
-## 2. Overview
+1. **Phase 1 - MVP Core Flow:** membuktikan alur produk pada development/staging.
+2. **Phase 2 - Production Readiness:** membuat hasil MVP aman dan operable untuk public launch.
 
-MVP dibangun sebagai satu aplikasi Next.js App Router yang self-hosted pada satu VPS. Aplikasi melayani empat pengalaman: showroom publik, dashboard admin, workspace customer, dan invitation publik. PostgreSQL menjadi source of truth operasional; template visual tetap source-controlled. Asset customer disimpan pada filesystem persisten VPS dan selalu diakses melalui authorization atau pemeriksaan status invitation.
+Approval plan tidak otomatis mengizinkan implementation. `tasks/todo.md` tetap blocked sampai human reviewer menyetujui plan dan task list. Tidak ada task Phase 2 yang menjadi syarat untuk menyatakan core flow MVP selesai, tetapi public launch dilarang sampai Production Readiness selesai.
 
-Delivery mengikuti vertical slice. Showroom diselesaikan lebih dulu, lalu order/activation, workspace, invitation publik, guest responses, analytics, dan production hardening. Setiap slice wajib meninggalkan aplikasi dalam keadaan dapat diuji dan dibangun.
+## 2. Delivery Definition
 
-## 3. Proposed Architecture Decisions
+### 2.1 MVP Core Flow
 
-Keputusan berikut menjadi final hanya setelah plan disetujui.
+Target journey:
 
-| Area | Proposed decision | Rationale dan konsekuensi |
+> Pengunjung memilih template -> admin mengaktifkan order -> customer mengisi draft -> admin publish -> tamu membuka invitation dan memberikan respons.
+
+MVP wajib memiliki security/data-integrity minimum yang tidak aman ditunda:
+
+- Server-side validation, authentication, authorization, dan ownership checks.
+- Hashed single-use magic token, revocable database session, dan secure cookie.
+- Explicit state transitions, database constraints, atomic activation/publish, dan idempotency.
+- Template/content version pinning serta immutable current published snapshot.
+- Asset lifecycle, upload validation, cleanup, reference protection, dan 250 MB quota.
+- Automated tests untuk core rules dan core journey.
+
+MVP selesai pada development/staging. MVP belum dianggap siap menerima traffic publik.
+
+### 2.2 Production Readiness
+
+Phase ini menambahkan:
+
+- Security hardening, full authorization matrix, CSP/HSTS, audit, dan threat review.
+- Adaptive CAPTCHA serta production-grade abuse controls.
+- Advanced analytics dashboard dan query hardening.
+- Containerization, CI/deployment pipeline, Nginx, TLS, secret management, dan rollback.
+- Automated backup, off-host copy, restore drill, disk monitoring, health checks, dan alerting.
+- Customer PIN recovery hanya jika kebutuhan support terbukti.
+- Full browser/device/performance verification dan public-launch approval.
+
+## 3. Architecture Decisions
+
+Keputusan berikut proposed sampai plan disetujui.
+
+| Area | Decision | Delivery phase |
 |---|---|---|
-| Runtime | Node.js 22.12+ | Memenuhi requirement Prisma 7.6 dan berada pada jalur LTS |
-| Framework | Next.js 16.2.12 App Router, React 19.2.4 | Sudah menjadi baseline repository |
-| Database | PostgreSQL 18 current minor | Versi supported sampai November 2030; gunakan minor terbaru yang tersedia pada image production |
-| ORM | Prisma ORM 7.6 dengan `@prisma/adapter-pg` | Driver adapter wajib pada Prisma 7; migration production memakai `prisma migrate deploy` |
-| Application shape | Modular monolith | Satu deployable unit cukup untuk traffic MVP dan menghindari network boundary internal |
-| Data access | Server-only Data Access Layer dan minimal DTO | Authorization dekat source data; mencegah raw record atau secret masuk Client Components |
-| Mutation | Server Actions untuk form privat; Route Handlers untuk public endpoints, auth callback, upload, dan asset delivery | Mengikuti boundary App Router dan menghindari internal HTTP call dari Server Components |
-| Validation | Shared schema validation pada setiap external boundary | Client input, route params, FormData, dan provider response tidak dipercaya |
-| Session | Database-backed opaque sessions | Revocable, invitation/customer scoped, dan tidak membawa PII di cookie |
-| Email | Resend free plan melalui satu server-only mailer module | Free tier saat plan dibuat: 3.000 email/bulan dan 100/hari; domain pengirim wajib terverifikasi |
-| Analytics | First-party event table di PostgreSQL | Tanpa provider, tracking cookie, raw IP, atau external script; biaya tambahan nol |
-| Template | Registry source-controlled plus DB visibility override | Layout, palette, demo content, dan harga direview lewat code; admin hanya hide/unhide |
-| Invitation content | Relational envelope plus versioned JSON content | Section antar-template dapat berbeda tanpa membebaskan customer dari schema template |
-| Asset storage | Filesystem VPS pada `/srv/undango/assets` | Sesuai keputusan zero-additional-cost; memerlukan persistent volume, backup, dan disk monitoring |
-| Abuse protection | Nginx request limits, app rate limit, honeypot, dan Cloudflare Turnstile saat threshold terlewati | Layered protection tanpa Redis; Turnstile credential menjadi deployment prerequisite |
-| Deployment | Docker Compose, satu app instance, PostgreSQL, dan Nginx + Certbot | Reproducible, HTTPS gratis, persistent volume eksplisit, dan sesuai single-VPS scope |
-| Testing | Vitest + Testing Library; Playwright terhadap production build | Sesuai PRD dan dokumentasi Next.js 16; async Server Components diuji melalui E2E |
+| Runtime | Node.js 22.12+, Next.js 16.2.12 App Router, React 19.2.4 | MVP |
+| Database | PostgreSQL 18 current minor | MVP |
+| ORM | Prisma ORM 7.6 dengan `@prisma/adapter-pg`; production memakai `prisma migrate deploy` | MVP |
+| Shape | Modular monolith; satu Next.js app dan satu PostgreSQL database | MVP |
+| Data access | `server-only` DAL, authorization policy, dan minimal DTO | MVP |
+| Mutation | Server Actions untuk authenticated UI; Route Handlers untuk HTTP/public boundaries | MVP |
+| Validation | Shared schemas pada FormData, params, uploads, provider responses, dan public payload | MVP |
+| Customer auth | Single-use magic link -> revocable opaque database session 24 jam | MVP |
+| Admin auth | Email/password untuk dashboard admin -> revocable session 24 jam; no public registration | MVP |
+| Customer link delivery | Dashboard generates single-use link; admin copies and sends it manually through WhatsApp | MVP |
+| Recovery email | External email provider only if automated recovery is approved | Production Readiness, conditional |
+| Templates | Source-controlled version registry; breaking change membuat version baru | MVP |
+| Content | Mutable draft + one immutable current published snapshot; no full history | MVP |
+| Assets | Filesystem storage, explicit lifecycle, 250 MB ready quota per invitation | MVP |
+| Analytics | Basic first-party catalog/detail/palette/WhatsApp events, no PII/cookie/IP | MVP |
+| Abuse | Validation, basic rate limit, honeypot, idempotency | MVP |
+| Advanced analytics | Admin aggregates, date filters, query/index hardening | Production Readiness |
+| Adaptive abuse | Cloudflare Turnstile and operational security events | Production Readiness |
+| Deployment | Docker Compose, Nginx + Certbot, PostgreSQL private network | Production Readiness |
+| Operations | Backup, restore, disk monitoring, health, alerting, rollback | Production Readiness |
+| Testing | Vitest + Testing Library; Playwright against production build | MVP, expanded in Production Readiness |
 
-## 4. Architecture Boundaries
+## 4. Logical Application Boundaries
 
 ```mermaid
 flowchart TB
   Browser[Browser / WhatsApp WebView]
-  Nginx[Nginx + TLS + request limits]
-  Next[Next.js App Router]
+  App[Next.js App Router]
   Pages[Server Components]
   Actions[Server Actions]
   Routes[Route Handlers]
   DAL[server-only DAL + policies + DTOs]
-  DB[(PostgreSQL 18)]
-  Files[(VPS asset volume)]
-  Resend[Resend API]
-  Turnstile[Cloudflare Turnstile]
+  DB[(PostgreSQL)]
+  Files[(Asset filesystem)]
 
-  Browser --> Nginx
-  Nginx --> Next
-  Next --> Pages
-  Next --> Actions
-  Next --> Routes
+  Browser --> App
+  App --> Pages
+  App --> Actions
+  App --> Routes
   Pages --> DAL
   Actions --> DAL
   Routes --> DAL
   DAL --> DB
   DAL --> Files
-  Routes --> Resend
-  Routes --> Turnstile
 ```
 
-### 4.1 Route Groups
+Rules:
 
-| Route area | Purpose | Rendering/access |
-|---|---|---|
-| `src/app/(showroom)/` | Home, catalog, dan detail template | Public; Server Components dengan client islands untuk filter dan palette |
-| `src/app/admin/` | Order, customer, invitation, responses, dan metrics | Admin session; secure check di DAL setiap read/write |
-| `src/app/workspace/` | Customer form dan live preview | Customer session; ownership check pada setiap invitation operation |
-| `src/app/i/[slug]/` | Invitation final | Public hanya saat `published`; status lain memakai `notFound()` |
-| `src/app/auth/` | Magic-link confirmation/exchange, request PIN, verify PIN, logout | Public endpoints dengan rate limit dan generic responses |
-| `src/app/api/` | Analytics, guest responses, uploads, assets, dan provider callbacks | Explicit Route Handlers dengan validation dan policy per endpoint |
+- Server Components read directly through DAL; they do not call internal Route Handlers.
+- Server Actions and Route Handlers are public attack surfaces and repeat auth, authorization, ownership, and validation.
+- Prisma records never cross into Client Components; safe DTO/view models do.
+- `src/app` owns routing/composition. Domain code lives under `src/features/*`; shared server infrastructure under `src/lib/server/*`.
 
-`src/app` hanya menangani routing dan composition. Domain logic ditempatkan pada `src/features/*`; cross-domain infrastructure berada pada `src/lib/server/*` dan ditandai `server-only`.
+## 5. Data and Lifecycle Design
 
-### 4.2 Read and Write Rules
+### 5.1 Template Versioning
 
-- Server Components membaca langsung dari DAL, bukan memanggil Route Handler milik aplikasi sendiri.
-- Server Actions tipis: parse input, panggil domain/DAL, lalu revalidate atau redirect.
-- Route Handlers dipakai ketika browser atau external service memerlukan HTTP contract.
-- Setiap Server Action dan Route Handler mengulang authentication, authorization, validation, dan ownership check.
-- DTO hanya membawa field yang dibutuhkan UI; Prisma records tidak diteruskan utuh ke Client Components.
+Each source-controlled template version exposes:
 
-## 5. Domain and Data Plan
+- `templateKey`
+- `templateVersion`
+- `contentSchemaVersion`
+- Stable palette keys and semantic tokens
+- Content validation schema
+- Capability set and demo content
+- Renderer for that exact version
 
-### 5.1 Source-Controlled Template Registry
+Invitation and published snapshot persist all four identity fields: `templateKey`, `templateVersion`, `contentSchemaVersion`, and `paletteKey`.
 
-Setiap template menyediakan contract berikut:
+Rules:
 
-- Stable `templateKey`, slug, category, price, display metadata, dan demo content.
-- Daftar palette dengan stable `paletteKey` dan semantic color tokens.
-- Validation schema untuk `InvitationContent` yang didukung template.
-- Renderer yang menerima normalized invitation view model.
-- Metadata capability, misalnya gallery, story, music, gift, atau multi-event.
+- Non-breaking visual fix may update existing version only when output contract and content interpretation stay compatible.
+- Any breaking layout/content/schema change creates a new template or schema version.
+- A version referenced by any non-deleted invitation or published snapshot cannot be removed.
+- Full content migration tooling is deferred; old renderer versions remain available.
 
-Database hanya menyimpan visibility override berdasarkan `templateKey`. Order menyimpan snapshot nama template, palette, harga, dan batas foto agar perubahan registry tidak mengubah transaksi lama.
+### 5.2 Draft and Published Snapshot
 
-### 5.2 Relational Entities
+```mermaid
+flowchart LR
+  Draft[Mutable draft + contentVersion]
+  Publish[Admin publish transaction]
+  Snapshot[Current PublishedSnapshot]
+  Public[Public /i/slug]
+
+  Draft --> Publish
+  Publish --> Snapshot
+  Snapshot --> Public
+```
+
+- Workspace always reads/writes draft.
+- Initial publish atomically creates/replaces one `PublishedSnapshot` and locks editing access.
+- Admin can reopen editing while Invitation remains `published`; old snapshot remains public.
+- Republish atomically replaces current snapshot and locks editing again.
+- Explicit unpublish changes status to `draft` and takes public route offline.
+- No prior snapshot history or rollback UI in MVP.
+
+Published snapshot includes content and referenced asset IDs. Asset files referenced by current snapshot cannot be removed even if removed from draft; cleanup happens only after republish/archive makes them unreferenced.
+
+### 5.3 Order and Invitation State
+
+Order states:
+
+```text
+pending -> paid -> activated
+pending -> cancelled
+paid -> refunded
+activated -> refunded
+```
+
+Invitation states:
+
+```text
+draft -> published
+published -> published  (republish current snapshot)
+published -> draft      (explicit unpublish)
+draft|published -> archived
+```
+
+Editing access is separate from Invitation status. Only admin can change editing access or public status.
+
+### 5.4 Database Enforcement
+
+Application policies and PostgreSQL protection both apply:
+
+- Unique `Invitation.orderId` guarantees one order activates at most one invitation.
+- Unique normalized invitation slug.
+- PostgreSQL enums/checks constrain known states and nonnegative content/storage versions.
+- Transition triggers reject disallowed Order/Invitation state changes.
+- Activation transaction locks paid Order, inserts Invitation idempotently, and sets Order `activated`; database trigger rejects non-paid activation.
+- Draft save uses compare-and-swap `WHERE contentVersion = expectedVersion`.
+- Publish transaction validates draft, replaces snapshot, updates status/lock, and commits atomically.
+- Guest submissions use client-generated idempotency key with invitation-scoped unique constraint.
+
+### 5.5 Core Entities
 
 ```mermaid
 erDiagram
   Customer ||--o{ Order : places
   Customer ||--o{ Invitation : owns
   Order ||--o| Invitation : activates
-  Invitation ||--|| InvitationContent : contains
+  Invitation ||--|| InvitationContent : has_draft
+  Invitation ||--o| PublishedSnapshot : publishes
   Invitation ||--o{ Asset : owns
+  PublishedSnapshot }o--o{ Asset : references
   Invitation ||--o{ RSVP : receives
   Invitation ||--o{ Wish : receives
   Customer ||--o{ Session : authenticates
   Customer ||--o{ MagicLink : receives
-  Customer ||--o{ EmailPin : receives
-  Invitation ||--o{ AuditEvent : records
-  Invitation ||--o{ AnalyticsEvent : measures
-  TemplateVisibilityOverride }o--|| TemplateRegistryKey : overrides
+  Admin ||--o{ Session : authenticates
 ```
 
-Core persistence rules:
+## 6. Authentication Plan
 
-- Money disimpan sebagai integer Rupiah, bukan floating point.
-- Semua timestamps disimpan UTC; event timezone disimpan sebagai IANA timezone.
-- `InvitationContent` memakai JSON dengan schema version dan integer `version` untuk optimistic concurrency.
-- Save memakai compare-and-swap terhadap `version`; stale write menghasilkan conflict, bukan silent overwrite.
-- Slug unik, normalized, dan tidak dapat menunjuk invitation non-published melalui public query.
-- Auth token, magic link, dan PIN disimpan sebagai hash; raw value hanya dikirim ke pemilik.
-- Delete wish memerlukan confirmation dan audit event; hard-delete policy diputuskan dalam ADR sebelum task tersebut.
+### 6.1 Session
 
-### 5.3 Lifecycle Policies
-
-- Order transition diimplementasikan sebagai allowlist, bukan arbitrary status assignment.
-- Hanya Order `paid` dapat menghasilkan Invitation `activated`.
-- Hanya admin dapat mengubah Invitation menjadi `published` atau `archived`.
-- Customer dapat save pada Invitation `published`; first save per workspace visit meminta warning dan hasil sukses langsung direvalidate pada public route.
-- Archive menutup public route dan customer access sampai admin mengaktifkan kembali akses.
-
-## 6. Authentication and Authorization Plan
-
-### 6.1 Session Model
-
-- Browser menerima random opaque session token melalui cookie `HttpOnly`, `Secure`, `SameSite=Lax`, `Path=/`, TTL 24 jam.
-- Database menyimpan hash token, actor type, actor ID, expiry, revoked timestamp, dan last-used timestamp.
-- Customer session memberi akses ke invitation milik customer dengan workspace access aktif.
-- Admin session memerlukan actor ber-role `admin`; role selalu dibaca ulang dari database pada secure operation.
-- Logout atau admin revoke menandai session revoked dan menghapus cookie.
+- Raw opaque session token contains at least 256 bits entropy.
+- Browser stores raw token in `HttpOnly`, `Secure` outside localhost, `SameSite=Lax`, `Path=/` cookie.
+- Database stores token hash, actor type/ID, expiry, revoke time, and last-used time.
+- Every protected read/write revalidates session and ownership/role through DAL.
+- Logout and admin revoke invalidate server record and cookie.
 
 ### 6.2 Customer Magic Link
 
-- Raw token memiliki entropy minimal 256 bit; database menyimpan hash, customer ID, expiry 24 jam, dan revoke timestamp.
-- Link reusable sesuai PRD sampai expiry atau revoke; replay risk didokumentasikan dan link dapat di-rotate.
-- GET hanya menampilkan confirmation page tanpa membuat session; explicit POST exchange membuat session 24 jam agar email link scanner tidak memicu login.
-- Confirmation memakai `Referrer-Policy: no-referrer`, mengganti URL setelah exchange, dan route token dikecualikan dari reverse-proxy access log.
-- Raw token tidak boleh masuk application log, analytics, audit event, atau error response.
+- Token is single-use, hashed at rest, expires after 24 hours, and can be revoked before use.
+- Admin copies the generated link from dashboard and sends it manually through WhatsApp; no email provider is required for MVP.
+- GET shows confirmation only; POST exchange atomically consumes token and creates session.
+- Concurrent/replayed POST produces exactly one session success.
+- Confirmation uses `Referrer-Policy: no-referrer`; raw token is excluded from app logs, analytics, audit payload, and later production proxy logs.
+- If expired/used, admin issues a new link. Customer PIN recovery is not MVP.
 
-### 6.3 Email PIN Recovery
+### 6.3 Admin Login
 
-- Request menerima email normalized dan selalu memberi response generik.
-- PIN 6 digit disimpan hashed, berlaku 10 menit, maksimal 5 percobaan per 15 menit, dan PIN lama invalid saat PIN baru diterbitkan.
-- Email dikirim melalui Resend menggunakan verified domain, idempotency key, dan tanpa PII pada provider tags.
-- Verifikasi sukses mencabut PIN dan membuat session 24 jam.
+- This login exists only for the admin dashboard. Admin does not log in to customer workspace and edits customer invitations through admin routes.
+- Admin email is unique and normalized; there is no public admin registration.
+- Password length is 12-128 characters and only an Argon2id hash is stored. Plaintext password never enters repository, logs, analytics, or audit payloads.
+- Login response is generic and limited to 5 failed attempts per 15 minutes per account/network key.
+- Successful verification creates revocable admin session 24 hours; secure operations re-read active admin role from database.
+- MVP password reset is an authenticated operator procedure. Public forgot-password and email recovery are deferred.
 
-### 6.4 Admin Authentication
-
-PRD tidak menetapkan admin login. Plan mengusulkan email PIN yang sama tetapi hanya untuk email pada tabel Admin yang sudah di-seed. Admin tidak mendapat reusable magic link. Bootstrap admin pertama dilakukan melalui deployment seed dengan email dari secret environment.
-
-## 7. Invitation Rendering Plan
-
-Satu renderer digunakan oleh tiga context:
-
-1. Demo preview showroom memakai demo content dari registry.
-2. Live preview workspace memakai unsaved client state yang sudah divalidasi.
-3. Invitation publik memakai persisted content dari safe DTO.
-
-Renderer menerima `InvitationViewModel`, bukan Prisma entity. Context hanya mengontrol mode, interactivity, dan data source. Template tidak boleh melakukan query database sendiri. Client Components dibatasi pada palette switcher, workspace form/preview bridge, countdown, gallery interaction, audio control, RSVP, dan wishes.
-
-Initial launch memakai minimum tiga template. Nama, cultural direction, visual reference, typography license, dan asset license menjadi pre-implementation product checkpoint.
-
-## 8. Asset Plan
-
-### 8.1 Filesystem Layout
+## 7. Asset Lifecycle
 
 ```text
-/srv/undango/assets/<invitationId>/<assetId>/original
-/srv/undango/assets/<invitationId>/<assetId>/display.webp
-/srv/undango/assets/<invitationId>/<assetId>/thumbnail.webp
-/srv/undango/backups/postgres/
-/srv/undango/backups/assets/
+pending -> processing -> ready
+pending|processing -> failed
+ready|failed -> deleted
 ```
 
-Rules:
+Upload flow:
 
-- Database ID menjadi public identifier; filesystem path tidak pernah diterima dari client.
-- Upload masuk temporary directory, diverifikasi magic bytes, size, dimensions/duration, lalu dipindah atomic.
-- Foto dinormalisasi ke WebP display/thumbnail; original dipertahankan hanya jika diperlukan oleh kebijakan yang disetujui.
-- Draft asset hanya dilayani setelah ownership check; published asset hanya dilayani jika parent invitation published.
-- HTTP response menetapkan safe content type, `nosniff`, disposition yang sesuai, dan cache policy berdasarkan status invitation.
-- Upload baru ditolak saat disk usage mencapai 90%; warning operasional pada 70% dan critical alert pada 85%.
+1. Create `pending` Asset row and temporary path.
+2. Stream upload with request/file-size limit.
+3. Verify magic bytes, image dimensions or audio duration, and invitation ownership.
+4. Move to `processing`; create normalized variants in temporary location.
+5. Atomically move final files and set `ready` with exact byte size.
+6. On failure, set `failed` and idempotently remove temporary/partial files.
 
-### 8.2 Backup
+Limits:
 
-- Nightly `pg_dump` dan asset snapshot disimpan lokal dengan retensi tujuh backup harian.
-- Satu backup terenkripsi disalin mingguan ke mesin milik owner di luar VPS tanpa layanan berbayar tambahan.
-- Restore drill dilakukan sebelum launch dan bulanan setelah launch.
-- Backup pada VPS yang sama tidak dianggap perlindungan terhadap kehilangan server; off-host copy wajib sebelum production launch.
+- Image: JPEG/PNG/WebP, 10 MB upload, max 2560 px processed dimension.
+- Audio: MP3/M4A, 15 MB, max 10 minutes.
+- Photo count: order snapshot.
+- Total `ready` bytes: 250 MB per invitation.
+- Only `ready` assets may enter draft/published content.
+- Asset referenced by current published snapshot cannot transition to physically deleted.
 
-## 9. Analytics Plan
+MVP includes request-time cleanup and retryable cleanup command for stale temporary/failed assets. Scheduled cleanup, disk alerts, and host-level monitoring are Production Readiness.
 
-Analytics dibuat first-party agar zero-cost dan tidak mengirim PII ke pihak ketiga.
+## 8. Analytics Split
 
-- Browser mengirim allowlisted event melalui same-origin `sendBeacon` atau keepalive fetch.
-- Server mengabaikan payload property yang tidak ada pada contract.
-- Tidak ada tracking cookie, fingerprint, raw IP, email, nomor telepon, nama tamu, atau content ucapan.
-- Event memiliki type, occurredAt, template/invitation internal ID bila relevan, palette ID, price tier, actor role, dan result allowlist.
-- Admin dashboard menghitung aggregate funnel dari SQL query.
-- Raw event tidak memiliki auto-expiry pada MVP; ukuran tabel menjadi monitored operational risk.
-- Setelah 30 hari production, owner menetapkan target conversion dan delivery berdasarkan baseline.
+### MVP
 
-## 10. Abuse Protection Plan
+- Store basic first-party events needed to validate showroom conversion: catalog viewed, detail viewed, palette selected, and WhatsApp clicked.
+- Allowlisted properties only; no cookie, fingerprint, raw IP, email, guest name, or content.
+- Analytics failure never blocks primary CTA.
 
-- Nginx membatasi body size, connection rate, dan request rate pada auth, RSVP, wish, upload, dan analytics routes.
-- Aplikasi menerapkan per-route rate bucket untuk auth dan public writes; identifier memakai HMAC dari IP dan rotating server secret, bukan raw IP.
-- Form RSVP dan wish memakai honeypot serta minimum-fill-time check.
-- Setelah threshold mencurigakan, response meminta Cloudflare Turnstile token; server memverifikasi token sebelum write.
-- Duplicate UI submit diblokir; idempotency key diterapkan pada email dan guest write yang dapat di-retry.
-- Security events menyimpan event type, timestamp, route, dan pseudonymous rate key tanpa payload user.
+### Production Readiness
 
-## 11. Deployment Plan
+- Add admin metrics dashboard, date ranges, activation/publish durations, guest engagement, query indexes, and table-growth policy.
+- Establish 30-day baseline, then product owner sets target conversion and delivery metrics.
 
-### 11.1 Topology
+## 9. Abuse and Security Split
+
+### MVP Minimum
+
+- Server validation and output encoding.
+- Ownership/role checks at DAL boundary.
+- Basic rate limits for admin password login, magic exchange, RSVP, wish, analytics, and upload.
+- Honeypot/minimum-fill-time for guest forms.
+- Idempotency for activation, publish, guest writes, and email send retry.
+- Safe structured errors and no secret/PII logging.
+
+### Production Readiness
+
+- Nginx connection/body/rate limits.
+- HMAC pseudonymous rate identifiers and security event retention.
+- Cloudflare Turnstile escalation for suspicious traffic.
+- CSP, HSTS, permissions/referrer/frame/content-type policies.
+- Full authorization matrix, dependency audit, threat review, and penetration-style abuse tests.
+
+## 10. Production Topology
+
+Production topology is planned now but implemented only in Phase 2.
 
 ```mermaid
 flowchart LR
-  Internet --> Nginx
+  Internet --> Nginx[Nginx + TLS]
   Nginx --> App[Next.js Node 22]
   App --> Postgres[(PostgreSQL 18)]
   App --> Volume[(Asset volume)]
-  App --> Resend
   App --> Turnstile
 ```
 
-- Docker Compose menjalankan satu app instance dan PostgreSQL pada private network.
-- Nginx menjadi satu-satunya public ingress; PostgreSQL tidak mengekspos port publik.
-- Certbot menyediakan dan memperbarui TLS certificate.
-- Secrets berada pada file environment VPS mode `0600`, tidak dalam image atau repository.
-- Health endpoint memeriksa process readiness; database check terpisah dari liveness.
+- Docker Compose runs one app instance and PostgreSQL on a private network.
+- Nginx is the only public ingress; Certbot handles TLS.
+- Persistent volumes store database and `/srv/undango/assets`.
+- Secrets live only on VPS with restricted permissions.
+- Release applies backup, `prisma migrate deploy`, app start/readiness, smoke test, and image rollback.
+- Database migrations are forward-only; destructive changes use expand-contract steps.
 
-### 11.2 Release Sequence
+## 11. Backup and Operations
 
-1. Jalankan `pnpm install --frozen-lockfile`, lint, unit/integration tests, production build, dan E2E.
-2. Build immutable app image tagged dengan Git commit SHA.
-3. Backup database dan asset metadata.
-4. Jalankan `pnpm exec prisma migrate deploy` sebagai one-off job.
-5. Start image baru, tunggu readiness, lalu lakukan smoke test.
-6. Jika app gagal, rollback image. Database migration bersifat forward-only; destructive change wajib memakai expand-contract migration terpisah.
+Production Readiness target:
 
-Repository belum memiliki remote atau commit. Transport image dan CI automation belum dapat difinalkan. Proposed MVP path: buat private GitHub remote, gunakan GitHub Actions free tier untuk quality gates, lalu deploy via SSH ke VPS. Ini memerlukan approval akun/remote pada plan review.
+- Nightly `pg_dump` plus asset snapshot, seven daily local copies.
+- Weekly encrypted off-host copy to owner-controlled machine.
+- Restore drill before public launch and monthly after launch.
+- Disk warning at 70%, critical at 85%, and new upload block at 90%.
+- Separate liveness/readiness checks and operational alerts.
+- Backup on same VPS alone does not satisfy launch gate.
 
 ## 12. Dependency Graph
 
 ```mermaid
 flowchart TD
-  A[Plan approved] --> B[ADRs]
-  B --> C[Test harness]
-  B --> D[Prisma + PostgreSQL foundation]
-  C --> E[Domain policies]
-  D --> E
-  E --> F[Template registry + shared renderer]
-  F --> G[Showroom catalog/detail/palette]
-  G --> H[WhatsApp CTA + analytics intake]
-  E --> I[Mailer + sessions + admin auth]
-  I --> J[Order operations + activation]
-  J --> K[Customer magic link + PIN]
-  F --> L[Workspace forms + live preview]
+  A[Plan approved] --> B[MVP foundations]
+  B --> C[Versioned templates + renderer]
+  C --> D[Showroom + WhatsApp]
+  B --> E[Admin auth + orders]
+  E --> F[Paid activation + single-use link]
+  C --> G[Draft workspace]
+  F --> G
+  G --> H[Asset lifecycle]
+  H --> I[Published snapshot + locking]
+  I --> J[Public invitation]
+  J --> K[RSVP + wishes]
+  D --> L[MVP core-flow verification]
   K --> L
-  L --> M[Asset uploads + published edit warning]
-  J --> N[Admin publish]
-  M --> O[Public invitation]
-  N --> O
-  O --> P[RSVP + wishes]
-  P --> Q[Response management + analytics dashboard]
-  H --> Q
-  Q --> R[Security hardening]
-  R --> S[VPS deployment + backup]
-  S --> T[Full E2E + release review]
+
+  L --> M[Production analytics]
+  L --> N[Adaptive abuse + security hardening]
+  L --> O[Container + deployment]
+  O --> P[TLS + backup + monitoring]
+  M --> Q[Public launch verification]
+  N --> Q
+  P --> Q
 ```
 
-## 13. Delivery Phases
+## 13. Task Map
 
-Detailed acceptance criteria, verification commands, dependencies, and file scope live in `tasks/todo.md`.
+Detailed acceptance criteria and verification commands live in `tasks/todo.md`.
 
-### Phase A: Architecture and Foundation
+### Phase 1 - MVP Core Flow
 
-- Tasks 1-4: ADRs, test harness, Prisma runtime, and core schema/policies.
-- Goal: reproducible quality gates and executable domain foundation.
+| Workstream | Tasks | Outcome |
+|---|---|---|
+| Foundation | `MVP-01` - `MVP-04` | ADRs, test harness, Prisma, constrained core schema |
+| Showroom | `MVP-05` - `MVP-11` | Three versioned templates, catalog/detail/palette, WhatsApp, basic events |
+| Operations | `MVP-12` - `MVP-18` | Admin credential/session, customers/orders, activation, manual WhatsApp single-use access |
+| Workspace | `MVP-19` - `MVP-24` | Versioned draft forms, preview, image/music asset lifecycle |
+| Publish and guests | `MVP-25` - `MVP-29` | Snapshot publish/republish, locked editing, public route, RSVP/wishes management |
+| MVP acceptance | `MVP-30` | Entire core journey passes on development/staging |
 
-### Checkpoint A
+### MVP Gate
 
-- Unit test, lint, type validation, and build pass.
-- Migration applies to empty PostgreSQL and test database.
-- Human reviews schema, auth threat model, and external dependency list.
+- Core journey passes Playwright and focused integration tests.
+- Database constraints, template pinning, snapshot isolation, auth replay defense, asset cleanup/quota, and guest idempotency pass.
+- Three templates pass mobile/desktop visual and license review.
+- `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm test:integration`, `pnpm build`, and MVP E2E pass.
+- Human marks MVP validated. Public launch remains blocked.
 
-### Phase B: Showroom Vertical Slice
+### Phase 2 - Production Readiness
 
-- Tasks 5-11: launch collection, shared renderer, three templates, catalog, detail, palette, WhatsApp CTA, and analytics intake.
-- Goal: visitor can browse realistic templates and open contextual WhatsApp message without login.
+| Workstream | Tasks | Outcome |
+|---|---|---|
+| Product operations | `PR-01` - `PR-02` | Advanced analytics and conditional customer recovery |
+| Security | `PR-03` - `PR-04` | Adaptive abuse controls and complete hardening |
+| Deployment | `PR-05` - `PR-07` | Containers, CI/release pipeline, Nginx/TLS |
+| Reliability | `PR-08` - `PR-09` | Backup/restore, disk/health monitoring, alerts |
+| Launch | `PR-10` - `PR-11` | Browser/device/performance verification and public-launch gate |
 
-### Checkpoint B
+### Production Readiness Gate
 
-- Showroom journey passes desktop/mobile Playwright smoke test.
-- Three templates pass visual review and licensing check.
-- Analytics records only allowlisted non-PII fields.
-
-### Phase C: Admin Operations and Activation
-
-- Tasks 12-18: mailer, admin auth, admin shell, template visibility, customer/order operations, transitions, activation, and access link.
-- Goal: admin can turn a paid manual order into an activated private workspace.
-
-### Checkpoint C
-
-- Unauthorized admin requests fail server-side.
-- Price and gallery snapshots survive template changes.
-- Paid-to-activation flow passes integration and E2E tests.
-
-### Phase D: Customer Workspace
-
-- Tasks 19-27: customer auth, PIN recovery, versioned content, forms, assets, music, and direct-live edit warning.
-- Goal: customer can safely complete and revise invitation without design freedom outside template contract.
-
-### Checkpoint D
-
-- Cross-customer access and stale writes are rejected.
-- Upload validation and disk guard tests pass.
-- Workspace save/refresh/live-preview journey passes on mobile viewport.
-
-### Phase E: Publish and Guest Experience
-
-- Tasks 28-32: admin publish, public rendering, RSVP, wishes, and response management.
-- Goal: only published invitations are public; guests can respond safely.
-
-### Checkpoint E
-
-- Non-published slugs return indistinguishable not-found responses.
-- Published invitation remains readable without audio/animation.
-- RSVP/wish abuse and ownership tests pass.
-
-### Phase F: Metrics, Hardening, and Deployment
-
-- Tasks 33-39: metrics dashboard, adaptive abuse protection, security review, Docker, Nginx/TLS, backup/restore, and release verification.
-- Goal: operable MVP on one VPS with measurable funnel and tested recovery.
-
-### Checkpoint F
-
-- Full lint, unit, integration, build, and Playwright suite pass.
-- Security checklist has no unmitigated critical/high issue.
-- Backup restore drill and rollback drill succeed.
-- Human approves production launch separately.
+- No unresolved reachable critical/high security issue.
+- TLS, secret management, backup restore, disk alerts, health checks, deployment, and rollback drills pass.
+- Adaptive abuse controls work with provider failure handling.
+- Full supported-browser/device suite passes against production-like deployment.
+- Human explicitly approves public launch.
 
 ## 14. Parallelization
 
-Safe after shared contracts are approved:
+Safe after shared contracts:
 
-- Template 2 and Template 3 can proceed in parallel after Template 1 establishes renderer contract.
-- Showroom UI and mailer module can proceed in parallel after foundation.
-- RSVP and wish slices can proceed in parallel after public invitation and shared guest-write policy.
-- Deployment docs can be drafted while feature slices run, but deployment execution waits for hardening.
+- `MVP-09` and `MVP-10` can run in parallel after first renderer contract.
+- Showroom UI and admin-auth foundation can run in parallel after schema foundation.
+- RSVP and wishes can run in parallel after public snapshot route.
+- `PR-01`, `PR-03`, and `PR-05` can begin independently after MVP Gate.
 
-Must remain sequential:
+Sequential requirements:
 
 - Prisma migrations touching same schema.
-- Auth/session foundation before protected admin or workspace routes.
-- Activation before customer access.
-- Workspace renderer contract before public renderer finalization.
-- Database migration before app release using that schema.
-
-Needs coordination:
-
-- Shared `InvitationViewModel` changes across showroom, workspace, and public invitation.
-- Template registry keys referenced by order snapshots.
-- Analytics event contract shared by browser sender and admin aggregates.
-- Asset policy shared by upload, workspace preview, and public delivery.
+- Template version contract before any template implementation.
+- Admin auth before protected order operations.
+- Paid activation before customer access.
+- Draft/asset model before published snapshot.
+- MVP Gate before any Production Readiness task is considered required.
+- Deployment foundation before TLS, backup, and production smoke tests.
 
 ## 15. Risks and Mitigations
 
-| Risk | Impact | Mitigation |
+| Risk | Phase | Mitigation |
 |---|---|---|
-| Reusable magic link leaked during 24-hour TTL | High | Strong random token, hash at rest, HTTPS, no logs, admin revoke/rotate, visible active-access controls |
-| Custom passwordless auth defects | High | Database sessions, isolated auth module, threat-model ADR, strict rate limits, focused integration/E2E security tests |
-| Customer edit immediately changes published invitation | High | Explicit warning, optimistic concurrency, audit event, atomic save, quick admin archive/revoke path |
-| Filesystem VPS loss | High | Persistent volume, nightly backup, mandatory weekly encrypted off-host copy, restore drill |
-| Disk exhaustion from unlimited lifetime | High | Per-order photo cap, upload normalization, 70/85/90 percent thresholds, admin storage report |
-| Public RSVP/wish spam | High | Nginx + app rate limits, honeypot, Turnstile escalation, strict validation, hide/delete controls |
-| Cultural template quality or asset licensing failure | High | Human visual review and license record before each template is accepted |
-| Prisma/PostgreSQL incompatibility | Medium | Compatibility smoke test before schema work; pin exact versions and current minor |
-| Resend free quota or provider outage | Medium | Usage monitoring, idempotent send, clear retry/support state, mailer boundary for later replacement |
-| First-party analytics adds database write load | Medium | Allowlist, compact rows, index only query dimensions, monitor table growth, batch/async only after evidence |
-| Single VPS downtime | Medium | Health checks, restart policy, documented restore/rollback; high availability explicitly outside MVP |
-| Migration rollback impossible | Medium | Forward-only expand-contract changes, pre-migration backup, image rollback, restore only as emergency |
-| Scope expansion across four products surfaces | High | Vertical slices, three-template minimum, task file cap, PRD boundaries, checkpoint approvals |
+| Template code changes break active invitation | MVP | Pin template/schema version; retain old renderer; breaking changes create new version |
+| Magic link replay | MVP | Single-use atomic consume, hash at rest, expiry/revoke, no token logs |
+| Published invitation changes during customer edit | MVP | Separate draft/current snapshot; public reads snapshot only; admin republish atomically |
+| Order activated twice or from wrong state | MVP | Unique order relation, locked transaction, DB trigger, idempotency key |
+| DB and filesystem diverge | MVP | Asset state machine, temp paths, atomic rename, failure cleanup, reconciliation tests |
+| VPS storage growth | MVP/PR | 250 MB quota in MVP; disk monitoring and upload block in PR |
+| Public spam | MVP/PR | Basic rate/honeypot in MVP; Turnstile and proxy limits in PR |
+| Admin password compromise or auth defect | MVP | Argon2id, 12-character minimum, generic errors, rate limits, database sessions, and focused tests |
+| Data loss | PR | Automated local/off-host backup and restore drills before launch |
+| Single VPS downtime | PR | Health/restart/rollback procedures; HA remains outside current plan |
+| Scope creep | Both | Explicit task prefixes, MVP Gate, PR Gate, <=5 files per task |
 
-## 16. Phase 2 Decisions Requiring Human Confirmation
+## 16. Inputs Required Before Tasks
 
-Plan approval confirms proposed architecture and assigns these prerequisites:
-
-| Decision/input | Proposed/default | Required before |
+| Input | Default/proposal | Required before |
 |---|---|---|
-| Launch template concepts | Three templates minimum; concepts and references selected by product owner | Task 5 |
-| Admin identity | Seed one or more admin emails from deployment secret | Task 13 |
-| Production domain | One app domain plus verified Resend sender domain | Task 12 and Task 37 |
-| VPS baseline | Linux x86_64, minimum 2 vCPU, 4 GB RAM, 40 GB persistent disk | Task 36 |
-| Off-host backup target | Encrypted weekly copy to owner-controlled machine | Task 38 |
-| Git remote and CI | Private GitHub repository and GitHub Actions free tier; Task 2 tetap dapat menjalankan gates secara lokal | Task 36 |
-| CAPTCHA | Cloudflare Turnstile free tier | Task 34 |
-| Wish delete semantics | Proposed hard delete after explicit confirmation plus retained audit event without content | Task 31 |
+| Launch template concepts | Three concepts with visual references and licenses | `MVP-05` |
+| Initial admin credential | One owner-controlled email; password supplied interactively/operator secret and hashed before storage | `MVP-12` |
+| Wish delete semantics | Hard delete content after explicit confirmation; retain content-free audit event | `MVP-28` |
+| Customer recovery evidence | Admin-issued WhatsApp magic link remains default; automated email recovery only if measured need | `PR-02` |
+| VPS baseline | Linux x86_64, 2 vCPU, 4 GB RAM, 40 GB disk | `PR-05` |
+| Git remote/CI | Private GitHub repository and GitHub Actions free tier | `PR-06` |
+| Production domain | One app domain with DNS access | `PR-07` |
+| Turnstile | Cloudflare Turnstile free tier | `PR-03` |
+| Off-host backup target | Encrypted copy to owner-controlled machine | `PR-08` |
 
 ## 17. Verification Sources
 
-Planning used repository state and current documentation:
-
-- Local Next.js 16.2.12 docs: project structure, mutation, Route Handlers, authentication, data security, analytics, testing, self-hosting, environment variables, and production checklist.
-- Prisma ORM 7.6 documentation: Node.js `^20.19 || ^22.12 || >=24`, required PostgreSQL driver adapter, singleton connection reuse, and production `prisma migrate deploy`.
-- PostgreSQL official support policy current 2 August 2026: PostgreSQL 18 supported through November 2030.
-- Resend official pricing and Next.js guide current 2 August 2026: free plan 3.000 email/month, 100/day, verified domain and API key required.
+- Local Next.js 16.2.12 docs: project structure, mutations, Route Handlers, auth, data security, analytics, testing, self-hosting, environment variables, and production checklist.
+- Prisma ORM 7.6 docs: Node.js requirement, PostgreSQL driver adapter, connection reuse, and `prisma migrate deploy`.
+- PostgreSQL support policy current 2 August 2026: PostgreSQL 18 supported through November 2030.
 
 ## 18. Approval Gate
 
-Before Phase 3 task execution:
-
-- [ ] Human approves architecture decisions and residual risks.
-- [ ] Human answers or accepts defaults in Section 16.
-- [ ] `tasks/todo.md` task order and scope are approved.
-- [ ] Plan status changes from `Draft` to `Approved` with reviewer and date.
-- [ ] No implementation task starts before all checks above pass.
+- [x] Human approves two-phase split and architecture decisions.
+- [x] Human accepts defaults in Section 16.
+- [x] Human approves task scopes/order in `tasks/todo.md`.
+- [x] Plan status is `Approved` with reviewer/date.
+- [x] Implementation remains paused until product owner gives a separate explicit start instruction.

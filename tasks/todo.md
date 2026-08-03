@@ -1,737 +1,415 @@
-# Task List: MVP Undango
+# Task List: Undango
 
-**Status:** Blocked - menunggu approval `tasks/plan.md`  
-**Specification:** [`docs/PRD.md`](../docs/PRD.md) v0.2 Approved  
-**Plan:** [`tasks/plan.md`](./plan.md) Draft  
+**Status:** Approved scope - execution paused by product owner  
+**Specification:** [`docs/PRD.md`](../docs/PRD.md) v0.4 Approved  
+**Plan:** [`tasks/plan.md`](./plan.md) v0.3 Approved  
 
-Tidak ada task implementasi yang boleh dimulai sebelum plan dan task list disetujui. Checklist ini mendefinisikan Phase 3, bukan memberikan authorization untuk mengubah kode.
+Task prefix menunjukkan delivery gate:
+
+- `MVP-*`: wajib untuk memvalidasi core flow pada development/staging.
+- `PR-*`: dikerjakan setelah MVP Gate untuk membuat aplikasi layak public launch.
+
+Plan dan task list sudah disetujui. Tidak ada task implementation yang boleh dimulai sampai product owner memberikan instruksi start development secara eksplisit.
 
 ## Definition of Done
 
-Setiap task implementasi dianggap selesai hanya jika:
+- Acceptance criteria task terpenuhi dan focused tests ditulis lebih dulu.
+- Authorization, validation, ownership, state transition, dan error handling diverifikasi server-side.
+- Perubahan maksimal sekitar lima file/path; task dipecah jika scope nyata lebih besar.
+- Focused tests, lint, typecheck, dan build tetap lulus.
+- PRD/plan/ADR diperbarui lebih dulu jika keputusan berubah.
 
-- Acceptance criteria task terpenuhi.
-- Focused test ditulis lebih dulu dan lulus.
-- `pnpm lint`, `pnpm test`, dan `pnpm build` tetap lulus; `pnpm test:e2e` dijalankan pada checkpoint terkait.
-- Tidak ada authorization, validation, secret, PII, atau error detail yang hanya dilindungi client-side.
-- Perubahan maksimal sekitar lima file; task dipecah lagi bila scope nyata lebih besar.
-- PRD, plan, dan ADR diperbarui lebih dulu jika keputusan berubah.
+# Phase 1: MVP Core Flow
 
-## Phase A: Architecture and Foundation
+## MVP Foundation
 
-### Task 1: Record approved architecture decisions
+### MVP-01: Record MVP architecture ADRs
 
-**Description:** Setelah plan disetujui, tulis ADR untuk modular monolith/DAL, passwordless database sessions, source-controlled templates plus filesystem assets, serta single-VPS deployment.
-
-**Acceptance criteria:**
-- [ ] Empat ADR berstatus Accepted dan merekam context, decision, alternatives, consequences, serta risk.
-- [ ] ADR tidak mengubah keputusan PRD atau plan tanpa approval baru.
-- [ ] Setiap keputusan implementation yang mahal dibalik memiliki owner jelas.
-
-**Verification:**
-- [ ] `git diff --check` lulus.
-- [ ] Manual review: ADR konsisten dengan `docs/PRD.md` dan `tasks/plan.md`.
-
+**Acceptance:** ADR merekam application boundaries, versioned templates/snapshot, customer magic-link auth, admin password auth, lifecycle constraints, dan asset lifecycle; seluruhnya konsisten dengan PRD v0.4.  
+**Verify:** `git diff --check`; human ADR review.  
 **Dependencies:** Plan approved  
-**Files likely touched:** `docs/decisions/0001-application-boundaries.md`, `docs/decisions/0002-passwordless-auth.md`, `docs/decisions/0003-template-and-asset-storage.md`, `docs/decisions/0004-vps-deployment.md`  
-**Estimated scope:** Medium, 4 files
+**Likely files:** `docs/decisions/0001-application-boundaries.md`, `docs/decisions/0002-template-snapshot.md`, `docs/decisions/0003-passwordless-auth.md`, `docs/decisions/0004-lifecycle-and-assets.md`  
+**Scope:** Medium, 4 files
 
-### Task 2: Establish quality harness
+### MVP-02: Establish test harness
 
-**Description:** Pasang Vitest, Testing Library, Playwright, typecheck, dan scripts reproducible sebelum behavior baru dibuat.
+**Acceptance:** Vitest, Testing Library, Playwright, `test`, `test:integration`, `test:e2e`, dan `typecheck` scripts tersedia non-watch; unit dan browser smoke test berjalan.  
+**Verify:** `pnpm lint && pnpm typecheck && pnpm test && pnpm test:e2e && pnpm build`.  
+**Dependencies:** `MVP-01`  
+**Likely files:** `package.json`, `pnpm-lock.yaml`, `vitest.config.mts`, `playwright.config.ts`, `tests/setup.ts`  
+**Scope:** Medium, 5 files
 
-**Acceptance criteria:**
-- [ ] `pnpm test`, `pnpm test:integration`, `pnpm test:e2e`, dan `pnpm typecheck` tersedia dengan mode non-watch untuk automation.
-- [ ] Satu unit test dan satu browser smoke test membuktikan harness berjalan.
-- [ ] Playwright menjalankan production build melalui `webServer` dan menyimpan artifact hanya saat gagal.
+### MVP-03: Bootstrap Prisma and PostgreSQL runtime
 
-**Verification:**
-- [ ] `pnpm lint && pnpm typecheck && pnpm test && pnpm test:e2e && pnpm build` lulus.
+**Acceptance:** Prisma 7.6 memakai `@prisma/adapter-pg`, singleton server-only pool, generated client output, dan validated `DATABASE_URL`; server module tidak dapat masuk client bundle.  
+**Verify:** `pnpm exec prisma validate`; focused DB test; `pnpm build`.  
+**Dependencies:** `MVP-02`  
+**Likely files:** `package.json`, `pnpm-lock.yaml`, `prisma.config.ts`, `prisma/schema.prisma`, `src/lib/server/db.ts`  
+**Scope:** Medium, 5 files
 
-**Dependencies:** Task 1  
-**Files likely touched:** `package.json`, `pnpm-lock.yaml`, `vitest.config.mts`, `playwright.config.ts`, `tests/setup.ts`  
-**Estimated scope:** Medium, 5 files
+### MVP-04: Define constrained core schema
 
-### Task 3: Bootstrap Prisma runtime
+**Acceptance:** Initial migration mencakup customers, admins/password hashes, orders, invitations, drafts, snapshots, assets, sessions/magic tokens, RSVP, wishes, analytics, dan audit; DB protects unique slug/order relation, allowed transitions, paid-only activation, optimistic version, and idempotency.  
+**Verify:** Empty database migration test; policy/trigger integration tests; `pnpm exec prisma validate`.  
+**Dependencies:** `MVP-03`  
+**Likely files:** `prisma/schema.prisma`, `prisma/migrations/*/migration.sql`, `prisma/seed.ts`, `tests/integration/schema-constraints.test.ts`, `src/features/shared/idempotency.ts`  
+**Scope:** Medium, 5 paths
 
-**Description:** Pasang Prisma 7.6, PostgreSQL driver adapter, generated client output, environment validation, dan singleton server-only connection.
+### Checkpoint MVP-A: Foundation
 
-**Acceptance criteria:**
-- [ ] Prisma client memakai `@prisma/adapter-pg` dan satu reusable pool per process.
-- [ ] Missing atau invalid `DATABASE_URL` gagal saat server initialization dengan error non-secret.
-- [ ] Browser bundle tidak dapat mengimpor database module.
+- [ ] `MVP-01` - `MVP-04` reviewed.
+- [ ] Empty DB migrates successfully.
+- [ ] Invalid state transitions and duplicate activation fail at database boundary.
+- [ ] Full local quality commands pass.
 
-**Verification:**
-- [ ] `pnpm exec prisma validate` lulus.
-- [ ] `pnpm test -- src/lib/server/db.test.ts` lulus.
-- [ ] `pnpm build` lulus tanpa database secret di client output.
+## MVP Showroom
 
-**Dependencies:** Task 2  
-**Files likely touched:** `package.json`, `pnpm-lock.yaml`, `prisma.config.ts`, `prisma/schema.prisma`, `src/lib/server/db.ts`  
-**Estimated scope:** Medium, 5 files
+### MVP-05: Approve launch collection and template version contract
 
-### Task 4: Define core schema and domain policies
+**Acceptance:** Product owner approves three concepts/licenses; registry contract requires `templateKey`, `templateVersion`, `contentSchemaVersion`, stable palettes, capabilities, schema, and renderer; referenced versions cannot disappear.  
+**Verify:** Registry contract tests and manual license review.  
+**Dependencies:** Checkpoint `MVP-A`  
+**Likely files:** `docs/templates/launch-collection.md`, `docs/templates/licenses.md`, `src/features/templates/types.ts`, `src/features/templates/registry.ts`, `src/features/templates/registry.test.ts`  
+**Scope:** Medium, 5 files
 
-**Description:** Bentuk initial migration untuk customer, order, invitation, content version, asset, auth artifacts, guest responses, analytics, audit, dan template visibility; implementasikan lifecycle allowlists sebagai pure policies.
+### MVP-06: Build shared renderer and Template 1 v1
 
-**Acceptance criteria:**
-- [ ] Schema menegakkan unique slug, order/invitation relations, token hashes, timestamps, dan price/gallery snapshots.
-- [ ] Lifecycle policy menolak invalid transition dan activation dari order selain `paid`.
-- [ ] Empty PostgreSQL database dapat menerima migration dan seed minimum secara reproducible.
+**Acceptance:** Renderer consumes safe view model plus pinned template version; Template 1 v1 renders realistic core sections on mobile/desktop; no database access exists inside template.  
+**Verify:** Renderer tests and manual 360 px/desktop review.  
+**Dependencies:** `MVP-05`  
+**Likely files:** `src/features/invitations/view-model.ts`, `src/features/templates/render-template.tsx`, `src/features/templates/template-1/v1/definition.ts`, `src/features/templates/template-1/v1/renderer.tsx`, `src/features/templates/render-template.test.tsx`  
+**Scope:** Medium, 5 files
 
-**Verification:**
-- [ ] `pnpm exec prisma validate` dan `pnpm test:integration -- schema` lulus.
-- [ ] `pnpm test -- src/features/orders/policies.test.ts src/features/invitations/policies.test.ts` lulus.
+### MVP-07: Deliver catalog browsing
 
-**Dependencies:** Task 3  
-**Files likely touched:** `prisma/schema.prisma`, `prisma/migrations/*/migration.sql`, `prisma/seed.ts`, `src/features/orders/policies.ts`, `src/features/invitations/policies.ts`  
-**Estimated scope:** Medium, 5 paths
+**Acceptance:** Public catalog lists only visible template versions with category/price/thumbnail; filter/reset works keyboard/mobile; hidden versions are absent.  
+**Verify:** Catalog component tests; `pnpm test:e2e -- --grep "catalog"`.  
+**Dependencies:** `MVP-06`  
+**Likely files:** `src/app/(showroom)/page.tsx`, `src/features/showroom/catalog.tsx`, `src/features/showroom/category-filter.tsx`, `src/features/showroom/catalog.test.tsx`, `src/app/globals.css`  
+**Scope:** Medium, 5 files
 
-## Checkpoint A: Foundation
+### MVP-08: Deliver detail and palette preview
 
-- [ ] Tasks 1-4 reviewed.
-- [ ] `pnpm lint && pnpm typecheck && pnpm test && pnpm test:integration && pnpm build` lulus.
-- [ ] Migration diuji pada database kosong.
-- [ ] Human confirms schema, auth threat model, dan dependency list sebelum showroom work.
+**Acceptance:** Detail renders exact template version/demo, offers only compatible palettes, updates semantic colors without layout mutation, and returns not found for unknown/hidden version.  
+**Verify:** Detail tests; `pnpm test:e2e -- --grep "template detail"`.  
+**Dependencies:** `MVP-07`  
+**Likely files:** `src/app/(showroom)/templates/[slug]/page.tsx`, `src/features/showroom/template-detail.tsx`, `src/features/showroom/palette-selector.tsx`, `src/features/showroom/template-detail.test.tsx`  
+**Scope:** Medium, 4 files
 
-## Phase B: Showroom Vertical Slice
+### MVP-09: Add Template 2 v1
 
-### Task 5: Approve launch collection and template contract
+**Acceptance:** Template 2 has distinct visual language, realistic demo, 3-6 palettes, immutable version identity, responsive tests, and complete license record.  
+**Verify:** Template-focused tests and human visual review.  
+**Dependencies:** `MVP-06`  
+**Likely files:** `src/features/templates/template-2/v1/definition.ts`, `src/features/templates/template-2/v1/renderer.tsx`, `src/features/templates/template-2/v1/renderer.test.tsx`, `src/features/templates/registry.ts`, `docs/templates/licenses.md`  
+**Scope:** Medium, 5 files
 
-**Description:** Tetapkan tiga konsep template launch, visual references, font/image licenses, stable keys, content schema, palette token contract, dan capability matrix.
+### MVP-10: Add Template 3 v1
 
-**Acceptance criteria:**
-- [ ] Product owner menyetujui tiga template concept dan minimum tiga palette per template.
-- [ ] Semua font, image, ornament, dan music demo memiliki license record.
-- [ ] Type contract melarang arbitrary color, CSS, font, atau layout input.
+**Acceptance:** Template 3 has distinct visual language, realistic demo, 3-6 palettes, immutable version identity, responsive tests, and complete license record.  
+**Verify:** Template-focused tests and human visual review.  
+**Dependencies:** `MVP-06`  
+**Likely files:** `src/features/templates/template-3/v1/definition.ts`, `src/features/templates/template-3/v1/renderer.tsx`, `src/features/templates/template-3/v1/renderer.test.tsx`, `src/features/templates/registry.ts`, `docs/templates/licenses.md`  
+**Scope:** Medium, 5 files
 
-**Verification:**
-- [ ] `pnpm test -- src/features/templates/registry.test.ts` lulus.
-- [ ] Manual review: design brief dan license inventory disetujui.
+### MVP-11: Connect WhatsApp CTA and basic events
 
-**Dependencies:** Checkpoint A  
-**Files likely touched:** `docs/templates/launch-collection.md`, `docs/templates/licenses.md`, `src/features/templates/types.ts`, `src/features/templates/registry.ts`, `src/features/templates/registry.test.ts`  
-**Estimated scope:** Medium, 5 files
+**Acceptance:** CTA carries template/version, current price, palette, and canonical URL; catalog/detail/palette/CTA events store allowlisted non-PII properties with basic rate limit; analytics failure never blocks CTA.  
+**Verify:** WhatsApp/event tests; mobile deep-link manual check; CTA E2E.  
+**Dependencies:** `MVP-08`, `MVP-09`, `MVP-10`  
+**Likely files:** `src/features/showroom/whatsapp.ts`, `src/features/showroom/whatsapp-cta.tsx`, `src/features/analytics/basic-events.ts`, `src/app/api/analytics/events/route.ts`, `src/features/analytics/basic-events.test.ts`  
+**Scope:** Medium, 5 files
 
-### Task 6: Build shared renderer with Template 1
+### Checkpoint MVP-B: Showroom
 
-**Description:** Buat normalized `InvitationViewModel`, renderer context, dan template pertama memakai realistic demo content serta responsive mobile-first layout.
+- [ ] `MVP-05` - `MVP-11` reviewed.
+- [ ] Three versioned templates pass visual/license review.
+- [ ] Catalog -> detail -> palette -> WhatsApp works without login.
+- [ ] Basic events contain no PII and cannot block conversion.
 
-**Acceptance criteria:**
-- [ ] Renderer menerima safe view model tanpa database access.
-- [ ] Template 1 menampilkan semua core section yang disetujui dan tetap readable tanpa client JavaScript tambahan.
-- [ ] Demo, workspace, dan public modes memakai contract sama tanpa mode-specific data leak.
+## MVP Admin Operations and Access
 
-**Verification:**
-- [ ] `pnpm test -- src/features/templates/template-renderer.test.tsx` lulus.
-- [ ] Manual visual check pada viewport 360 px dan desktop.
+### MVP-12: Bootstrap admin credentials and password hashing
 
-**Dependencies:** Task 5  
-**Files likely touched:** `src/features/invitations/view-model.ts`, `src/features/templates/template-renderer.tsx`, `src/features/templates/template-1/definition.ts`, `src/features/templates/template-1/renderer.tsx`, `src/features/templates/template-renderer.test.tsx`  
-**Estimated scope:** Medium, 5 files
+**Acceptance:** Argon2id helper accepts password length 12-128, verifies hashes without exposing timing/error detail, and operator bootstrap/reset stores only hash for unique normalized admin email without logging plaintext.  
+**Verify:** Password hashing/verification tests; bootstrap/reset integration test confirms no plaintext persistence or output.  
+**Dependencies:** `MVP-04`; initial admin credential available through operator-only input  
+**Likely files:** `package.json`, `pnpm-lock.yaml`, `src/features/auth/password.ts`, `scripts/admin-credential.ts`, `src/features/auth/password.test.ts`  
+**Scope:** Medium, 5 files
 
-### Task 7: Deliver catalog browsing
+### MVP-13: Implement admin dashboard login and session
 
-**Description:** Ganti starter page dengan catalog public yang mengambil active registry entries, menampilkan harga Rupiah, dan memfilter kategori tanpa login.
+**Acceptance:** Email/password login creates revocable 24-hour opaque session only for active admin; generic errors and 5 failures/15-minute limit apply; admin session authorizes dashboard routes but is rejected as customer workspace identity.  
+**Verify:** Admin login/session integration and E2E tests including invalid password, expiry, revoke, brute force, dashboard access, and workspace rejection.  
+**Dependencies:** `MVP-04`, `MVP-12`  
+**Likely files:** `src/features/auth/session.ts`, `src/features/auth/admin-auth.ts`, `src/features/auth/policies.ts`, `src/app/auth/admin/actions.ts`, `tests/integration/admin-auth.test.ts`  
+**Scope:** Medium, 5 files
 
-**Acceptance criteria:**
-- [ ] Hanya template visible yang tampil dengan nama, category, thumbnail, dan consistent price.
-- [ ] Category filter dapat dipakai dan direset pada mobile/desktop tanpa kehilangan keyboard access.
-- [ ] Empty dan error state sengaja dirancang.
+### MVP-14: Build admin shell and template visibility
 
-**Verification:**
-- [ ] `pnpm test -- src/features/showroom/catalog.test.tsx` lulus.
-- [ ] `pnpm test:e2e -- --grep "catalog"` lulus.
+**Acceptance:** Admin routes reveal no data to unauthenticated/non-admin actors; admin can hide/unhide registry entries but cannot alter source-controlled design/version/price.  
+**Verify:** Visibility integration test and admin E2E.  
+**Dependencies:** `MVP-08`, `MVP-13`  
+**Likely files:** `src/app/admin/layout.tsx`, `src/app/admin/templates/page.tsx`, `src/features/admin/admin-nav.tsx`, `src/features/templates/visibility.ts`, `src/features/templates/visibility.test.ts`  
+**Scope:** Medium, 5 files
 
-**Dependencies:** Task 6  
-**Files likely touched:** `src/app/(showroom)/page.tsx`, `src/features/showroom/catalog.tsx`, `src/features/showroom/category-filter.tsx`, `src/features/showroom/catalog.test.tsx`, `src/app/globals.css`  
-**Estimated scope:** Medium, 5 files
+### MVP-15: Deliver customer and pending order intake
 
-### Task 8: Deliver template detail and palette preview
+**Acceptance:** Admin can create/find customer and record `pending` order with immutable template key/version, schema version, palette, price, photo-count, and storage quota snapshots.  
+**Verify:** Order-intake integration test including multiple orders per customer and invalid registry version.  
+**Dependencies:** `MVP-04`, `MVP-13`, `MVP-14`  
+**Likely files:** `src/app/admin/orders/page.tsx`, `src/app/admin/orders/new/page.tsx`, `src/features/orders/actions.ts`, `src/features/orders/data.ts`, `tests/integration/order-intake.test.ts`  
+**Scope:** Medium, 5 files
 
-**Description:** Tambahkan dynamic detail route, full demo renderer, palette selector, URL-safe selection, dan not-found untuk template hidden/unknown.
+### MVP-16: Enforce order transitions and atomic activation
 
-**Acceptance criteria:**
-- [ ] Detail menunjukkan template, price, demo content, dan hanya palette milik template.
-- [ ] Palette change memperbarui semantic tokens tanpa mengganti content/layout.
-- [ ] Unknown atau hidden template menghasilkan not found tanpa internal detail.
+**Acceptance:** Only allowed Order transitions succeed; paid-only activation transaction creates exactly one draft Invitation pinned to snapshots and sets Order activated; duplicate/replayed activation returns same result.  
+**Verify:** Policy and DB trigger tests; activation E2E.  
+**Dependencies:** `MVP-06`, `MVP-15`  
+**Likely files:** `src/features/orders/policies.ts`, `src/features/invitations/activation.ts`, `src/app/admin/orders/[orderId]/actions.ts`, `tests/integration/order-transitions.test.ts`, `tests/integration/invitation-activation.test.ts`  
+**Scope:** Medium, 5 files
 
-**Verification:**
-- [ ] `pnpm test -- src/features/showroom/template-detail.test.tsx` lulus.
-- [ ] `pnpm test:e2e -- --grep "template detail"` lulus.
+### MVP-17: Issue single-use customer magic links
 
-**Dependencies:** Task 7  
-**Files likely touched:** `src/app/(showroom)/templates/[slug]/page.tsx`, `src/features/showroom/template-detail.tsx`, `src/features/showroom/palette-selector.tsx`, `src/features/showroom/template-detail.test.tsx`  
-**Estimated scope:** Medium, 4 files
+**Acceptance:** Admin generates 256-bit single-use link with 24-hour TTL; DB stores hash only; revoke/replace invalidates unused link; dashboard reveals raw link once for manual WhatsApp delivery and never logs/persists it.  
+**Verify:** Magic-link issue/copy tests including no raw-token persistence, analytics, audit payload, or logs.  
+**Dependencies:** `MVP-13`, `MVP-16`  
+**Likely files:** `src/features/auth/magic-link.ts`, `src/features/auth/magic-link-panel.tsx`, `src/app/admin/invitations/[invitationId]/actions.ts`, `src/app/admin/invitations/[invitationId]/page.tsx`, `tests/integration/magic-link-issue.test.ts`  
+**Scope:** Medium, 5 files
 
-### Task 9: Add Template 2
+### MVP-18: Consume magic link into customer session
 
-**Description:** Implementasikan template kedua menggunakan renderer contract tanpa memperluas unrestricted customization surface.
+**Acceptance:** GET confirmation has no side effect; rate-limited atomic POST consume creates one session and rejects replay/expiry/revoke; token disappears from URL/referrer/log; session accesses only owned invitation with active editing access.  
+**Verify:** Concurrent consume, replay, ownership, and customer-auth E2E tests.  
+**Dependencies:** `MVP-17`  
+**Likely files:** `src/app/auth/magic/[token]/page.tsx`, `src/app/auth/magic/[token]/actions.ts`, `src/features/auth/customer-session.ts`, `src/features/auth/customer-policy.ts`, `tests/integration/customer-magic-link.test.ts`  
+**Scope:** Medium, 5 files
 
-**Acceptance criteria:**
-- [ ] Template 2 memiliki distinct visual language, realistic demo, 3-6 palettes, dan complete content capabilities.
-- [ ] Registry validation dan responsive rendering lulus.
-- [ ] Asset dan font license record diperbarui.
+### Checkpoint MVP-C: Operations
 
-**Verification:**
-- [ ] `pnpm test -- src/features/templates/template-2` lulus.
-- [ ] Manual visual review pada mobile dan desktop disetujui.
+- [ ] `MVP-12` - `MVP-18` reviewed.
+- [ ] Admin email/password dashboard auth, workspace rejection, order transitions, activation, and single-use replay defense pass.
+- [ ] Order snapshots contain exact template/schema/palette versions.
+- [ ] Customer cannot access another invitation.
 
-**Dependencies:** Task 6  
-**Files likely touched:** `src/features/templates/template-2/definition.ts`, `src/features/templates/template-2/renderer.tsx`, `src/features/templates/template-2/renderer.test.tsx`, `src/features/templates/registry.ts`, `docs/templates/licenses.md`  
-**Estimated scope:** Medium, 5 files
+## MVP Workspace and Assets
 
-### Task 10: Add Template 3
+### MVP-19: Build versioned draft workspace core
 
-**Description:** Implementasikan template ketiga memakai contract sama dan memenuhi minimum launch collection.
+**Acceptance:** Workspace reads/writes mutable draft pinned to template/schema version; compare-and-swap rejects stale saves and preserves local input; locked editing rejects customer writes server-side.  
+**Verify:** Workspace-save integration and editor component tests.  
+**Dependencies:** `MVP-06`, `MVP-18`  
+**Likely files:** `src/app/workspace/invitations/[invitationId]/page.tsx`, `src/features/workspace/workspace-editor.tsx`, `src/features/workspace/actions.ts`, `src/features/invitations/workspace-dto.ts`, `tests/integration/workspace-save.test.ts`  
+**Scope:** Medium, 5 files
 
-**Acceptance criteria:**
-- [ ] Template 3 memiliki distinct visual language, realistic demo, 3-6 palettes, dan complete content capabilities.
-- [ ] Registry validation dan responsive rendering lulus.
-- [ ] Asset dan font license record diperbarui.
+### MVP-20: Add identity and copy fields
 
-**Verification:**
-- [ ] `pnpm test -- src/features/templates/template-3` lulus.
-- [ ] Manual visual review pada mobile dan desktop disetujui.
+**Acceptance:** Couple/parent names, quote, opening, and closing use shared server/client schema; errors retain draft; optional omissions render without broken layout.  
+**Verify:** Section tests and manual mobile focus/keyboard check.  
+**Dependencies:** `MVP-19`  
+**Likely files:** `src/features/invitations/content-schema.ts`, `src/features/workspace/identity-section.tsx`, `src/features/workspace/copy-section.tsx`, `src/features/workspace/identity-section.test.tsx`  
+**Scope:** Medium, 4 files
 
-**Dependencies:** Task 6  
-**Files likely touched:** `src/features/templates/template-3/definition.ts`, `src/features/templates/template-3/renderer.tsx`, `src/features/templates/template-3/renderer.test.tsx`, `src/features/templates/registry.ts`, `docs/templates/licenses.md`  
-**Estimated scope:** Medium, 5 files
+### MVP-21: Add events, location, and countdown
 
-### Task 11: Connect WhatsApp conversion and first-party events
+**Acceptance:** Event date/time stores explicit IANA timezone, Maps URL uses allowlist, and countdown handles browser timezone/past events consistently.  
+**Verify:** Timezone/Maps unit tests and manual timezone matrix.  
+**Dependencies:** `MVP-19`  
+**Likely files:** `src/features/invitations/events.ts`, `src/features/workspace/event-section.tsx`, `src/features/invitations/countdown.tsx`, `src/features/invitations/events.test.ts`, `src/features/workspace/event-section.test.tsx`  
+**Scope:** Medium, 5 files
 
-**Description:** Tambahkan contextual WhatsApp CTA dan same-origin allowlisted analytics intake untuk showroom funnel.
+### MVP-22: Add story, gift, and section controls
 
-**Acceptance criteria:**
-- [ ] Message memuat template, current price, selected palette, dan canonical detail URL pada mobile/desktop.
-- [ ] Detail view, palette selection, dan CTA click tersimpan sebagai compact non-PII events.
-- [ ] Unknown event/property ditolak dan analytics failure tidak memblokir CTA.
+**Acceptance:** Gift remains informational, unsupported capabilities cannot be enabled, and empty/disabled sections collapse cleanly across three pinned template versions.  
+**Verify:** Optional-section tests and three-template preview review.  
+**Dependencies:** `MVP-19`, `MVP-20`  
+**Likely files:** `src/features/workspace/story-section.tsx`, `src/features/workspace/gift-section.tsx`, `src/features/workspace/section-controls.tsx`, `src/features/invitations/content-schema.ts`, `src/features/workspace/optional-sections.test.tsx`  
+**Scope:** Medium, 5 files
 
-**Verification:**
-- [ ] `pnpm test -- src/features/showroom/whatsapp.test.ts src/features/analytics/events.test.ts` lulus.
-- [ ] `pnpm test:e2e -- --grep "WhatsApp"` lulus.
+### MVP-23: Implement image asset lifecycle
 
-**Dependencies:** Tasks 8-10  
-**Files likely touched:** `src/features/showroom/whatsapp-cta.tsx`, `src/features/showroom/whatsapp.ts`, `src/features/analytics/events.ts`, `src/app/api/analytics/events/route.ts`, `src/features/analytics/events.test.ts`  
-**Estimated scope:** Medium, 5 files
+**Acceptance:** Rate-limited image upload follows pending/processing/ready/failed/deleted, validates magic bytes/10 MB/2560 px/photo cap/250 MB quota, atomically writes variants, cleans partial files, and prevents deleting published references.  
+**Verify:** Malicious upload, failure cleanup, quota, reconciliation, and protected-delivery integration tests.  
+**Dependencies:** `MVP-04`, `MVP-19`  
+**Likely files:** `src/features/assets/image-service.ts`, `src/features/assets/lifecycle.ts`, `src/app/api/assets/images/route.ts`, `src/app/api/assets/[assetId]/route.ts`, `tests/integration/image-assets.test.ts`  
+**Scope:** Medium, 5 files
 
-## Checkpoint B: Showroom
+### MVP-24: Implement music asset lifecycle
 
-- [ ] Tasks 5-11 reviewed.
-- [ ] Three-template catalog and detail journey pass Playwright on mobile and desktop.
-- [ ] WhatsApp deep link tested on physical mobile and desktop WhatsApp Web.
-- [ ] Analytics records verified free of PII.
+**Acceptance:** MP3/M4A upload follows shared lifecycle, validates magic bytes/15 MB/10 minutes/quota, cleans failure paths, protects delivery, and audio remains optional with user-controlled playback.  
+**Verify:** Music lifecycle integration tests and Safari/Chrome mobile manual check.  
+**Dependencies:** `MVP-19`, `MVP-23`  
+**Likely files:** `src/features/assets/music-service.ts`, `src/features/invitations/audio-player.tsx`, `src/app/api/assets/music/route.ts`, `tests/integration/music-assets.test.ts`, `src/features/invitations/audio-player.test.tsx`  
+**Scope:** Medium, 5 files
 
-## Phase C: Admin Operations and Activation
+### Checkpoint MVP-D: Workspace
 
-### Task 12: Integrate transactional mailer
+- [ ] `MVP-19` - `MVP-24` reviewed.
+- [ ] Stale write and locked-workspace writes fail.
+- [ ] Asset lifecycle, cleanup, published-reference protection, and quota pass.
+- [ ] Workspace preview works at 360 px.
 
-**Description:** Tambahkan server-only Resend mailer untuk PIN dan access messages with verified-domain configuration, idempotency, provider response validation, dan test double.
+## MVP Publish and Guest Flow
 
-**Acceptance criteria:**
-- [ ] API key hanya dibaca server-side; production sender wajib memakai verified domain.
-- [ ] Duplicate retry memakai idempotency key dan failure menghasilkan safe operational state.
-- [ ] Free quota assumption serta provider replacement trigger terdokumentasi.
+### MVP-25: Publish current snapshot and control editing lock
 
-**Verification:**
-- [ ] `pnpm test -- src/features/email/mailer.test.ts` lulus dengan mocked provider.
-- [ ] Resend test-address smoke check dilakukan pada staging credential.
+**Acceptance:** Initial publish atomically creates current snapshot and locks editing; reopening editing keeps old snapshot live; republish atomically replaces it; unpublish/archive follow allowed transitions; only admin can perform actions.  
+**Verify:** Snapshot isolation, atomic failure, lock, republish, unpublish, archive, and authorization integration/E2E tests.  
+**Dependencies:** `MVP-19` - `MVP-24`  
+**Likely files:** `src/features/invitations/publication.ts`, `src/features/invitations/snapshot.ts`, `src/app/admin/invitations/[invitationId]/actions.ts`, `src/app/admin/invitations/[invitationId]/page.tsx`, `tests/integration/publication.test.ts`  
+**Scope:** Medium, 5 files
 
-**Dependencies:** Checkpoint A dan production sender input  
-**Files likely touched:** `package.json`, `pnpm-lock.yaml`, `src/features/email/mailer.ts`, `src/features/email/mailer.test.ts`, `.env.example`  
-**Estimated scope:** Medium, 5 files
+### MVP-26: Deliver public invitation route
 
-### Task 13: Implement database sessions and admin PIN login
+**Acceptance:** `/i/[slug]` reads only current snapshot and exact pinned renderer; draft edits never leak; unknown/draft/archived are indistinguishable not-found; all core sections remain readable without enhancements.  
+**Verify:** Public route E2E across Chromium/WebKit/Firefox and manual WhatsApp WebView/reduced-motion check.  
+**Dependencies:** `MVP-25`  
+**Likely files:** `src/app/i/[slug]/page.tsx`, `src/app/i/[slug]/not-found.tsx`, `src/app/i/[slug]/opengraph-image.tsx`, `src/features/invitations/public-data.ts`, `e2e/public-invitation.spec.ts`  
+**Scope:** Medium, 5 files
 
-**Description:** Implementasikan opaque session cookie, hashed database token, admin email PIN login, logout, expiry, revoke, dan server-side role policy.
+### MVP-27: Add idempotent RSVP
 
-**Acceptance criteria:**
-- [ ] Admin login hanya berhasil untuk seeded admin email; generic response mencegah email enumeration.
-- [ ] Cookie memakai HttpOnly, Secure production, SameSite=Lax, Path=/, TTL 24 jam.
-- [ ] Expired/revoked session dan non-admin direct requests ditolak di DAL/action.
+**Acceptance:** Published invitation accepts name/attendance/guest count/event with server validation, basic rate limit and honeypot; contact data is absent; scoped idempotency prevents duplicate retry.  
+**Verify:** RSVP integration/E2E including invalid status, duplicate key, over-limit, and abuse basics.  
+**Dependencies:** `MVP-26`  
+**Likely files:** `src/features/guests/rsvp-form.tsx`, `src/features/guests/rsvp-schema.ts`, `src/features/guests/rsvp-service.ts`, `src/app/api/invitations/[slug]/rsvp/route.ts`, `tests/integration/rsvp.test.ts`  
+**Scope:** Medium, 5 files
 
-**Verification:**
-- [ ] `pnpm test:integration -- admin-auth` lulus termasuk brute-force dan revoke cases.
-- [ ] `pnpm test:e2e -- --grep "admin login"` lulus.
+### MVP-28: Add idempotent wishes
 
-**Dependencies:** Tasks 4 and 12  
-**Files likely touched:** `src/features/auth/session.ts`, `src/features/auth/admin-auth.ts`, `src/features/auth/policies.ts`, `src/app/auth/admin/actions.ts`, `tests/integration/admin-auth.test.ts`  
-**Estimated scope:** Medium, 5 files
+**Acceptance:** Published invitation accepts plain-text name/message limits with server validation, basic rate/honeypot, scoped idempotency, no stored XSS; hide/delete semantics follow approved decision.  
+**Verify:** Wish integration/E2E including XSS, duplicate key, hidden/deleted, and invalid status.  
+**Dependencies:** `MVP-26`; delete semantics approved  
+**Likely files:** `src/features/guests/wish-form.tsx`, `src/features/guests/wish-schema.ts`, `src/features/guests/wish-service.ts`, `src/app/api/invitations/[slug]/wishes/route.ts`, `tests/integration/wishes.test.ts`  
+**Scope:** Medium, 5 files
 
-### Task 14: Build admin shell and template visibility
+### MVP-29: Add owner/admin response management
 
-**Description:** Buat protected admin layout, navigation, current actor UI, serta hide/unhide template backed by visibility override.
+**Acceptance:** Customer sees only owned invitation responses, admin can select any invitation, pagination is bounded/deterministic, and hide/unhide/delete re-check authorization.  
+**Verify:** Response-management integration/E2E including IDOR attempts.  
+**Dependencies:** `MVP-27`, `MVP-28`  
+**Likely files:** `src/app/workspace/invitations/[invitationId]/responses/page.tsx`, `src/app/admin/invitations/[invitationId]/responses/page.tsx`, `src/features/guests/response-data.ts`, `src/features/guests/response-actions.ts`, `tests/integration/response-management.test.ts`  
+**Scope:** Medium, 5 files
 
-**Acceptance criteria:**
-- [ ] Unauthenticated/non-admin users tidak menerima protected data atau UI.
-- [ ] Admin dapat hide/unhide; layout/palette/demo/price tidak editable melalui dashboard.
-- [ ] Visibility change segera tercermin pada catalog dan direct detail route.
+### MVP-30: Verify complete MVP core flow
 
-**Verification:**
-- [ ] `pnpm test:integration -- template-visibility` lulus.
-- [ ] `pnpm test:e2e -- --grep "template visibility"` lulus.
+**Acceptance:** E2E covers showroom -> WhatsApp -> admin pending/paid/activation -> single-use access -> draft edit -> publish -> reopen/republish snapshot isolation -> RSVP/wish; all PRD MVP criteria map to evidence.  
+**Verify:** `pnpm lint && pnpm typecheck && pnpm test && pnpm test:integration && pnpm build && pnpm test:e2e -- --grep "MVP core"`.  
+**Dependencies:** `MVP-01` - `MVP-29`  
+**Likely files:** `e2e/mvp-core-flow.spec.ts`, `e2e/mvp-security.spec.ts`, `docs/mvp-validation-checklist.md`, `docs/mvp-validation-report.md`  
+**Scope:** Medium, 4 files
 
-**Dependencies:** Tasks 8 and 13  
-**Files likely touched:** `src/app/admin/layout.tsx`, `src/app/admin/templates/page.tsx`, `src/features/admin/admin-nav.tsx`, `src/features/templates/visibility.ts`, `src/features/templates/visibility.test.ts`  
-**Estimated scope:** Medium, 5 files
+## MVP Gate
 
-### Task 15: Deliver customer and order intake
+- [ ] `MVP-01` - `MVP-30` complete and reviewed.
+- [ ] Core flow and security/data-integrity invariants pass.
+- [ ] Human marks MVP validated on development/staging.
+- [ ] Public launch remains blocked.
 
-**Description:** Tambahkan admin flow untuk create/find customer dan record manual WhatsApp order dengan template/palette/price/gallery snapshots.
+# Phase 2: Production Readiness
 
-**Acceptance criteria:**
-- [ ] Existing customer dapat dipakai ulang dan memiliki banyak orders/invitations.
-- [ ] Order creation memvalidasi registry keys dan menyimpan immutable snapshots.
-- [ ] List/detail hanya menampilkan minimum operational DTO.
+Production Readiness starts only after MVP Gate. These tasks do not block MVP validation.
 
-**Verification:**
-- [ ] `pnpm test:integration -- order-intake` lulus.
-- [ ] Manual check: create two orders for one customer.
+## Production Product Operations
 
-**Dependencies:** Tasks 4, 13, and 14  
-**Files likely touched:** `src/app/admin/orders/page.tsx`, `src/app/admin/orders/new/page.tsx`, `src/features/orders/actions.ts`, `src/features/orders/data.ts`, `tests/integration/order-intake.test.ts`  
-**Estimated scope:** Medium, 5 files
+### PR-01: Build advanced analytics dashboard
 
-### Task 16: Enforce order lifecycle and snapshots
+**Acceptance:** Admin sees bounded aggregate funnel/date ranges for templates, WhatsApp, activation, publish duration, views, RSVP, and wishes; raw PII never enters events/client; required indexes handle representative volume.  
+**Verify:** Aggregate integration tests and fixture reconciliation/query-plan review.  
+**Dependencies:** MVP Gate  
+**Likely files:** `src/app/admin/metrics/page.tsx`, `src/features/analytics/aggregates.ts`, `src/features/analytics/dashboard.tsx`, `src/features/analytics/range.ts`, `tests/integration/analytics-aggregates.test.ts`  
+**Scope:** Medium, 5 files
 
-**Description:** Tambahkan order detail actions untuk requested, payment_pending, paid, cancelled, dan refunded menggunakan transition allowlist dan audit event.
+### PR-02: Add customer PIN recovery if evidence requires it
 
-**Acceptance criteria:**
-- [ ] Invalid transition ditolak walau action dipanggil langsung.
-- [ ] Price/gallery/template/palette snapshots tidak berubah saat registry berubah.
-- [ ] Actor, from/to status, dan timestamp tercatat tanpa secret/PII berlebih.
+**Acceptance:** Task starts only after documented support need and approved email provider; PIN is hashed, 10-minute TTL, 5 attempts/15 minutes, generic response, and successful consume creates revocable session. If evidence absent, decision to defer is documented and admin-issued WhatsApp magic link remains support path.  
+**Verify:** Product decision record; if built, recovery integration/E2E tests.  
+**Dependencies:** MVP Gate and explicit product approval  
+**Likely files:** `docs/decisions/0005-customer-recovery.md`, `src/app/auth/recover/actions.ts`, `src/features/auth/customer-pin.ts`, `src/features/auth/customer-pin-email.ts`, `tests/integration/customer-recovery.test.ts`  
+**Scope:** Conditional, up to 5 files
 
-**Verification:**
-- [ ] `pnpm test -- src/features/orders/policies.test.ts` lulus.
-- [ ] `pnpm test:integration -- order-transitions` lulus.
+## Production Security
 
-**Dependencies:** Task 15  
-**Files likely touched:** `src/app/admin/orders/[orderId]/page.tsx`, `src/features/orders/actions.ts`, `src/features/orders/policies.ts`, `src/features/audit/events.ts`, `tests/integration/order-transitions.test.ts`  
-**Estimated scope:** Medium, 5 files
+### PR-03: Add adaptive abuse protection
 
-### Task 17: Activate invitation from paid order
+**Acceptance:** Production auth/guest/upload/analytics limits use pseudonymous keys; suspicious traffic requires Turnstile; raw IP/token/content is not logged; provider failure follows explicit fail-safe policy.  
+**Verify:** Abuse integration tests and staging Turnstile test-key check.  
+**Dependencies:** MVP Gate; Turnstile approved  
+**Likely files:** `src/features/security/rate-limit.ts`, `src/features/security/turnstile.ts`, `src/features/security/events.ts`, `src/features/security/abuse-policy.ts`, `tests/integration/abuse-protection.test.ts`  
+**Scope:** Medium, 5 files
 
-**Description:** Implementasikan idempotent activation yang membuat invitation, unique slug, default content, selected template/palette, dan workspace access hanya dari paid order.
+### PR-04: Complete security and privacy hardening
 
-**Acceptance criteria:**
-- [ ] Non-paid order tidak dapat diaktivasi melalui UI atau direct action.
-- [ ] Repeated activation tidak membuat duplicate invitation.
-- [ ] Initial content valid terhadap selected template schema dan snapshots order.
+**Acceptance:** CSP/HSTS/frame/content-type/referrer/permissions policies match resources; every protected boundary appears in authorization matrix; dependency audit/threat review has no unmitigated reachable critical/high risk.  
+**Verify:** Authorization matrix, security headers, audit triage, full lint/type/test/build.  
+**Dependencies:** `PR-03`; `PR-02` if implemented  
+**Likely files:** `next.config.ts`, `src/lib/server/env.ts`, `src/lib/server/errors.ts`, `tests/integration/authorization-matrix.test.ts`, `docs/security-review.md`  
+**Scope:** Medium, 5 files
 
-**Verification:**
-- [ ] `pnpm test:integration -- invitation-activation` lulus.
-- [ ] `pnpm test:e2e -- --grep "activate paid order"` lulus.
+## Production Deployment
 
-**Dependencies:** Tasks 6 and 16  
-**Files likely touched:** `src/features/invitations/activation.ts`, `src/features/invitations/slug.ts`, `src/features/invitations/default-content.ts`, `src/app/admin/orders/[orderId]/actions.ts`, `tests/integration/invitation-activation.test.ts`  
-**Estimated scope:** Medium, 5 files
+### PR-05: Containerize app and PostgreSQL
 
-### Task 18: Issue and manage customer magic links
+**Acceptance:** Node 22 app and PostgreSQL 18 run on private Compose network; DB/assets persist across recreation; secrets are external; migration is one-off job; image is immutable/commit-tagged.  
+**Verify:** `docker compose config`; clean-host migration/restart/persistence smoke test.  
+**Dependencies:** MVP Gate; VPS baseline approved  
+**Likely files:** `Dockerfile`, `.dockerignore`, `compose.yaml`, `compose.production.yaml`, `docs/deployment.md`  
+**Scope:** Medium, 5 files
 
-**Description:** Tambahkan admin action untuk generate, send, revoke, dan rotate reusable 24-hour customer magic link using hashed token storage.
+### PR-06: Add CI and release pipeline
 
-**Acceptance criteria:**
-- [ ] Raw token ditampilkan/dikirim sekali dan tidak masuk database, log, analytics, atau error.
-- [ ] Link reusable hanya sampai expiry/revoke; rotation invalidates prior link.
-- [ ] Admin UI menunjukkan expiry/status tanpa menunjukkan token.
+**Acceptance:** CI uses frozen pnpm install, lint, typecheck, tests, build, and E2E; deployment requires approved commit, applies migrations before app switch, verifies readiness, and retains prior image for rollback.  
+**Verify:** CI run and staging deploy/rollback drill.  
+**Dependencies:** `PR-05`; Git remote approved  
+**Likely files:** `.github/workflows/ci.yml`, `.github/workflows/deploy.yml`, `scripts/deploy.sh`, `scripts/rollback.sh`, `docs/deployment.md`  
+**Scope:** Medium, 5 files
 
-**Verification:**
-- [ ] `pnpm test:integration -- magic-link-admin` lulus termasuk replay, expiry, revoke, dan rotate.
+### PR-07: Add Nginx and TLS
 
-**Dependencies:** Tasks 12, 13, and 17  
-**Files likely touched:** `src/features/auth/magic-link.ts`, `src/features/auth/magic-link-email.ts`, `src/app/admin/invitations/[invitationId]/actions.ts`, `src/app/admin/invitations/[invitationId]/page.tsx`, `tests/integration/magic-link-admin.test.ts`  
-**Estimated scope:** Medium, 5 files
+**Acceptance:** HTTPS-only public ingress, private app/DB ports, upload/proxy/rate limits, streaming support, secure forwarded headers, and no magic-token access logs; Certbot renewal works.  
+**Verify:** `nginx -t`, TLS renewal dry-run, upload/429/streaming/token-log smoke tests.  
+**Dependencies:** `PR-03`, `PR-05`; DNS ready  
+**Likely files:** `infra/nginx/undango.conf`, `infra/nginx/rate-limits.conf`, `compose.production.yaml`, `docs/deployment.md`, `docs/rollback.md`  
+**Scope:** Medium, 5 files
 
-## Checkpoint C: Operations
+## Production Reliability
 
-- [ ] Tasks 12-18 reviewed.
-- [ ] Unauthorized and cross-role requests fail server-side.
-- [ ] Order snapshot and paid-to-activation paths pass integration/E2E.
-- [ ] Magic link secret handling reviewed before customer auth work.
+### PR-08: Add backup and restore automation
 
-## Phase D: Customer Workspace
+**Acceptance:** Nightly DB/assets backup keeps seven local copies; weekly encrypted off-host copy has owner; checksums and success/failure records exist; fresh host restores known invitation.  
+**Verify:** Backup dry-run, checksum, full restore drill.  
+**Dependencies:** `PR-05`; off-host target approved  
+**Likely files:** `infra/backup/backup.sh`, `infra/backup/restore.sh`, `infra/backup/verify.sh`, `compose.production.yaml`, `docs/disaster-recovery.md`  
+**Scope:** Medium, 5 files
 
-### Task 19: Exchange customer magic link for session
+### PR-09: Add monitoring and operational alerts
 
-**Description:** Implementasikan public magic-link confirmation tanpa side effect, explicit POST exchange, safe redirect, customer session, workspace ownership checks, dan logout.
+**Acceptance:** Liveness/readiness separated; disk warns 70%, critical 85%, blocks new uploads 90%; backup/deploy/process failures alert named owner; no PII/secrets in telemetry.  
+**Verify:** Health, threshold, process-failure, and alert-delivery simulations.  
+**Dependencies:** `PR-05`, `PR-08`  
+**Likely files:** `src/app/api/health/live/route.ts`, `src/app/api/health/ready/route.ts`, `infra/monitoring/disk-check.sh`, `infra/monitoring/health-check.sh`, `docs/operations.md`  
+**Scope:** Medium, 5 files
 
-**Acceptance criteria:**
-- [ ] GET confirmation tidak membuat session; explicit POST pada valid reusable link creates 24-hour customer session; expired/revoked/unknown links fail generically.
-- [ ] Customer dapat mengakses hanya owned invitations dengan active workspace access.
-- [ ] Token dihilangkan dari browser URL setelah exchange, referrer dinonaktifkan, dan token tidak masuk application/proxy logs.
+## Production Launch
 
-**Verification:**
-- [ ] `pnpm test:integration -- customer-magic-link` lulus.
-- [ ] `pnpm test:e2e -- --grep "customer magic link"` lulus.
+### PR-10: Run browser, device, accessibility, and performance verification
 
-**Dependencies:** Task 18  
-**Files likely touched:** `src/app/auth/magic/[token]/page.tsx`, `src/app/auth/magic/[token]/actions.ts`, `src/features/auth/customer-session.ts`, `src/features/auth/customer-policy.ts`, `tests/integration/customer-magic-link.test.ts`  
-**Estimated scope:** Medium, 5 files
+**Acceptance:** Core public/admin/workspace journeys pass supported browsers and physical mobile/WhatsApp WebView; reduced motion/audio/Maps/failure states work; agreed minimum accessibility/performance findings are resolved or accepted.  
+**Verify:** Production-like Playwright matrix, Lighthouse/manual evidence, device checklist.  
+**Dependencies:** `PR-04`, `PR-07`, `PR-09`  
+**Likely files:** `e2e/production-browser-matrix.spec.ts`, `e2e/production-security.spec.ts`, `docs/device-checklist.md`, `docs/accessibility-review.md`, `docs/performance-review.md`  
+**Scope:** Medium, 5 files
 
-### Task 20: Add email PIN recovery
+### PR-11: Run public-launch gate
 
-**Description:** Implementasikan request PIN, email delivery, verify PIN, attempt budget, expiry, resend invalidation, dan generic responses.
+**Acceptance:** Full suites pass; production smoke, adaptive abuse, TLS renewal, backup restore, monitoring, deployment rollback, and PRD traceability have evidence; no critical/high unresolved risk; human launch approval recorded.  
+**Verify:** Full repository commands, production drills, signed launch report.  
+**Dependencies:** `PR-01`, `PR-02` decision, `PR-03` - `PR-10`  
+**Likely files:** `docs/release-checklist.md`, `docs/security-review.md`, `docs/disaster-recovery.md`, `docs/launch-report.md`, `e2e/public-launch.spec.ts`  
+**Scope:** Medium, 5 files
 
-**Acceptance criteria:**
-- [ ] PIN berlaku 10 menit, maksimal 5 failed attempts per 15 minutes, dan new PIN invalidates old PIN.
-- [ ] Registered/unregistered email menghasilkan externally indistinguishable request response.
-- [ ] Verification sukses consumes PIN dan creates 24-hour customer session.
+## Production Readiness Gate
 
-**Verification:**
-- [ ] `pnpm test:integration -- pin-recovery` lulus termasuk timing-independent public result checks.
-- [ ] `pnpm test:e2e -- --grep "PIN recovery"` lulus dengan fake mailer.
-
-**Dependencies:** Tasks 12 and 19  
-**Files likely touched:** `src/app/auth/recover/page.tsx`, `src/app/auth/recover/actions.ts`, `src/features/auth/email-pin.ts`, `src/features/auth/pin-email.ts`, `tests/integration/pin-recovery.test.ts`  
-**Estimated scope:** Medium, 5 files
-
-### Task 21: Build versioned workspace core
-
-**Description:** Buat workspace invitation selector, server-safe DTO, form state boundary, live preview bridge, explicit save, dan optimistic version conflict handling.
-
-**Acceptance criteria:**
-- [ ] Save persists valid content and refresh restores latest successful version.
-- [ ] Stale version returns conflict and preserves local form input instead of overwriting newer data.
-- [ ] Client receives no customer/order/auth fields outside workspace need.
-
-**Verification:**
-- [ ] `pnpm test:integration -- workspace-save` lulus.
-- [ ] `pnpm test -- src/features/workspace/workspace-editor.test.tsx` lulus.
-
-**Dependencies:** Tasks 6, 19, and 20  
-**Files likely touched:** `src/app/workspace/invitations/[invitationId]/page.tsx`, `src/features/workspace/workspace-editor.tsx`, `src/features/workspace/actions.ts`, `src/features/invitations/workspace-dto.ts`, `tests/integration/workspace-save.test.ts`  
-**Estimated scope:** Medium, 5 files
-
-### Task 22: Add identity and copy fields
-
-**Description:** Tambahkan form schema dan controls untuk pasangan, orang tua, quote, opening, dan closing copy dengan live preview.
-
-**Acceptance criteria:**
-- [ ] Required/optional limits divalidasi client dan server memakai schema sama.
-- [ ] Invalid input mempertahankan draft dan menunjukkan field-level errors.
-- [ ] Template renderer handles omitted optional copy without broken gaps.
-
-**Verification:**
-- [ ] `pnpm test -- src/features/workspace/identity-section.test.tsx` lulus.
-- [ ] Manual mobile keyboard/focus check.
-
-**Dependencies:** Task 21  
-**Files likely touched:** `src/features/invitations/content-schema.ts`, `src/features/workspace/identity-section.tsx`, `src/features/workspace/copy-section.tsx`, `src/features/workspace/identity-section.test.tsx`  
-**Estimated scope:** Medium, 4 files
-
-### Task 23: Add events, location, and countdown
-
-**Description:** Tambahkan multi-event details, local date/time with explicit IANA timezone, address, allowlisted Google Maps URL, dan countdown preview.
-
-**Acceptance criteria:**
-- [ ] Event timestamps round-trip tanpa implicit WIB assumption.
-- [ ] Maps URL validation rejects unsupported schemes/hosts while preserving written address.
-- [ ] Countdown remains correct across browser timezone and handles past event gracefully.
-
-**Verification:**
-- [ ] `pnpm test -- src/features/invitations/events.test.ts src/features/workspace/event-section.test.tsx` lulus.
-- [ ] Manual timezone matrix check.
-
-**Dependencies:** Task 21  
-**Files likely touched:** `src/features/invitations/events.ts`, `src/features/workspace/event-section.tsx`, `src/features/invitations/countdown.tsx`, `src/features/invitations/events.test.ts`, `src/features/workspace/event-section.test.tsx`  
-**Estimated scope:** Medium, 5 files
-
-### Task 24: Add story, gift, and section controls
-
-**Description:** Tambahkan story, gift account data, optional section toggles, dan safe template capability checks.
-
-**Acceptance criteria:**
-- [ ] Gift displays information only and never collects guest payment data.
-- [ ] Unsupported section cannot be enabled for selected template.
-- [ ] Empty/disabled sections leave no broken spacing in preview.
-
-**Verification:**
-- [ ] `pnpm test -- src/features/workspace/optional-sections.test.tsx` lulus.
-- [ ] Manual preview check across three templates.
-
-**Dependencies:** Tasks 21 and 22  
-**Files likely touched:** `src/features/workspace/story-section.tsx`, `src/features/workspace/gift-section.tsx`, `src/features/workspace/section-controls.tsx`, `src/features/invitations/content-schema.ts`, `src/features/workspace/optional-sections.test.tsx`  
-**Estimated scope:** Medium, 5 files
-
-### Task 25: Add image asset pipeline
-
-**Description:** Implementasikan invitation-scoped JPEG/PNG/WebP upload, magic-byte validation, 10 MB limit, max 2560 px normalization, gallery cap, variants, dan protected delivery.
-
-**Acceptance criteria:**
-- [ ] Invalid type, spoofed MIME, oversize, over-cap, dan cross-invitation access ditolak.
-- [ ] DB/file operation cleans partial state on failure and creates display/thumbnail variants atomically.
-- [ ] Draft/public delivery follows ownership/publication status and safe headers.
-
-**Verification:**
-- [ ] `pnpm test:integration -- image-assets` lulus with malicious fixtures.
-- [ ] `pnpm test:e2e -- --grep "gallery upload"` lulus.
-
-**Dependencies:** Tasks 4 and 21  
-**Files likely touched:** `src/features/assets/image-service.ts`, `src/features/assets/policy.ts`, `src/app/api/assets/images/route.ts`, `src/app/api/assets/[assetId]/route.ts`, `tests/integration/image-assets.test.ts`  
-**Estimated scope:** Medium, 5 files
-
-### Task 26: Add music asset and controls
-
-**Description:** Implementasikan MP3/M4A upload, magic-byte/duration/15 MB validation, protected delivery, dan accessible play/pause behavior after user interaction.
-
-**Acceptance criteria:**
-- [ ] Invalid/spoofed/oversize/over-10-minute audio ditolak dan partial files dibersihkan.
-- [ ] Audio tidak mencoba autoplay sebelum browser-permitted interaction dan selalu memiliki pause control.
-- [ ] Invitation remains readable and functional when audio fails.
-
-**Verification:**
-- [ ] `pnpm test:integration -- music-assets` lulus.
-- [ ] Manual Safari mobile and Chrome mobile audio check.
-
-**Dependencies:** Tasks 21 and 25  
-**Files likely touched:** `src/features/assets/music-service.ts`, `src/features/invitations/audio-player.tsx`, `src/app/api/assets/music/route.ts`, `tests/integration/music-assets.test.ts`, `src/features/invitations/audio-player.test.tsx`  
-**Estimated scope:** Medium, 5 files
-
-### Task 27: Warn and apply direct-live published edits
-
-**Description:** Tambahkan first-save warning per workspace visit, atomic published content update, public revalidation, audit event, dan admin emergency archive path.
-
-**Acceptance criteria:**
-- [ ] Published save cannot proceed until customer explicitly confirms public impact.
-- [ ] Confirmed save atomically updates content/version and public route; failed save leaves old public version intact.
-- [ ] Warning does not grant publish/unpublish/archive capability.
-
-**Verification:**
-- [ ] `pnpm test:integration -- published-edit` lulus including stale/failed writes.
-- [ ] `pnpm test:e2e -- --grep "published edit warning"` lulus.
-
-**Dependencies:** Tasks 21-26  
-**Files likely touched:** `src/features/workspace/published-warning.tsx`, `src/features/workspace/actions.ts`, `src/features/invitations/public-cache.ts`, `src/features/audit/events.ts`, `tests/integration/published-edit.test.ts`  
-**Estimated scope:** Medium, 5 files
-
-## Checkpoint D: Workspace
-
-- [ ] Tasks 19-27 reviewed.
-- [ ] Cross-customer, expired session, stale write, and upload attack tests pass.
-- [ ] Workspace save/refresh/live-preview journey passes on 360 px viewport.
-- [ ] Physical-device image and audio checks pass.
-
-## Phase E: Publish and Guest Experience
-
-### Task 28: Add admin publish, unpublish, and archive
-
-**Description:** Implementasikan admin-only visibility transitions, readiness validation, timestamps, audit events, dan public cache invalidation.
-
-**Acceptance criteria:**
-- [ ] Customer/direct non-admin requests cannot change visibility.
-- [ ] Publish rejects missing required template content and exposes route only after commit succeeds.
-- [ ] Unpublish/archive closes route without deleting invitation data.
-
-**Verification:**
-- [ ] `pnpm test:integration -- publication-lifecycle` lulus.
-- [ ] `pnpm test:e2e -- --grep "admin publish"` lulus.
-
-**Dependencies:** Tasks 17 and 27  
-**Files likely touched:** `src/features/invitations/publication.ts`, `src/app/admin/invitations/[invitationId]/actions.ts`, `src/app/admin/invitations/[invitationId]/page.tsx`, `src/features/audit/events.ts`, `tests/integration/publication-lifecycle.test.ts`  
-**Estimated scope:** Medium, 5 files
-
-### Task 29: Complete public invitation route
-
-**Description:** Buat `/i/[slug]` memakai public DTO/shared renderer, metadata, not-found privacy, animation reduction, Maps, gallery, gift, story, dan audio integration.
-
-**Acceptance criteria:**
-- [ ] Hanya published slug renders; unknown/non-published responses indistinguishable.
-- [ ] All populated standard sections render mobile-first and optional sections collapse cleanly.
-- [ ] Core information remains readable when JS, animation, image, or audio enhancement fails.
-
-**Verification:**
-- [ ] `pnpm test:e2e -- --grep "public invitation"` lulus across Chromium, WebKit, and Firefox.
-- [ ] Manual WhatsApp WebView and reduced-motion check.
-
-**Dependencies:** Tasks 6, 23-26, and 28  
-**Files likely touched:** `src/app/i/[slug]/page.tsx`, `src/app/i/[slug]/not-found.tsx`, `src/app/i/[slug]/opengraph-image.tsx`, `src/features/invitations/public-data.ts`, `e2e/public-invitation.spec.ts`  
-**Estimated scope:** Medium, 5 files
-
-### Task 30: Add public RSVP
-
-**Description:** Tambahkan RSVP form dan endpoint untuk name, attendance, guest count, dan event selection only when relevant.
-
-**Acceptance criteria:**
-- [ ] Only published invitation accepts RSVP; name max 100 and guest count respects invitation limit.
-- [ ] Contact data tidak diminta/disimpan dan duplicate pending submit diblokir.
-- [ ] Server rejects unknown fields and returns consistent safe errors.
-
-**Verification:**
-- [ ] `pnpm test:integration -- rsvp` lulus.
-- [ ] `pnpm test:e2e -- --grep "RSVP"` lulus.
-
-**Dependencies:** Task 29  
-**Files likely touched:** `src/features/guests/rsvp-form.tsx`, `src/features/guests/rsvp-schema.ts`, `src/features/guests/rsvp-service.ts`, `src/app/api/invitations/[slug]/rsvp/route.ts`, `tests/integration/rsvp.test.ts`  
-**Estimated scope:** Medium, 5 files
-
-### Task 31: Add public wishes
-
-**Description:** Tambahkan wish form, server sanitization, 100-character name, 1.000-character message, visibility state, delete confirmation contract, dan public list.
-
-**Acceptance criteria:**
-- [ ] Only published invitation accepts valid plain-text wishes and React rendering never interprets user HTML.
-- [ ] Hidden/deleted wishes do not appear publicly.
-- [ ] Delete removes content as approved while retaining content-free audit event.
-
-**Verification:**
-- [ ] `pnpm test:integration -- wishes` lulus with stored-XSS fixtures.
-- [ ] `pnpm test:e2e -- --grep "wishes"` lulus.
-
-**Dependencies:** Task 29 and approval of delete semantics  
-**Files likely touched:** `src/features/guests/wish-form.tsx`, `src/features/guests/wish-schema.ts`, `src/features/guests/wish-service.ts`, `src/app/api/invitations/[slug]/wishes/route.ts`, `tests/integration/wishes.test.ts`  
-**Estimated scope:** Medium, 5 files
-
-### Task 32: Add owner/admin response management
-
-**Description:** Buat paginated RSVP/wish views scoped to invitation owner/admin plus hide, unhide, and delete actions.
-
-**Acceptance criteria:**
-- [ ] Customer sees only owned invitation responses; admin can select any invitation.
-- [ ] List pagination has deterministic ordering and no unbounded query.
-- [ ] Hide/unhide/delete actions re-check ownership/role and update public output.
-
-**Verification:**
-- [ ] `pnpm test:integration -- response-management` lulus including IDOR cases.
-- [ ] `pnpm test:e2e -- --grep "manage responses"` lulus.
-
-**Dependencies:** Tasks 30 and 31  
-**Files likely touched:** `src/app/workspace/invitations/[invitationId]/responses/page.tsx`, `src/app/admin/invitations/[invitationId]/responses/page.tsx`, `src/features/guests/response-data.ts`, `src/features/guests/response-actions.ts`, `tests/integration/response-management.test.ts`  
-**Estimated scope:** Medium, 5 files
-
-## Checkpoint E: Guest Experience
-
-- [ ] Tasks 28-32 reviewed.
-- [ ] Draft/privacy and admin-only publish tests pass.
-- [ ] Public invitation works across target browsers and mobile viewport.
-- [ ] RSVP/wish validation, XSS, ownership, and pagination tests pass.
-
-## Phase F: Metrics, Hardening, and Deployment
-
-### Task 33: Build admin metrics dashboard
-
-**Description:** Tambahkan aggregate queries dan dashboard untuk template/palette interest, detail-to-WhatsApp ratio, activation rate, delivery duration, workspace save actor, views, RSVP, dan wishes.
-
-**Acceptance criteria:**
-- [ ] Metrics derive only from allowlisted events and operational timestamps.
-- [ ] Date range and empty state work without loading raw event payload into browser.
-- [ ] Query plan remains bounded with required indexes and representative test volume.
-
-**Verification:**
-- [ ] `pnpm test:integration -- analytics-aggregates` lulus.
-- [ ] Manual reconcile dashboard counts against fixture data.
-
-**Dependencies:** Tasks 11, 16, 27, 30, and 31  
-**Files likely touched:** `src/app/admin/metrics/page.tsx`, `src/features/analytics/aggregates.ts`, `src/features/analytics/metrics-dashboard.tsx`, `src/features/analytics/range.ts`, `tests/integration/analytics-aggregates.test.ts`  
-**Estimated scope:** Medium, 5 files
-
-### Task 34: Add adaptive abuse protection
-
-**Description:** Implementasikan application rate buckets, HMAC pseudonymous keys, honeypot/min-fill checks, Turnstile escalation/verification, dan security event logging.
-
-**Acceptance criteria:**
-- [ ] Auth, RSVP, wish, analytics, dan upload routes have explicit limits and generic 429/error semantics.
-- [ ] Raw IP, PIN, token, guest content, dan Turnstile secret tidak disimpan/logged.
-- [ ] Suspicious requests require valid Turnstile while normal requests remain friction-light.
-
-**Verification:**
-- [ ] `pnpm test:integration -- abuse-protection` lulus including replay/provider failure.
-- [ ] Manual staging check with Turnstile test keys.
-
-**Dependencies:** Tasks 20, 25, 30, and 31; Turnstile account approved  
-**Files likely touched:** `src/features/security/rate-limit.ts`, `src/features/security/honeypot.ts`, `src/features/security/turnstile.ts`, `src/features/security/events.ts`, `tests/integration/abuse-protection.test.ts`  
-**Estimated scope:** Medium, 5 files
-
-### Task 35: Complete security and privacy hardening
-
-**Description:** Tambahkan security headers/CSP, environment allowlist, upload/path audit, structured safe errors, dependency audit, authorization matrix test, dan production threat-model review.
-
-**Acceptance criteria:**
-- [ ] CSP, HSTS production, frame, content-type, referrer, and permissions policies match used resources.
-- [ ] Every protected action/route has server authorization and IDOR regression coverage.
-- [ ] Native dependency audit has no unmitigated reachable critical/high finding.
-
-**Verification:**
-- [ ] `pnpm test:integration -- authorization-matrix` lulus.
-- [ ] `pnpm audit` triaged; `pnpm lint && pnpm typecheck && pnpm test && pnpm build` lulus.
-- [ ] Browser security-header inspection passes on production-like server.
-
-**Dependencies:** Tasks 13-34  
-**Files likely touched:** `next.config.ts`, `src/lib/server/env.ts`, `src/lib/server/errors.ts`, `tests/integration/authorization-matrix.test.ts`, `docs/security-review.md`  
-**Estimated scope:** Medium, 5 files
-
-### Task 36: Containerize app and PostgreSQL
-
-**Description:** Buat reproducible Node 22 application image, PostgreSQL 18 Compose service, private network, persistent volumes, healthchecks, and one-off migration job.
-
-**Acceptance criteria:**
-- [ ] App and database start from clean host using documented commands; PostgreSQL has no public port.
-- [ ] Asset/database volumes survive app recreation and secrets are not baked into image.
-- [ ] Release image is immutable and tagged by commit SHA.
-
-**Verification:**
-- [ ] `docker compose config` lulus.
-- [ ] Clean-volume staging deploy, migration, restart, and persistence smoke tests pass.
-
-**Dependencies:** Tasks 3, 4, and 35; VPS baseline approved  
-**Files likely touched:** `Dockerfile`, `.dockerignore`, `compose.yaml`, `compose.production.yaml`, `docs/deployment.md`  
-**Estimated scope:** Medium, 5 files
-
-### Task 37: Add Nginx, TLS, and release runbook
-
-**Description:** Konfigurasi Nginx reverse proxy, Certbot TLS, upload/body/rate limits, streaming behavior, forwarded headers, readiness routing, and manual release/rollback sequence.
-
-**Acceptance criteria:**
-- [ ] Only HTTPS ingress is public; HTTP redirects; database and app ports remain private.
-- [ ] Proxy limits match upload requirements and do not buffer intended streaming responses.
-- [ ] Magic-link token path tidak masuk access log; release/rollback runbook references immutable image dan forward-only migrations.
-
-**Verification:**
-- [ ] `nginx -t` lulus pada staging container/host.
-- [ ] TLS renewal dry-run and upload/429/streaming smoke tests pass.
-
-**Dependencies:** Tasks 34 and 36; domain DNS ready  
-**Files likely touched:** `infra/nginx/undango.conf`, `infra/nginx/rate-limits.conf`, `compose.production.yaml`, `docs/deployment.md`, `docs/rollback.md`  
-**Estimated scope:** Medium, 5 files
-
-### Task 38: Add backup, restore, and disk monitoring
-
-**Description:** Implementasikan nightly PostgreSQL/asset backups, seven-day local rotation, weekly encrypted off-host copy, disk thresholds, upload block, and restore drill.
-
-**Acceptance criteria:**
-- [ ] Automated local backup records success/failure; off-host encrypted copy procedure has named owner.
-- [ ] 70/85/90 percent disk thresholds alert, escalate, and block only new uploads as planned.
-- [ ] Fresh staging host can restore database/assets and serve known invitation from backup.
-
-**Verification:**
-- [ ] Backup script dry-run and checksum verification pass.
-- [ ] Documented restore drill and disk-threshold simulation pass.
-
-**Dependencies:** Tasks 25, 36, and off-host target approval  
-**Files likely touched:** `infra/backup/backup.sh`, `infra/backup/restore.sh`, `infra/monitoring/disk-check.sh`, `compose.production.yaml`, `docs/disaster-recovery.md`  
-**Estimated scope:** Medium, 5 files
-
-### Task 39: Run full release verification
-
-**Description:** Lengkapi E2E suite seluruh journey, physical-device checks, performance/accessibility minimum review, production smoke test, rollback drill, dan final launch report. Task ini memverifikasi; tidak menambah scope baru.
-
-**Acceptance criteria:**
-- [ ] Discovery, WhatsApp, admin order/activation, customer auth/workspace, publish, live edit, RSVP, wish, and metrics journeys pass.
-- [ ] Security, backup restore, rollback, mobile, browser, asset, audio, Maps, and reduced-motion checks have evidence.
-- [ ] Semua PRD success criteria mapped ke passing test atau signed manual check.
-
-**Verification:**
-- [ ] `pnpm lint && pnpm typecheck && pnpm test && pnpm test:integration && pnpm build && pnpm test:e2e` lulus.
-- [ ] `pnpm audit` findings triaged and release checklist signed.
-- [ ] Human production launch approval recorded separately.
-
-**Dependencies:** Tasks 1-38  
-**Files likely touched:** `e2e/mvp-journeys.spec.ts`, `e2e/security.spec.ts`, `docs/release-checklist.md`, `docs/security-review.md`, `docs/launch-report.md`  
-**Estimated scope:** Medium, 5 files
-
-## Final Checkpoint
-
-- [ ] Tasks 1-39 completed and reviewed.
-- [ ] PRD success criteria traceability complete.
-- [ ] Production backup restore and image rollback demonstrated.
-- [ ] No unresolved critical/high security or data-loss risk.
-- [ ] Product owner explicitly approves launch.
+- [ ] `PR-01` and `PR-03` - `PR-11` complete; `PR-02` completed or explicitly deferred with evidence.
+- [ ] Security, TLS, deployment, rollback, backup/restore, monitoring, and browser/device gates pass.
+- [ ] Product owner explicitly approves public launch.

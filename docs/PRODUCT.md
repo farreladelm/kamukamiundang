@@ -1,8 +1,10 @@
 # Product Specification — MVP Undangan Digital Indonesia
 
-**Status:** Draft / source of truth MVP  
+**Status:** Product definition / vision  
 **Tanggal:** 2 Agustus 2026  
 **Target pasar:** pasangan di Indonesia yang ingin memakai undangan pernikahan digital siap pakai.
+
+> Requirement implementasi, lifecycle, authentication, serta pembagian MVP dan Production Readiness mengikuti [`docs/PRD.md`](./PRD.md) versi Approved terbaru. Jika dokumen ini berbeda dengan PRD, PRD menjadi implementation contract.
 
 ## 1. Ringkasan produk
 
