@@ -1,8 +1,12 @@
+import { headers } from "next/headers";
 import { Catalog } from "@/features/showroom/catalog";
 import { getVisibleTemplateCatalog } from "@/features/templates/registry";
 
-export default function ShowroomPage() {
+export default async function ShowroomPage() {
   const templates = getVisibleTemplateCatalog();
+  const requestHeaders = await headers();
+  const host = requestHeaders.get("host") ?? "localhost:3000";
+  const protocol = requestHeaders.get("x-forwarded-proto") ?? "http";
 
   return (
     <main className="bg-[#f7f4ed] text-stone-900">
@@ -35,7 +39,7 @@ export default function ShowroomPage() {
         </div>
       </section>
       <div id="koleksi">
-        <Catalog templates={templates} />
+        <Catalog templates={templates} canonicalOrigin={`${protocol}://${host}`} />
       </div>
     </main>
   );

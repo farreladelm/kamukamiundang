@@ -13,6 +13,7 @@ type WhatsAppCtaProps = {
     priceInRupiah: number;
   };
   palette: Pick<TemplatePalette, "key" | "name">;
+  className?: string;
 };
 
 function recordWhatsAppCtaClick({
@@ -43,6 +44,7 @@ export function WhatsAppCta({
   canonicalUrl,
   template,
   palette,
+  className,
 }: WhatsAppCtaProps) {
   const href = buildWhatsAppHref(whatsappNumber, {
     templateKey: template.templateKey,
@@ -55,7 +57,7 @@ export function WhatsAppCta({
   });
 
   return (
-    <a href={href} onClick={() => recordWhatsAppCtaClick({ template, palette })}>
+    <a className={className} href={href} onClick={() => recordWhatsAppCtaClick({ template, palette })}>
       Pesan via WhatsApp
     </a>
   );

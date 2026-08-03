@@ -19,3 +19,13 @@ test("catalog filters and resets template collection", async ({ page }) => {
 
   await expect(page.getByText("Larasati", { exact: true })).toBeVisible();
 });
+
+test("catalog exposes preview and WhatsApp contact actions", async ({ page }) => {
+  await page.goto("/");
+
+  await expect(page.getByRole("link", { name: "Lihat preview Larasati" })).toHaveAttribute(
+    "href",
+    "/templates/larasati",
+  );
+  await expect(page.getByRole("link", { name: "Pesan via WhatsApp" })).toHaveCount(3);
+});

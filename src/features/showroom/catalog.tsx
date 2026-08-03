@@ -1,7 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import type { TemplateCatalogItem } from "@/features/templates/types";
+import { WhatsAppCta } from "@/features/showroom/whatsapp-cta";
 
 const allCategoriesLabel = "Semua";
 
@@ -15,8 +17,10 @@ function formatRupiah(priceInRupiah: number): string {
 
 export function Catalog({
   templates,
+  canonicalOrigin = "",
 }: {
   templates: readonly TemplateCatalogItem[];
+  canonicalOrigin?: string;
 }) {
   const visibleTemplates = templates.filter((template) => template.isVisible);
   const categories = [
@@ -112,6 +116,21 @@ export function Catalog({
                 <p className="mt-5 border-t border-stone-200 pt-4 text-sm font-semibold text-stone-900">
                   Mulai {formatRupiah(template.priceInRupiah)}
                 </p>
+                <div className="mt-5 grid gap-2 sm:grid-cols-2">
+                  <Link
+                    href={`/templates/${template.slug}`}
+                    className="inline-flex min-h-11 items-center justify-center border border-stone-900 px-3 text-center text-sm font-semibold text-stone-900 transition-colors hover:bg-stone-900 hover:text-stone-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-900"
+                  >
+                    Lihat preview {template.name}
+                  </Link>
+                  <WhatsAppCta
+                    whatsappNumber="6282131401640"
+                    canonicalUrl={`${canonicalOrigin}/templates/${template.slug}`}
+                    template={template}
+                    palette={palette}
+                    className="inline-flex min-h-11 items-center justify-center bg-stone-900 px-3 text-center text-sm font-semibold text-stone-50 transition-colors hover:bg-amber-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-900"
+                  />
+                </div>
               </div>
             </article>
           );

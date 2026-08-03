@@ -36,4 +36,18 @@ describe("Catalog", () => {
     expect(screen.getByText("Larasati")).toBeInTheDocument();
     expect(screen.queryByText("Pesisir Senja")).not.toBeInTheDocument();
   });
+
+  it("offers preview and contact actions for each visible template", () => {
+    render(<Catalog templates={templateRegistry} canonicalOrigin="https://undango.test" />);
+
+    expect(screen.getByRole("link", { name: "Lihat preview Larasati" })).toHaveAttribute(
+      "href",
+      "/templates/larasati",
+    );
+    expect(screen.getAllByRole("link", { name: "Pesan via WhatsApp" })).toHaveLength(3);
+    expect(screen.getAllByRole("link", { name: "Pesan via WhatsApp" })[0]).toHaveAttribute(
+      "href",
+      expect.stringContaining("undango.test%2Ftemplates%2Flarasati"),
+    );
+  });
 });
