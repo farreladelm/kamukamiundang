@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { TemplateCatalogItem } from "@/features/templates/types";
 
 const allCategoriesLabel = "Semua";
@@ -28,6 +28,17 @@ export function Catalog({
     (template) =>
       activeCategory === allCategoriesLabel || template.category === activeCategory,
   );
+
+  useEffect(() => {
+    void fetch("/api/analytics/events", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: "template_list_viewed",
+        properties: { category: activeCategory },
+      }),
+    }).catch(() => undefined);
+  }, [activeCategory]);
 
   return (
     <section className="mx-auto max-w-6xl px-5 pb-20 sm:px-8" aria-labelledby="collection-title">

@@ -5,8 +5,8 @@
 | Asset class | Source | License | Scope |
 | --- | --- | --- | --- |
 | Larasati layout, CSS ornament, copy, palette tokens | Undango source code | Proprietary, owned by Undango | `template-1` v1 |
-| Pesisir Senja concept, layout tokens, copy, palette tokens | Undango source code | Proprietary, owned by Undango | `template-2` v1 |
-| Taman Aksara concept, layout tokens, copy, palette tokens | Undango source code | Proprietary, owned by Undango | `template-3` v1 |
+| Pesisir Senja renderer, CSS horizon artwork, layout, copy, palette tokens | Undango source code | Proprietary, owned by Undango | `template-2` v1 |
+| Taman Aksara renderer, CSS botanical artwork, layout, copy, palette tokens | Undango source code | Proprietary, owned by Undango | `template-3` v1 |
 | Type | Browser serif and system sans-serif fallback stacks | System-provided fonts; no redistributed font files | All launch concepts |
 
 ## Review Notes
