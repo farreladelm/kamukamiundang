@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import { renderTemplate } from "@/features/templates/render-template";
 import { getTemplateDefinition } from "@/features/templates/registry";
 
@@ -54,13 +53,7 @@ export function TemplateDetail({
           className="relative hidden min-h-[35rem] flex-1 flex-col justify-between overflow-hidden p-6 sm:p-10 lg:sticky lg:top-0 lg:flex lg:h-screen lg:min-h-0 lg:p-16"
           style={{ backgroundColor: selectedPalette.tokens.canvas, color: selectedPalette.tokens.ink }}
         >
-          <div className="relative z-10 flex items-center justify-between gap-4">
-            <Link
-              href="/"
-              className="text-sm font-semibold underline decoration-current/40 underline-offset-4 transition-opacity hover:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-4"
-            >
-              Kembali ke koleksi
-            </Link>
+          <div className="relative z-10 flex justify-end">
             <span className="text-xs font-semibold tracking-[0.16em] uppercase opacity-60">
               Preview publik
             </span>

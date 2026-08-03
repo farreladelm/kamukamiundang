@@ -48,6 +48,7 @@ describe("TemplateDetail", () => {
     );
 
     expect(screen.getByTestId("preview-cover")).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "Kembali ke koleksi" })).not.toBeInTheDocument();
     expect(screen.getByTestId("preview-cover").className).toContain("lg:h-screen");
     expect(screen.getByTestId("preview-cover").className).toContain("lg:sticky");
     expect(screen.getByTestId("preview-cover").className).toContain("hidden");
