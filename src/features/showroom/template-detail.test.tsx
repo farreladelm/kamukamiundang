@@ -17,17 +17,21 @@ describe("TemplateDetail", () => {
     const demo = screen.getByTestId("template-demo");
     const renderedTemplate = demo.firstElementChild;
 
-    expect(screen.getByText("Aruna & Bima", { selector: "h1" })).toBeInTheDocument();
-    expect(screen.getByText("Gading", { selector: "button" })).toHaveAttribute(
+    expect(screen.getByRole("heading", { name: "Larasati" })).toBeInTheDocument();
+    expect(screen.getByText("Aruna")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Buka pilihan palet" }));
+    expect(screen.getByRole("button", { name: /^Gading/ })).toHaveAttribute(
       "aria-pressed",
       "true",
     );
-    expect(screen.queryByText("Terakota", { selector: "button" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "Terakota" })).not.toBeInTheDocument();
     expect(renderedTemplate).toHaveStyle({ backgroundColor: "rgb(246, 240, 229)" });
 
-    fireEvent.click(screen.getByText("Soga", { selector: "button" }));
+    fireEvent.click(screen.getByRole("button", { name: "Soga" }));
 
-    expect(screen.getByText("Soga", { selector: "button" })).toHaveAttribute(
+    expect(screen.getByRole("button", { name: "Buka pilihan palet" })).toHaveTextContent("Soga");
+    fireEvent.click(screen.getByRole("button", { name: "Buka pilihan palet" }));
+    expect(screen.getByRole("button", { name: /^Soga/ })).toHaveAttribute(
       "aria-pressed",
       "true",
     );
@@ -38,4 +42,30 @@ describe("TemplateDetail", () => {
       expect.stringContaining("wa.me/6282131401640"),
     );
   }, 15_000);
+
+  it("renders as a mobile invitation with desktop cover and fixed palette control", () => {
+    render(
+      <TemplateDetail
+        templateKey="template-1"
+        templateVersion={1}
+        canonicalUrl="https://undango.test/templates/larasati"
+      />,
+    );
+
+    expect(screen.getByTestId("preview-cover")).toBeInTheDocument();
+    expect(screen.getByTestId("invitation-frame")).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Buka pilihan palet" })).toHaveAttribute(
+      "aria-expanded",
+      "false",
+    );
+    expect(screen.queryByRole("dialog", { name: "Pilihan palet" })).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Buka pilihan palet" }));
+
+    expect(screen.getByRole("dialog", { name: "Pilihan palet" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Soga" })).toHaveAttribute(
+      "aria-pressed",
+      "false",
+    );
+  });
 });

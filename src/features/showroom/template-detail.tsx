@@ -22,6 +22,8 @@ export function TemplateDetail({
   }
 
   const [paletteKey, setPaletteKey] = useState(template.demo.paletteKey);
+  const [isPaletteOpen, setIsPaletteOpen] = useState(false);
+  const selectedPalette = template.palettes.find((palette) => palette.key === paletteKey)!;
 
   useEffect(() => {
     void fetch("/api/analytics/events", {
@@ -36,6 +38,7 @@ export function TemplateDetail({
 
   function selectPalette(nextPaletteKey: string) {
     setPaletteKey(nextPaletteKey);
+    setIsPaletteOpen(false);
     void fetch("/api/analytics/events", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -47,48 +50,115 @@ export function TemplateDetail({
   }
 
   return (
-    <main className="min-h-screen bg-[#f7f4ed] px-5 py-8 text-stone-900 sm:px-8 sm:py-12">
-      <div className="mx-auto max-w-6xl">
-        <Link
-          href="/"
-          className="text-sm font-semibold text-stone-700 underline decoration-stone-400 underline-offset-4 hover:text-stone-950 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-stone-900"
+    <main className="min-h-screen bg-stone-950 text-stone-900">
+      <div className="mx-auto flex min-h-screen max-w-[120rem] flex-col lg:flex-row">
+        <section
+          data-testid="preview-cover"
+          className="relative flex min-h-[35rem] flex-1 flex-col justify-between overflow-hidden p-6 sm:p-10 lg:min-h-screen lg:p-16"
+          style={{ backgroundColor: selectedPalette.tokens.canvas, color: selectedPalette.tokens.ink }}
         >
-          Kembali ke koleksi
-        </Link>
-        <div className="mt-8 grid gap-8 lg:grid-cols-[16rem_minmax(0,1fr)] lg:items-start">
-          <aside className="border-y border-stone-300 py-6 lg:border-y-0 lg:border-r lg:pr-8">
-            <p className="text-xs font-semibold tracking-[0.16em] text-stone-500 uppercase">
+          <div className="relative z-10 flex items-center justify-between gap-4">
+            <Link
+              href="/"
+              className="text-sm font-semibold underline decoration-current/40 underline-offset-4 transition-opacity hover:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-4"
+            >
+              Kembali ke koleksi
+            </Link>
+            <span className="text-xs font-semibold tracking-[0.16em] uppercase opacity-60">
+              Preview publik
+            </span>
+          </div>
+
+          <div className="relative z-10 max-w-xl py-16 lg:py-8">
+            <p
+              className="text-xs font-semibold tracking-[0.24em] uppercase"
+              style={{ color: selectedPalette.tokens.accent }}
+            >
               {template.category}
             </p>
-            <h1 className="mt-2 font-serif text-4xl text-stone-900">{template.name}</h1>
-            <p className="mt-4 text-sm leading-6 text-stone-600">{template.description}</p>
-            <fieldset className="mt-8">
-              <legend className="text-sm font-semibold text-stone-900">Pilih palet</legend>
-              <div className="mt-3 flex flex-wrap gap-2 lg:flex-col lg:items-start">
-                {template.palettes.map((palette) => (
-                  <button
-                    key={palette.key}
-                    type="button"
-                    className="border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 transition-colors hover:border-stone-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-900 aria-pressed:border-stone-900 aria-pressed:bg-stone-900 aria-pressed:text-stone-50"
-                    aria-pressed={paletteKey === palette.key}
-                    onClick={() => selectPalette(palette.key)}
-                  >
-                    {palette.name}
-                  </button>
-                ))}
-              </div>
-            </fieldset>
+            <h1 className="mt-2 font-serif text-3xl">{template.name}</h1>
+            <p className="mt-8 font-serif text-[clamp(3.5rem,8vw,8rem)] leading-[0.86]">
+              {template.demo.content.couple.firstName}
+              <span className="block pl-[0.6em] italic opacity-50">&amp;</span>
+              <span className="block">{template.demo.content.couple.secondName}</span>
+            </p>
+            <p className="mt-8 max-w-sm text-sm leading-7 opacity-70">
+              {template.demo.content.eventDate}. {template.description}
+            </p>
+          </div>
+
+          <div className="relative z-10 flex flex-wrap items-center justify-between gap-5 border-t pt-5" style={{ borderColor: selectedPalette.tokens.line }}>
+            <p className="max-w-xs text-xs leading-5 opacity-60">
+              Invitation dirancang untuk dibaca nyaman dari layar ponsel.
+            </p>
             <WhatsAppCta
               whatsappNumber="6282131401640"
               canonicalUrl={canonicalUrl}
               template={template}
-              palette={template.palettes.find((palette) => palette.key === paletteKey)!}
+              palette={selectedPalette}
+              className="inline-flex min-h-11 items-center justify-center bg-stone-900 px-4 text-sm font-semibold text-stone-50 transition-opacity hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-4"
             />
-          </aside>
-          <div data-testid="template-demo">
-            {renderTemplate(template, paletteKey, template.demo.content)}
           </div>
-        </div>
+
+          <div className="absolute -right-32 top-1/2 size-96 -translate-y-1/2 rounded-full border opacity-40" style={{ borderColor: selectedPalette.tokens.accent }} aria-hidden="true" />
+          <div className="absolute -bottom-24 left-1/3 size-72 rounded-full border opacity-30" style={{ borderColor: selectedPalette.tokens.line }} aria-hidden="true" />
+        </section>
+
+        <section className="flex w-full justify-center bg-stone-950 px-3 py-5 sm:px-6 lg:w-[30rem] lg:shrink-0 lg:px-6 lg:py-8">
+          <div
+            data-testid="invitation-frame"
+            className="h-fit w-full max-w-[26rem] overflow-hidden bg-white shadow-2xl shadow-black/40"
+          >
+            <div data-testid="template-demo">
+              {renderTemplate(template, paletteKey, template.demo.content)}
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <div className="fixed right-5 bottom-5 z-30 sm:right-8 sm:bottom-8">
+        {isPaletteOpen && (
+          <div
+            id="palette-picker"
+            role="dialog"
+            aria-label="Pilihan palet"
+            className="absolute right-0 bottom-16 w-56 border border-stone-200 bg-white p-3 text-stone-900 shadow-2xl"
+          >
+            <p className="px-2 pb-2 text-xs font-semibold tracking-[0.16em] text-stone-500 uppercase">
+              Pilih palet
+            </p>
+            <div className="grid gap-1">
+              {template.palettes.map((palette) => (
+                <button
+                  key={palette.key}
+                  type="button"
+                  className="flex min-h-11 items-center gap-3 px-2 text-left text-sm font-medium transition-colors hover:bg-stone-100 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-stone-900"
+                  aria-pressed={paletteKey === palette.key}
+                  onClick={() => selectPalette(palette.key)}
+                >
+                  <span
+                    className="size-6 shrink-0 rounded-full border border-stone-300"
+                    style={{ backgroundColor: palette.tokens.accent }}
+                    aria-hidden="true"
+                  />
+                  <span>{palette.name}</span>
+                  {paletteKey === palette.key && <span className="ml-auto text-xs">Aktif</span>}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+        <button
+          type="button"
+          aria-expanded={isPaletteOpen}
+          aria-controls="palette-picker"
+          aria-label="Buka pilihan palet"
+          className="flex min-h-12 items-center gap-2 border border-white/30 bg-stone-900 px-4 text-sm font-semibold text-white shadow-xl transition-colors hover:bg-stone-700 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
+          onClick={() => setIsPaletteOpen((open) => !open)}
+        >
+          <span className="size-4 rounded-full border border-white/50" style={{ backgroundColor: selectedPalette.tokens.accent }} aria-hidden="true" />
+          Palet: {selectedPalette.name}
+        </button>
       </div>
     </main>
   );

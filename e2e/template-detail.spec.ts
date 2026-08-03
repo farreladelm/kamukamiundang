@@ -5,7 +5,8 @@ test("template detail renders demo and updates compatible palette preview", asyn
 
   await expect(page.getByRole("heading", { name: "Larasati" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Aruna & Bima" })).toBeVisible();
-  await expect(page.getByRole("button", { name: "Gading" })).toHaveAttribute(
+  await page.getByRole("button", { name: "Buka pilihan palet" }).click();
+  await expect(page.getByRole("button", { name: /^Gading/ })).toHaveAttribute(
     "aria-pressed",
     "true",
   );
@@ -16,7 +17,8 @@ test("template detail renders demo and updates compatible palette preview", asyn
 
   await page.getByRole("button", { name: "Soga" }).click();
 
-  await expect(page.getByRole("button", { name: "Soga" })).toHaveAttribute(
+  await page.getByRole("button", { name: "Buka pilihan palet" }).click();
+  await expect(page.getByRole("button", { name: /^Soga/ })).toHaveAttribute(
     "aria-pressed",
     "true",
   );
