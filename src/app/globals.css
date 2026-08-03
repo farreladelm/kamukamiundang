@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f7f4ed;
+  --foreground: #292524;
 }
 
 @theme inline {
@@ -12,15 +12,102 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}
+
+.font-serif {
+  font-family: Georgia, "Times New Roman", serif;
+}
+
+.template-thumbnail {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  overflow: hidden;
+  border: 1px solid var(--thumbnail-line);
+}
+
+.template-thumbnail::before,
+.template-thumbnail::after {
+  position: absolute;
+  content: "";
+}
+
+.template-thumbnail-mark,
+.template-thumbnail-copy {
+  position: relative;
+  z-index: 1;
+}
+
+.template-thumbnail-mark {
+  display: grid;
+  width: 4.5rem;
+  height: 4.5rem;
+  place-items: center;
+  border: 1px solid var(--thumbnail-accent);
+  border-radius: 9999px;
+  color: var(--thumbnail-accent);
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 2rem;
+  font-style: italic;
+}
+
+.template-thumbnail-copy {
+  color: var(--thumbnail-accent);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  writing-mode: vertical-rl;
+}
+
+.template-thumbnail-arch::before {
+  top: 2.5rem;
+  right: 12%;
+  bottom: 0;
+  left: 12%;
+  border: 1px solid var(--thumbnail-accent);
+  border-bottom: 0;
+  border-radius: 999px 999px 0 0;
+}
+
+.template-thumbnail-coast::before {
+  right: -20%;
+  bottom: 19%;
+  left: -20%;
+  height: 43%;
+  background: var(--thumbnail-surface);
+  border-radius: 50% 50% 0 0;
+  transform: rotate(-6deg);
+}
+
+.template-thumbnail-coast::after {
+  top: 20%;
+  right: 18%;
+  width: 4rem;
+  height: 4rem;
+  border: 1px solid var(--thumbnail-accent);
+  border-radius: 9999px;
+}
+
+.template-thumbnail-garden::before {
+  top: 0;
+  left: -2rem;
+  width: 10rem;
+  height: 10rem;
+  border: 1px solid var(--thumbnail-accent);
+  border-radius: 0 0 100% 0;
+}
+
+.template-thumbnail-garden::after {
+  right: -3rem;
+  bottom: -3rem;
+  width: 11rem;
+  height: 11rem;
+  border: 1px solid var(--thumbnail-accent);
+  border-radius: 100% 0 0;
 }
