@@ -43,3 +43,33 @@ test("keeps cover fixed on desktop and hides it on mobile", async ({ page }) => 
   await expect(page.getByTestId("preview-cover")).toBeHidden();
   await expect(page.getByTestId("invitation-frame")).toBeVisible();
 });
+
+test("opens invitation cover and preserves recipient query", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto("/templates/larasati?to=Raka%20Pratama");
+
+  await expect(page.getByTestId("invitation-cover")).toBeVisible();
+  await expect(page.getByText("Raka Pratama")).toBeVisible();
+
+  await page.getByRole("button", { name: "Buka undangan" }).click();
+
+  await expect(page.getByTestId("invitation-cover")).toBeHidden();
+  await expect(page.getByTestId("invitation-content")).toHaveAttribute("aria-hidden", "false");
+});
+
+test("keeps desktop invitation rail still until cover opens", async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.goto("/templates/larasati");
+
+  const rail = page.getByTestId("invitation-scroll");
+  const bounds = await rail.boundingBox();
+  if (!bounds) throw new Error("Invitation rail is not measurable");
+
+  await page.mouse.move(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2);
+  await page.mouse.wheel(0, 800);
+  await expect.poll(() => rail.evaluate((element) => element.scrollTop)).toBe(0);
+
+  await page.getByRole("button", { name: "Buka undangan" }).click();
+  await page.mouse.wheel(0, 800);
+  await expect.poll(() => rail.evaluate((element) => element.scrollTop)).toBeGreaterThan(0);
+});

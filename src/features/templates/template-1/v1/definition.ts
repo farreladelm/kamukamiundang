@@ -4,7 +4,7 @@ import type { TemplateDefinition } from "@/features/templates/types";
 export const templateOneV1: TemplateDefinition = {
   templateKey: "template-1",
   templateVersion: 1,
-  contentSchemaVersion: 1,
+  contentSchemaVersion: 2,
   slug: "larasati",
   name: "Larasati",
   category: "Klasik",
@@ -12,7 +12,7 @@ export const templateOneV1: TemplateDefinition = {
   priceInRupiah: 650000,
   previewStyle: "arch",
   isVisible: true,
-  capabilities: ["gallery", "gift", "map", "music", "story"],
+  capabilities: ["gallery", "gift", "map", "music", "story", "wishes"],
   palettes: [
     {
       key: "gading",
@@ -55,14 +55,31 @@ export const templateOneV1: TemplateDefinition = {
     paletteKey: "gading",
     content: {
       eyebrow: "The wedding of",
+      cover: { title: "The wedding of", recipientLabel: "Dear", recipientName: "Nama Tamu" },
       couple: { firstName: "Aruna", secondName: "Bima" },
+      profiles: [
+        {
+          name: "Aruna Prameswari",
+          role: "putri",
+          parents: "Putri dari Bapak Hadi dan Ibu Rani",
+          instagram: "@arunapram",
+        },
+        {
+          name: "Bima Adinata",
+          role: "putra",
+          parents: "Putra dari Bapak Surya dan Ibu Ratih",
+          instagram: "@bimaadinata",
+        },
+      ],
       opening:
         "Dengan penuh syukur, kami mengundang Bapak, Ibu, Saudara, dan Sahabat untuk hadir dalam hari bahagia kami.",
       quote: "Apa yang telah dipersatukan oleh kasih, semoga selalu dikuatkan oleh doa.",
       eventDate: "Sabtu, 14 November 2026",
+      eventDateIso: "2026-11-14T08:00:00+07:00",
       events: [
         {
           label: "Akad Nikah",
+          date: "Sabtu, 14 November 2026",
           time: "08.00 WIB",
           venue: "Pendopo Joglo Sari",
           address: "Jl. Taman Sari No. 18, Yogyakarta",
@@ -70,15 +87,50 @@ export const templateOneV1: TemplateDefinition = {
         },
         {
           label: "Resepsi",
+          date: "Sabtu, 14 November 2026",
           time: "11.00 - 13.00 WIB",
           venue: "Pendopo Joglo Sari",
           address: "Jl. Taman Sari No. 18, Yogyakarta",
           mapUrl: "https://maps.google.com/?q=Pendopo+Joglo+Sari",
         },
       ],
-      story:
-        "Kami dipertemukan oleh sore-sore panjang di kampus, lalu belajar bahwa pulang paling baik adalah berjalan beriringan.",
+      gallery: {
+        videoLabel: "Putar film kecil kami",
+        photos: [
+          { id: "aruna-01", alt: "Potret Aruna dan Bima di taman", tone: "leaf" },
+          { id: "aruna-02", alt: "Aruna dan Bima berjalan bersama", tone: "sand" },
+          { id: "aruna-03", alt: "Momen hangat Aruna dan Bima", tone: "rose" },
+          { id: "aruna-04", alt: "Potret pasangan di sore hari", tone: "sky" },
+          { id: "aruna-05", alt: "Aruna dan Bima tersenyum", tone: "night" },
+          { id: "aruna-06", alt: "Detail bunga dan cincin pernikahan", tone: "sand" },
+        ],
+      },
+      story: {
+        intro: "Cerita kecil yang membawa kami sampai ke hari ini.",
+        entries: [
+          {
+            title: "Pertama bertemu",
+            text: "Kami dipertemukan oleh sore-sore panjang di kampus, lalu belajar bahwa pulang paling baik adalah berjalan beriringan.",
+            photo: { id: "aruna-story-01", alt: "Aruna dan Bima saat pertama bertemu", tone: "sand" },
+          },
+          {
+            title: "Memilih bersama",
+            text: "Dari percakapan sederhana, tumbuh keyakinan untuk saling menjaga dalam setiap musim.",
+            photo: { id: "aruna-story-02", alt: "Aruna dan Bima menikmati hari bersama", tone: "rose" },
+          },
+        ],
+      },
+      gift: {
+        intro: "Doa dan kehadiran Anda adalah hadiah terindah. Bila ingin berbagi tanda kasih, berikut detailnya.",
+        accounts: [{ bank: "Bank Nusantara", accountNumber: "1234 5678 90", accountName: "Aruna Prameswari" }],
+        physicalAddress: "Jl. Taman Sari No. 18, Yogyakarta",
+      },
+      wishes: {
+        prompt: "Tuliskan ucapan dan doa untuk kami.",
+        entries: [{ name: "Keluarga Prameswari", message: "Selamat menempuh hidup baru. Semoga selalu penuh kasih." }],
+      },
       closing: "Merupakan kehormatan bagi kami apabila Anda berkenan hadir.",
+      branding: "Undangan oleh Undango",
     },
   },
   renderer: TemplateOneRenderer,

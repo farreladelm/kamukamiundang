@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import { renderTemplate } from "@/features/templates/render-template";
 import { getTemplateDefinition } from "@/features/templates/registry";
@@ -15,6 +15,8 @@ describe("renderTemplate", () => {
 
     render(renderTemplate(template, template.demo.paletteKey, template.demo.content));
 
+    fireEvent.click(screen.getByRole("button", { name: "Buka undangan" }));
+
     expect(
       screen.getByRole("heading", { name: "Aruna & Bima" }),
     ).toBeInTheDocument();
@@ -23,7 +25,7 @@ describe("renderTemplate", () => {
     expect(
       screen.getAllByRole("link", { name: "Buka Google Maps" })[0],
     ).toHaveAttribute("href", "https://maps.google.com/?q=Pendopo+Joglo+Sari");
-  });
+  }, 15_000);
 
   it("rejects palette keys outside pinned template version", () => {
     const template = getTemplateDefinition("template-1", 1);

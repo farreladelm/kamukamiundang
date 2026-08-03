@@ -7,9 +7,11 @@ import { getTemplateDefinition } from "@/features/templates/registry";
 export function TemplateDetail({
   templateKey,
   templateVersion,
+  recipientName = "Nama Tamu",
 }: {
   templateKey: string;
   templateVersion: number;
+  recipientName?: string;
 }) {
   const template = getTemplateDefinition(templateKey, templateVersion);
 
@@ -53,6 +55,12 @@ export function TemplateDetail({
           className="relative hidden min-h-[35rem] flex-1 flex-col justify-between overflow-hidden p-6 sm:p-10 lg:sticky lg:top-0 lg:flex lg:h-screen lg:min-h-0 lg:p-16"
           style={{ backgroundColor: selectedPalette.tokens.canvas, color: selectedPalette.tokens.ink }}
         >
+          <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
+            <div className="absolute inset-0 opacity-75" style={{ background: `linear-gradient(135deg, ${selectedPalette.tokens.surface}, ${selectedPalette.tokens.canvas} 48%, ${selectedPalette.tokens.accent}66)` }} />
+            <div className="absolute top-1/2 left-1/2 aspect-[3/4] w-[min(42vw,30rem)] -translate-x-1/2 -translate-y-1/2 border border-current opacity-35" />
+            <div className="absolute top-[18%] left-[18%] h-28 w-28 rounded-full border opacity-35" style={{ borderColor: selectedPalette.tokens.accent }} />
+            <div className="absolute right-[14%] bottom-[14%] h-56 w-56 rounded-full border opacity-25" style={{ borderColor: selectedPalette.tokens.line }} />
+          </div>
           <div className="relative z-10 flex justify-end">
             <span className="text-xs font-semibold tracking-[0.16em] uppercase opacity-60">
               Preview publik
@@ -74,7 +82,7 @@ export function TemplateDetail({
             </p>
             <p className="mt-8 max-w-sm text-sm leading-7 opacity-70">
               {template.demo.content.eventDate}. {template.description}
-            </p>
+             </p>
           </div>
 
           <div className="relative z-10 border-t pt-5" style={{ borderColor: selectedPalette.tokens.line }}>
@@ -83,13 +91,11 @@ export function TemplateDetail({
             </p>
           </div>
 
-          <div className="absolute -right-32 top-1/2 size-96 -translate-y-1/2 rounded-full border opacity-40" style={{ borderColor: selectedPalette.tokens.accent }} aria-hidden="true" />
-          <div className="absolute -bottom-24 left-1/3 size-72 rounded-full border opacity-30" style={{ borderColor: selectedPalette.tokens.line }} aria-hidden="true" />
         </section>
 
         <section
           data-testid="invitation-scroll"
-          className="flex w-full justify-center overflow-y-visible lg:h-screen lg:w-[26rem] lg:shrink-0 lg:overflow-y-auto"
+          className="flex w-full justify-center overflow-y-visible lg:h-screen lg:w-[30rem] lg:shrink-0 lg:overflow-y-auto"
           style={{ backgroundColor: selectedPalette.tokens.canvas }}
         >
           <div
@@ -97,7 +103,10 @@ export function TemplateDetail({
             className="h-fit w-full overflow-hidden bg-white"
           >
             <div data-testid="template-demo">
-              {renderTemplate(template, paletteKey, template.demo.content)}
+              {renderTemplate(template, paletteKey, {
+                ...template.demo.content,
+                cover: { ...template.demo.content.cover, recipientName },
+              })}
             </div>
           </div>
         </section>

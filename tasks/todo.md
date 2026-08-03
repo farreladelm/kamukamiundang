@@ -325,7 +325,7 @@ Production Readiness starts only after MVP Gate. These tasks do not block MVP va
 **Acceptance:** Task starts only after documented support need and approved email provider; PIN is hashed, 10-minute TTL, 5 attempts/15 minutes, generic response, and successful consume creates revocable session. If evidence absent, decision to defer is documented and admin-issued WhatsApp magic link remains support path.  
 **Verify:** Product decision record; if built, recovery integration/E2E tests.  
 **Dependencies:** MVP Gate and explicit product approval  
-**Likely files:** `docs/decisions/0005-customer-recovery.md`, `src/app/auth/recover/actions.ts`, `src/features/auth/customer-pin.ts`, `src/features/auth/customer-pin-email.ts`, `tests/integration/customer-recovery.test.ts`  
+**Likely files:** `docs/decisions/0006-customer-recovery.md`, `src/app/auth/recover/actions.ts`, `src/features/auth/customer-pin.ts`, `src/features/auth/customer-pin-email.ts`, `tests/integration/customer-recovery.test.ts`  
 **Scope:** Conditional, up to 5 files
 
 ## Production Security

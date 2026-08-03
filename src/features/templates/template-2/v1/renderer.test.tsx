@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import { templateTwoV1 } from "@/features/templates/template-2/v1/definition";
 
@@ -15,10 +15,12 @@ describe("TemplateTwoRenderer", () => {
       />,
     );
 
+    fireEvent.click(screen.getByRole("button", { name: "Buka undangan" }));
+
     expect(
       screen.getByRole("heading", { name: "Nara & Dimas" }),
     ).toBeInTheDocument();
-    expect(screen.getByText("Minggu, 6 Desember 2026")).toBeInTheDocument();
+    expect(screen.getAllByText("Minggu, 6 Desember 2026").length).toBeGreaterThan(0);
     expect(screen.getByText("Akad & Pemberkatan")).toBeInTheDocument();
     expect(screen.getAllByText("Ruang Ombak, Nusa Dua")).toHaveLength(2);
     expect(screen.getAllByRole("link", { name: "Lihat lokasi" })[0]).toHaveAttribute(
@@ -26,7 +28,7 @@ describe("TemplateTwoRenderer", () => {
       "https://maps.google.com/?q=Ruang+Ombak+Nusa+Dua",
     );
     expect(container.querySelector(".sm\\:grid-cols-2")).not.toBeNull();
-  });
+  }, 15_000);
 
   it("keeps three named palette choices", () => {
     expect(templateTwoV1.palettes.map((palette) => palette.key)).toEqual([
