@@ -53,6 +53,11 @@ describe("TemplateDetail", () => {
     expect(screen.getByTestId("preview-cover").className).toContain("lg:sticky");
     expect(screen.getByTestId("preview-cover").className).toContain("hidden");
     expect(screen.getByTestId("invitation-frame")).toBeInTheDocument();
+    expect(screen.getByTestId("invitation-scroll")).toHaveStyle({
+      backgroundColor: "rgb(246, 240, 229)",
+    });
+    expect(screen.getByTestId("invitation-scroll").className).not.toContain("px-3");
+    expect(screen.getByTestId("invitation-scroll").className).not.toContain("py-5");
     expect(screen.getByRole("button", { name: "Buka pilihan palet" })).toHaveAttribute(
       "aria-expanded",
       "false",

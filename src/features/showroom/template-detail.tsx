@@ -89,11 +89,12 @@ export function TemplateDetail({
 
         <section
           data-testid="invitation-scroll"
-          className="flex w-full justify-center overflow-y-visible bg-stone-950 px-3 py-5 sm:px-6 lg:h-screen lg:w-[30rem] lg:shrink-0 lg:overflow-y-auto lg:px-6 lg:py-8"
+          className="flex w-full justify-center overflow-y-visible lg:h-screen lg:w-[26rem] lg:shrink-0 lg:overflow-y-auto"
+          style={{ backgroundColor: selectedPalette.tokens.canvas }}
         >
           <div
             data-testid="invitation-frame"
-            className="h-fit w-full max-w-[26rem] overflow-hidden bg-white shadow-2xl shadow-black/40"
+            className="h-fit w-full overflow-hidden bg-white"
           >
             <div data-testid="template-demo">
               {renderTemplate(template, paletteKey, template.demo.content)}
