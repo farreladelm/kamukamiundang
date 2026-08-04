@@ -1,9 +1,9 @@
 import { headers } from "next/headers";
 import { Catalog } from "@/features/showroom/catalog";
-import { getVisibleTemplateCatalog } from "@/features/templates/registry";
+import { getVisibleTemplateCatalogFromDatabase } from "@/features/templates/visibility";
 
 export default async function ShowroomPage() {
-  const templates = getVisibleTemplateCatalog();
+  const templates = await getVisibleTemplateCatalogFromDatabase();
   const requestHeaders = await headers();
   const host = requestHeaders.get("host") ?? "localhost:3000";
   const protocol = requestHeaders.get("x-forwarded-proto") ?? "http";

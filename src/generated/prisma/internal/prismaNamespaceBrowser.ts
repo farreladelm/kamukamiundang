@@ -53,6 +53,7 @@ export const AnyNull = runtime.AnyNull
 export const ModelName = {
   Customer: 'Customer',
   Admin: 'Admin',
+  TemplateVisibility: 'TemplateVisibility',
   Order: 'Order',
   Invitation: 'Invitation',
   InvitationContent: 'InvitationContent',
@@ -105,6 +106,19 @@ export const AdminScalarFieldEnum = {
 } as const
 
 export type AdminScalarFieldEnum = (typeof AdminScalarFieldEnum)[keyof typeof AdminScalarFieldEnum]
+
+
+export const TemplateVisibilityScalarFieldEnum = {
+  id: 'id',
+  templateKey: 'templateKey',
+  templateVersion: 'templateVersion',
+  isVisible: 'isVisible',
+  updatedByAdminId: 'updatedByAdminId',
+  updatedAt: 'updatedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type TemplateVisibilityScalarFieldEnum = (typeof TemplateVisibilityScalarFieldEnum)[keyof typeof TemplateVisibilityScalarFieldEnum]
 
 
 export const OrderScalarFieldEnum = {

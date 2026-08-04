@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { TemplateDetail } from "@/features/showroom/template-detail";
-import { getVisibleTemplateCatalog } from "@/features/templates/registry";
+import { getVisibleTemplateCatalogFromDatabase } from "@/features/templates/visibility";
 
 export default async function TemplateDetailPage({
   params,
@@ -11,7 +11,7 @@ export default async function TemplateDetailPage({
 }) {
   const { slug } = await params;
   const { to } = await searchParams;
-  const template = getVisibleTemplateCatalog().find(
+  const template = (await getVisibleTemplateCatalogFromDatabase()).find(
     (candidate) => candidate.slug === slug,
   );
 

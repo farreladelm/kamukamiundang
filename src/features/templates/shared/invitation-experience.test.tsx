@@ -61,4 +61,18 @@ describe("InvitationExperience", () => {
     expect(screen.queryByRole("heading", { name: "Sampaikan kehadiran" })).not.toBeInTheDocument();
     expect(screen.getByRole("heading", { name: "Tanda kasih" })).toBeInTheDocument();
   });
+
+  it("shows RSVP field errors before accepting an incomplete submission", () => {
+    const Renderer = templateTwoV1.renderer;
+    render(<Renderer content={templateTwoV1.demo.content} palette={templateTwoV1.palettes[0]} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Buka undangan" }));
+    const rsvpSection = screen.getByRole("heading", { name: "Sampaikan kehadiran" }).closest("section");
+    const form = rsvpSection?.querySelector("form");
+    if (!form) throw new Error("RSVP form not found");
+
+    fireEvent.submit(form);
+
+    expect(screen.getByText("Nama wajib diisi.")).toBeInTheDocument();
+  });
 });

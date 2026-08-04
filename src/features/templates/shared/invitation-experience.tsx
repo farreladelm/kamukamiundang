@@ -6,6 +6,7 @@ import type {
   TemplatePalette,
   TemplatePhoto,
 } from "@/features/templates/types";
+import { rsvpDemoSchema, wishDemoSchema } from "@/features/forms/schemas";
 
 type InvitationVariant = "classic" | "coast" | "garden";
 
@@ -90,6 +91,8 @@ export function InvitationExperience({
   const [copiedAccount, setCopiedAccount] = useState<string | null>(null);
   const [rsvpSent, setRsvpSent] = useState(false);
   const [wishSent, setWishSent] = useState(false);
+  const [rsvpErrors, setRsvpErrors] = useState<Record<string, string>>({});
+  const [wishErrors, setWishErrors] = useState<Record<string, string>>({});
   const articleRef = useRef<HTMLElement>(null);
   const contentRef = useRef<HTMLElement>(null);
 
@@ -117,6 +120,32 @@ export function InvitationExperience({
   function openInvitation() {
     setIsOpen(true);
     window.setTimeout(() => contentRef.current?.focus(), 0);
+  }
+
+  function submitRsvp(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const result = rsvpDemoSchema.safeParse(Object.fromEntries(new FormData(event.currentTarget).entries()));
+
+    if (!result.success) {
+      setRsvpErrors(Object.fromEntries(Object.entries(result.error.flatten().fieldErrors).map(([field, errors]) => [field, errors?.[0] ?? ""])),);
+      return;
+    }
+
+    setRsvpErrors({});
+    setRsvpSent(true);
+  }
+
+  function submitWish(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const result = wishDemoSchema.safeParse(Object.fromEntries(new FormData(event.currentTarget).entries()));
+
+    if (!result.success) {
+      setWishErrors(Object.fromEntries(Object.entries(result.error.flatten().fieldErrors).map(([field, errors]) => [field, errors?.[0] ?? ""])),);
+      return;
+    }
+
+    setWishErrors({});
+    setWishSent(true);
   }
 
   async function copyAccount(accountNumber: string) {
@@ -271,18 +300,21 @@ export function InvitationExperience({
             {rsvpSent ? (
               <p className="mt-8 border p-4 text-sm" role="status" style={{ borderColor: palette.tokens.accent }}>Terima kasih, konfirmasi Anda sudah tercatat di demo ini.</p>
             ) : (
-              <form className="mt-8 grid gap-4" onSubmit={(event) => { event.preventDefault(); setRsvpSent(true); }}>
-                <label className="grid gap-2 text-xs font-semibold" htmlFor="rsvp-name">Nama</label>
-                <input id="rsvp-name" name="name" required className="min-h-11 border bg-transparent px-3 text-sm focus-visible:outline-2" style={{ borderColor: palette.tokens.line }} />
-                <label className="grid gap-2 text-xs font-semibold" htmlFor="rsvp-count">Jumlah tamu</label>
-                <select id="rsvp-count" name="guests" className="min-h-11 border bg-transparent px-3 text-sm focus-visible:outline-2" style={{ borderColor: palette.tokens.line }} defaultValue="1">
-                  {Array.from({ length: content.rsvp.maxGuests }, (_, index) => index + 1).map((count) => <option key={count} value={count}>{count} tamu</option>)}
-                </select>
-                <fieldset className="grid gap-3 border-0 p-0">
-                  <legend className="mb-1 text-xs font-semibold">Kehadiran</legend>
-                  <label className="flex items-center gap-2 text-sm"><input type="radio" name="attendance" value="yes" defaultChecked /> Ya, saya hadir</label>
-                  <label className="flex items-center gap-2 text-sm"><input type="radio" name="attendance" value="no" /> Maaf, saya tidak dapat hadir</label>
-                </fieldset>
+              <form className="mt-8 grid gap-4" noValidate onSubmit={submitRsvp}>
+                 <label className="grid gap-2 text-xs font-semibold" htmlFor="rsvp-name">Nama</label>
+                 <input id="rsvp-name" name="name" required aria-invalid={Boolean(rsvpErrors.name)} aria-describedby={rsvpErrors.name ? "rsvp-name-error" : undefined} className="min-h-11 border bg-transparent px-3 text-sm focus-visible:outline-2 aria-[invalid=true]:border-red-700" style={{ borderColor: palette.tokens.line }} />
+                 {rsvpErrors.name && <p id="rsvp-name-error" className="text-xs text-red-800" role="alert">{rsvpErrors.name}</p>}
+                 <label className="grid gap-2 text-xs font-semibold" htmlFor="rsvp-count">Jumlah tamu</label>
+                 <select id="rsvp-count" name="guests" aria-invalid={Boolean(rsvpErrors.guests)} aria-describedby={rsvpErrors.guests ? "rsvp-count-error" : undefined} className="min-h-11 border bg-transparent px-3 text-sm focus-visible:outline-2 aria-[invalid=true]:border-red-700" style={{ borderColor: palette.tokens.line }} defaultValue="1">
+                   {Array.from({ length: content.rsvp.maxGuests }, (_, index) => index + 1).map((count) => <option key={count} value={count}>{count} tamu</option>)}
+                 </select>
+                 {rsvpErrors.guests && <p id="rsvp-count-error" className="text-xs text-red-800" role="alert">{rsvpErrors.guests}</p>}
+                 <fieldset className="grid gap-3 border-0 p-0">
+                   <legend className="mb-1 text-xs font-semibold">Kehadiran</legend>
+                   <label className="flex items-center gap-2 text-sm"><input type="radio" name="attendance" value="yes" defaultChecked /> Ya, saya hadir</label>
+                   <label className="flex items-center gap-2 text-sm"><input type="radio" name="attendance" value="no" /> Maaf, saya tidak dapat hadir</label>
+                   {rsvpErrors.attendance && <p className="text-xs text-red-800" role="alert">{rsvpErrors.attendance}</p>}
+                 </fieldset>
                 <button type="submit" className="mt-2 min-h-11 border px-4 text-xs font-semibold tracking-[0.14em] uppercase" style={{ borderColor: palette.tokens.accent }}>Kirim RSVP</button>
               </form>
             )}
@@ -338,7 +370,7 @@ export function InvitationExperience({
             <SectionHeading eyebrow="Ucapan dan doa" title="Kirimkan kata baik" palette={palette} />
             <p className="mt-5 text-sm leading-6" style={{ color: palette.tokens.muted }}>{content.wishes.prompt}</p>
             <div className="mt-8 grid gap-3">{content.wishes.entries.map((entry) => <blockquote key={entry.name} className="border-l-2 pl-4 text-sm leading-6" style={{ borderColor: palette.tokens.accent }}><p>&ldquo;{entry.message}&rdquo;</p><cite className="mt-2 block text-xs not-italic font-semibold">{entry.name}</cite></blockquote>)}</div>
-            {wishSent ? <p className="mt-8 text-sm" role="status">Terima kasih atas ucapan Anda.</p> : <form className="mt-8 grid gap-4" onSubmit={(event) => { event.preventDefault(); setWishSent(true); }}><label className="grid gap-2 text-xs font-semibold" htmlFor="wish-name">Nama</label><input id="wish-name" required className="min-h-11 border bg-transparent px-3 text-sm" style={{ borderColor: palette.tokens.line }} /><label className="grid gap-2 text-xs font-semibold" htmlFor="wish-message">Ucapan</label><textarea id="wish-message" required maxLength={1000} className="min-h-28 border bg-transparent px-3 py-3 text-sm" style={{ borderColor: palette.tokens.line }} /><button type="submit" className="min-h-11 border px-4 text-xs font-semibold tracking-[0.14em] uppercase" style={{ borderColor: palette.tokens.accent }}>Kirim ucapan</button></form>}
+            {wishSent ? <p className="mt-8 text-sm" role="status">Terima kasih atas ucapan Anda.</p> : <form className="mt-8 grid gap-4" noValidate onSubmit={submitWish}><label className="grid gap-2 text-xs font-semibold" htmlFor="wish-name">Nama</label><input id="wish-name" name="name" required aria-invalid={Boolean(wishErrors.name)} aria-describedby={wishErrors.name ? "wish-name-error" : undefined} className="min-h-11 border bg-transparent px-3 text-sm aria-[invalid=true]:border-red-700" style={{ borderColor: palette.tokens.line }} />{wishErrors.name && <p id="wish-name-error" className="text-xs text-red-800" role="alert">{wishErrors.name}</p>}<label className="grid gap-2 text-xs font-semibold" htmlFor="wish-message">Ucapan</label><textarea id="wish-message" name="message" required maxLength={1000} aria-invalid={Boolean(wishErrors.message)} aria-describedby={wishErrors.message ? "wish-message-error" : undefined} className="min-h-28 border bg-transparent px-3 py-3 text-sm aria-[invalid=true]:border-red-700" style={{ borderColor: palette.tokens.line }} />{wishErrors.message && <p id="wish-message-error" className="text-xs text-red-800" role="alert">{wishErrors.message}</p>}<button type="submit" className="min-h-11 border px-4 text-xs font-semibold tracking-[0.14em] uppercase" style={{ borderColor: palette.tokens.accent }}>Kirim ucapan</button></form>}
           </section>
         )}
 

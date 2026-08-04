@@ -1,8 +1,13 @@
 allowBuilds:
   '@prisma/engines': true
+  argon2: true
+  esbuild: true
   prisma: true
   sharp: true
   unrs-resolver: true
 ignoredBuiltDependencies:
   - sharp
   - unrs-resolver
+overrides:
+  postcss: 8.5.25
+  sharp: 0.35.0

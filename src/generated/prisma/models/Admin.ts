@@ -191,6 +191,7 @@ export type AdminWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"Admin"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Admin"> | Date | string
   sessions?: Prisma.SessionListRelationFilter
+  templateVisibilities?: Prisma.TemplateVisibilityListRelationFilter
 }
 
 export type AdminOrderByWithRelationInput = {
@@ -201,20 +202,22 @@ export type AdminOrderByWithRelationInput = {
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   sessions?: Prisma.SessionOrderByRelationAggregateInput
+  templateVisibilities?: Prisma.TemplateVisibilityOrderByRelationAggregateInput
 }
 
 export type AdminWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  email?: string
   AND?: Prisma.AdminWhereInput | Prisma.AdminWhereInput[]
   OR?: Prisma.AdminWhereInput[]
   NOT?: Prisma.AdminWhereInput | Prisma.AdminWhereInput[]
-  email?: Prisma.StringFilter<"Admin"> | string
   passwordHash?: Prisma.StringFilter<"Admin"> | string
   isActive?: Prisma.BoolFilter<"Admin"> | boolean
   createdAt?: Prisma.DateTimeFilter<"Admin"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Admin"> | Date | string
   sessions?: Prisma.SessionListRelationFilter
-}, "id">
+  templateVisibilities?: Prisma.TemplateVisibilityListRelationFilter
+}, "id" | "email">
 
 export type AdminOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -248,6 +251,7 @@ export type AdminCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   sessions?: Prisma.SessionCreateNestedManyWithoutAdminInput
+  templateVisibilities?: Prisma.TemplateVisibilityCreateNestedManyWithoutUpdatedByAdminInput
 }
 
 export type AdminUncheckedCreateInput = {
@@ -258,6 +262,7 @@ export type AdminUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutAdminInput
+  templateVisibilities?: Prisma.TemplateVisibilityUncheckedCreateNestedManyWithoutUpdatedByAdminInput
 }
 
 export type AdminUpdateInput = {
@@ -268,6 +273,7 @@ export type AdminUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sessions?: Prisma.SessionUpdateManyWithoutAdminNestedInput
+  templateVisibilities?: Prisma.TemplateVisibilityUpdateManyWithoutUpdatedByAdminNestedInput
 }
 
 export type AdminUncheckedUpdateInput = {
@@ -278,6 +284,7 @@ export type AdminUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutAdminNestedInput
+  templateVisibilities?: Prisma.TemplateVisibilityUncheckedUpdateManyWithoutUpdatedByAdminNestedInput
 }
 
 export type AdminCreateManyInput = {
@@ -334,6 +341,11 @@ export type AdminMinOrderByAggregateInput = {
   updatedAt?: Prisma.SortOrder
 }
 
+export type AdminScalarRelationFilter = {
+  is?: Prisma.AdminWhereInput
+  isNot?: Prisma.AdminWhereInput
+}
+
 export type AdminNullableScalarRelationFilter = {
   is?: Prisma.AdminWhereInput | null
   isNot?: Prisma.AdminWhereInput | null
@@ -341,6 +353,20 @@ export type AdminNullableScalarRelationFilter = {
 
 export type BoolFieldUpdateOperationsInput = {
   set?: boolean
+}
+
+export type AdminCreateNestedOneWithoutTemplateVisibilitiesInput = {
+  create?: Prisma.XOR<Prisma.AdminCreateWithoutTemplateVisibilitiesInput, Prisma.AdminUncheckedCreateWithoutTemplateVisibilitiesInput>
+  connectOrCreate?: Prisma.AdminCreateOrConnectWithoutTemplateVisibilitiesInput
+  connect?: Prisma.AdminWhereUniqueInput
+}
+
+export type AdminUpdateOneRequiredWithoutTemplateVisibilitiesNestedInput = {
+  create?: Prisma.XOR<Prisma.AdminCreateWithoutTemplateVisibilitiesInput, Prisma.AdminUncheckedCreateWithoutTemplateVisibilitiesInput>
+  connectOrCreate?: Prisma.AdminCreateOrConnectWithoutTemplateVisibilitiesInput
+  upsert?: Prisma.AdminUpsertWithoutTemplateVisibilitiesInput
+  connect?: Prisma.AdminWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AdminUpdateToOneWithWhereWithoutTemplateVisibilitiesInput, Prisma.AdminUpdateWithoutTemplateVisibilitiesInput>, Prisma.AdminUncheckedUpdateWithoutTemplateVisibilitiesInput>
 }
 
 export type AdminCreateNestedOneWithoutSessionsInput = {
@@ -359,6 +385,62 @@ export type AdminUpdateOneWithoutSessionsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.AdminUpdateToOneWithWhereWithoutSessionsInput, Prisma.AdminUpdateWithoutSessionsInput>, Prisma.AdminUncheckedUpdateWithoutSessionsInput>
 }
 
+export type AdminCreateWithoutTemplateVisibilitiesInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  sessions?: Prisma.SessionCreateNestedManyWithoutAdminInput
+}
+
+export type AdminUncheckedCreateWithoutTemplateVisibilitiesInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutAdminInput
+}
+
+export type AdminCreateOrConnectWithoutTemplateVisibilitiesInput = {
+  where: Prisma.AdminWhereUniqueInput
+  create: Prisma.XOR<Prisma.AdminCreateWithoutTemplateVisibilitiesInput, Prisma.AdminUncheckedCreateWithoutTemplateVisibilitiesInput>
+}
+
+export type AdminUpsertWithoutTemplateVisibilitiesInput = {
+  update: Prisma.XOR<Prisma.AdminUpdateWithoutTemplateVisibilitiesInput, Prisma.AdminUncheckedUpdateWithoutTemplateVisibilitiesInput>
+  create: Prisma.XOR<Prisma.AdminCreateWithoutTemplateVisibilitiesInput, Prisma.AdminUncheckedCreateWithoutTemplateVisibilitiesInput>
+  where?: Prisma.AdminWhereInput
+}
+
+export type AdminUpdateToOneWithWhereWithoutTemplateVisibilitiesInput = {
+  where?: Prisma.AdminWhereInput
+  data: Prisma.XOR<Prisma.AdminUpdateWithoutTemplateVisibilitiesInput, Prisma.AdminUncheckedUpdateWithoutTemplateVisibilitiesInput>
+}
+
+export type AdminUpdateWithoutTemplateVisibilitiesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sessions?: Prisma.SessionUpdateManyWithoutAdminNestedInput
+}
+
+export type AdminUncheckedUpdateWithoutTemplateVisibilitiesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutAdminNestedInput
+}
+
 export type AdminCreateWithoutSessionsInput = {
   id?: string
   email: string
@@ -366,6 +448,7 @@ export type AdminCreateWithoutSessionsInput = {
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  templateVisibilities?: Prisma.TemplateVisibilityCreateNestedManyWithoutUpdatedByAdminInput
 }
 
 export type AdminUncheckedCreateWithoutSessionsInput = {
@@ -375,6 +458,7 @@ export type AdminUncheckedCreateWithoutSessionsInput = {
   isActive?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  templateVisibilities?: Prisma.TemplateVisibilityUncheckedCreateNestedManyWithoutUpdatedByAdminInput
 }
 
 export type AdminCreateOrConnectWithoutSessionsInput = {
@@ -400,6 +484,7 @@ export type AdminUpdateWithoutSessionsInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  templateVisibilities?: Prisma.TemplateVisibilityUpdateManyWithoutUpdatedByAdminNestedInput
 }
 
 export type AdminUncheckedUpdateWithoutSessionsInput = {
@@ -409,6 +494,7 @@ export type AdminUncheckedUpdateWithoutSessionsInput = {
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  templateVisibilities?: Prisma.TemplateVisibilityUncheckedUpdateManyWithoutUpdatedByAdminNestedInput
 }
 
 
@@ -418,10 +504,12 @@ export type AdminUncheckedUpdateWithoutSessionsInput = {
 
 export type AdminCountOutputType = {
   sessions: number
+  templateVisibilities: number
 }
 
 export type AdminCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   sessions?: boolean | AdminCountOutputTypeCountSessionsArgs
+  templateVisibilities?: boolean | AdminCountOutputTypeCountTemplateVisibilitiesArgs
 }
 
 /**
@@ -441,6 +529,13 @@ export type AdminCountOutputTypeCountSessionsArgs<ExtArgs extends runtime.Types.
   where?: Prisma.SessionWhereInput
 }
 
+/**
+ * AdminCountOutputType without action
+ */
+export type AdminCountOutputTypeCountTemplateVisibilitiesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.TemplateVisibilityWhereInput
+}
+
 
 export type AdminSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -450,6 +545,7 @@ export type AdminSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   createdAt?: boolean
   updatedAt?: boolean
   sessions?: boolean | Prisma.Admin$sessionsArgs<ExtArgs>
+  templateVisibilities?: boolean | Prisma.Admin$templateVisibilitiesArgs<ExtArgs>
   _count?: boolean | Prisma.AdminCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["admin"]>
 
@@ -483,6 +579,7 @@ export type AdminSelectScalar = {
 export type AdminOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "email" | "passwordHash" | "isActive" | "createdAt" | "updatedAt", ExtArgs["result"]["admin"]>
 export type AdminInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   sessions?: boolean | Prisma.Admin$sessionsArgs<ExtArgs>
+  templateVisibilities?: boolean | Prisma.Admin$templateVisibilitiesArgs<ExtArgs>
   _count?: boolean | Prisma.AdminCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type AdminIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -492,6 +589,7 @@ export type $AdminPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   name: "Admin"
   objects: {
     sessions: Prisma.$SessionPayload<ExtArgs>[]
+    templateVisibilities: Prisma.$TemplateVisibilityPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -895,6 +993,7 @@ readonly fields: AdminFieldRefs;
 export interface Prisma__AdminClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   sessions<T extends Prisma.Admin$sessionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Admin$sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  templateVisibilities<T extends Prisma.Admin$templateVisibilitiesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Admin$templateVisibilitiesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TemplateVisibilityPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1344,6 +1443,30 @@ export type Admin$sessionsArgs<ExtArgs extends runtime.Types.Extensions.Internal
   take?: number
   skip?: number
   distinct?: Prisma.SessionScalarFieldEnum | Prisma.SessionScalarFieldEnum[]
+}
+
+/**
+ * Admin.templateVisibilities
+ */
+export type Admin$templateVisibilitiesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the TemplateVisibility
+   */
+  select?: Prisma.TemplateVisibilitySelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the TemplateVisibility
+   */
+  omit?: Prisma.TemplateVisibilityOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.TemplateVisibilityInclude<ExtArgs> | null
+  where?: Prisma.TemplateVisibilityWhereInput
+  orderBy?: Prisma.TemplateVisibilityOrderByWithRelationInput | Prisma.TemplateVisibilityOrderByWithRelationInput[]
+  cursor?: Prisma.TemplateVisibilityWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.TemplateVisibilityScalarFieldEnum | Prisma.TemplateVisibilityScalarFieldEnum[]
 }
 
 /**

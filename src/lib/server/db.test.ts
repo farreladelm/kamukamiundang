@@ -1,7 +1,7 @@
 // @vitest-environment node
 
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { getDatabaseUrl } from "./env";
+import { getApplicationOrigin, getDatabaseUrl } from "./env";
 
 describe("getDatabaseUrl", () => {
   afterEach(() => {
@@ -25,6 +25,22 @@ describe("getDatabaseUrl", () => {
 
     expect(getDatabaseUrl()).toBe(
       "postgresql://user:password@localhost:5432/undango",
+    );
+  });
+
+  it("uses a configured HTTPS application origin in production", () => {
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("APP_URL", "https://undango.example/invitations");
+
+    expect(getApplicationOrigin("http://spoofed.example")).toBe("https://undango.example");
+  });
+
+  it("rejects an unset production application origin", () => {
+    vi.stubEnv("NODE_ENV", "production");
+    vi.stubEnv("APP_URL", "");
+
+    expect(() => getApplicationOrigin("http://localhost:3000")).toThrow(
+      "APP_URL must be set in production",
     );
   });
 });

@@ -28,6 +28,11 @@ export type Customer = Prisma.CustomerModel
  */
 export type Admin = Prisma.AdminModel
 /**
+ * Model TemplateVisibility
+ * 
+ */
+export type TemplateVisibility = Prisma.TemplateVisibilityModel
+/**
  * Model Order
  * 
  */

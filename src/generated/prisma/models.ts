@@ -10,6 +10,7 @@
  */
 export type * from './models/Customer'
 export type * from './models/Admin'
+export type * from './models/TemplateVisibility'
 export type * from './models/Order'
 export type * from './models/Invitation'
 export type * from './models/InvitationContent'

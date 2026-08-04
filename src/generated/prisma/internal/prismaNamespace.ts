@@ -386,6 +386,7 @@ type FieldRefInputType<Model, FieldType> = Model extends never ? never : FieldRe
 export const ModelName = {
   Customer: 'Customer',
   Admin: 'Admin',
+  TemplateVisibility: 'TemplateVisibility',
   Order: 'Order',
   Invitation: 'Invitation',
   InvitationContent: 'InvitationContent',
@@ -413,7 +414,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "customer" | "admin" | "order" | "invitation" | "invitationContent" | "publishedSnapshot" | "snapshotAsset" | "asset" | "session" | "magicLink" | "rsvp" | "wish" | "analyticsEvent" | "auditEvent"
+    modelProps: "customer" | "admin" | "templateVisibility" | "order" | "invitation" | "invitationContent" | "publishedSnapshot" | "snapshotAsset" | "asset" | "session" | "magicLink" | "rsvp" | "wish" | "analyticsEvent" | "auditEvent"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -562,6 +563,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.AdminCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.AdminCountAggregateOutputType> | number
+        }
+      }
+    }
+    TemplateVisibility: {
+      payload: Prisma.$TemplateVisibilityPayload<ExtArgs>
+      fields: Prisma.TemplateVisibilityFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.TemplateVisibilityFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TemplateVisibilityPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.TemplateVisibilityFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TemplateVisibilityPayload>
+        }
+        findFirst: {
+          args: Prisma.TemplateVisibilityFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TemplateVisibilityPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.TemplateVisibilityFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TemplateVisibilityPayload>
+        }
+        findMany: {
+          args: Prisma.TemplateVisibilityFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TemplateVisibilityPayload>[]
+        }
+        create: {
+          args: Prisma.TemplateVisibilityCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TemplateVisibilityPayload>
+        }
+        createMany: {
+          args: Prisma.TemplateVisibilityCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.TemplateVisibilityCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TemplateVisibilityPayload>[]
+        }
+        delete: {
+          args: Prisma.TemplateVisibilityDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TemplateVisibilityPayload>
+        }
+        update: {
+          args: Prisma.TemplateVisibilityUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TemplateVisibilityPayload>
+        }
+        deleteMany: {
+          args: Prisma.TemplateVisibilityDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.TemplateVisibilityUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.TemplateVisibilityUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TemplateVisibilityPayload>[]
+        }
+        upsert: {
+          args: Prisma.TemplateVisibilityUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$TemplateVisibilityPayload>
+        }
+        aggregate: {
+          args: Prisma.TemplateVisibilityAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateTemplateVisibility>
+        }
+        groupBy: {
+          args: Prisma.TemplateVisibilityGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TemplateVisibilityGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.TemplateVisibilityCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.TemplateVisibilityCountAggregateOutputType> | number
         }
       }
     }
@@ -1516,6 +1591,19 @@ export const AdminScalarFieldEnum = {
 export type AdminScalarFieldEnum = (typeof AdminScalarFieldEnum)[keyof typeof AdminScalarFieldEnum]
 
 
+export const TemplateVisibilityScalarFieldEnum = {
+  id: 'id',
+  templateKey: 'templateKey',
+  templateVersion: 'templateVersion',
+  isVisible: 'isVisible',
+  updatedByAdminId: 'updatedByAdminId',
+  updatedAt: 'updatedAt',
+  createdAt: 'createdAt'
+} as const
+
+export type TemplateVisibilityScalarFieldEnum = (typeof TemplateVisibilityScalarFieldEnum)[keyof typeof TemplateVisibilityScalarFieldEnum]
+
+
 export const OrderScalarFieldEnum = {
   id: 'id',
   customerId: 'customerId',
@@ -2032,6 +2120,7 @@ export type PrismaClientOptions = ({
 export type GlobalOmitConfig = {
   customer?: Prisma.CustomerOmit
   admin?: Prisma.AdminOmit
+  templateVisibility?: Prisma.TemplateVisibilityOmit
   order?: Prisma.OrderOmit
   invitation?: Prisma.InvitationOmit
   invitationContent?: Prisma.InvitationContentOmit
