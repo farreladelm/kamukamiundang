@@ -1,15 +1,16 @@
 # Task List: Undango
 
-**Status:** Approved scope - execution paused by product owner  
-**Specification:** [`docs/PRD.md`](../docs/PRD.md) v0.4 Approved  
-**Plan:** [`tasks/plan.md`](./plan.md) v0.3 Approved  
+**Status:** MVP-01 - MVP-18 complete and approved; hybrid template catalog amendment approved, implementation pending  
+**Specification:** [`docs/PRD.md`](../docs/PRD.md) v0.5 Approved  
+**Plan:** [`tasks/plan.md`](./plan.md) v0.4 Approved  
+**Template catalog plan:** [`tasks/template-catalog-plan.md`](./template-catalog-plan.md)  
 
 Task prefix menunjukkan delivery gate:
 
 - `MVP-*`: wajib untuk memvalidasi core flow pada development/staging.
 - `PR-*`: dikerjakan setelah MVP Gate untuk membuat aplikasi layak public launch.
 
-Plan dan task list sudah disetujui. Tidak ada task implementation yang boleh dimulai sampai product owner memberikan instruksi start development secara eksplisit.
+Plan dan task list sudah disetujui. `MVP-01` - `MVP-18` tetap berstatus selesai dan approved. Amandemen 4 Agustus 2026 menambahkan `MVP-CAT-*` sebagai remediation terpisah; completion evidence task lama tidak dihapus.
 
 ## Definition of Done
 
@@ -66,6 +67,7 @@ Plan dan task list sudah disetujui. Tidak ada task implementation yang boleh dim
 
 ### MVP-05: Approve launch collection and template version contract
 
+**Amendment impact:** Selesai di PRD v0.4; contract perlu diperbaiki melalui `MVP-CAT-01` dan `MVP-CAT-03` untuk memisahkan runtime manifest dari metadata katalog.  
 **Acceptance:** Product owner approves three concepts/licenses; registry contract requires `templateKey`, `templateVersion`, `contentSchemaVersion`, stable palettes, capabilities, schema, and renderer; referenced versions cannot disappear.  
 **Verify:** Registry contract tests and manual license review.  
 **Dependencies:** Checkpoint `MVP-A`  
@@ -74,6 +76,7 @@ Plan dan task list sudah disetujui. Tidak ada task implementation yang boleh dim
 
 ### MVP-06: Build shared renderer and Template 1 v1
 
+**Amendment impact:** Selesai; tidak perlu redesign visual. Definition/type extraction dan exact resolver perlu re-verification pada `MVP-CAT-03`.  
 **Acceptance:** Renderer consumes safe view model plus pinned template version; Template 1 v1 renders realistic core sections on mobile/desktop; no database access exists inside template.  
 **Verify:** Renderer tests and manual 360 px/desktop review.  
 **Dependencies:** `MVP-05`  
@@ -82,6 +85,7 @@ Plan dan task list sudah disetujui. Tidak ada task implementation yang boleh dim
 
 ### MVP-07: Deliver catalog browsing
 
+**Amendment impact:** Selesai di PRD v0.4; data source perlu diperbaiki pada `MVP-CAT-05` agar metadata bisnis berasal dari database-resolved catalog.  
 **Acceptance:** Public catalog lists only visible template versions with category/price/thumbnail; filter/reset works keyboard/mobile; hidden versions are absent.  
 **Verify:** Catalog component tests; `pnpm test:e2e -- --grep "catalog"`.  
 **Dependencies:** `MVP-06`  
@@ -90,6 +94,7 @@ Plan dan task list sudah disetujui. Tidak ada task implementation yang boleh dim
 
 ### MVP-08: Deliver detail and palette preview
 
+**Amendment impact:** Selesai di PRD v0.4; slug dan metadata detail perlu dipindahkan ke database-resolved catalog pada `MVP-CAT-05`, sementara renderer/palette tetap source-controlled.  
 **Acceptance:** Detail renders exact template version/demo, offers only compatible palettes, updates semantic colors without layout mutation, and returns not found for unknown/hidden version.  
 **Verify:** Detail tests; `pnpm test:e2e -- --grep "template detail"`.  
 **Dependencies:** `MVP-07`  
@@ -98,6 +103,7 @@ Plan dan task list sudah disetujui. Tidak ada task implementation yang boleh dim
 
 ### MVP-09: Add Template 2 v1
 
+**Amendment impact:** Selesai; runtime manifest tetap berlaku. Metadata bisnis yang masih berada di definition dipindahkan/reconciled oleh `MVP-CAT-02` dan `MVP-CAT-03`.  
 **Acceptance:** Template 2 has distinct visual language, realistic demo, 3-6 palettes, immutable version identity, responsive tests, and complete license record.  
 **Verify:** Template-focused tests and human visual review.  
 **Dependencies:** `MVP-06`  
@@ -106,6 +112,7 @@ Plan dan task list sudah disetujui. Tidak ada task implementation yang boleh dim
 
 ### MVP-10: Add Template 3 v1
 
+**Amendment impact:** Selesai; runtime manifest tetap berlaku. Metadata bisnis yang masih berada di definition dipindahkan/reconciled oleh `MVP-CAT-02` dan `MVP-CAT-03`.  
 **Acceptance:** Template 3 has distinct visual language, realistic demo, 3-6 palettes, immutable version identity, responsive tests, and complete license record.  
 **Verify:** Template-focused tests and human visual review.  
 **Dependencies:** `MVP-06`  
@@ -114,6 +121,7 @@ Plan dan task list sudah disetujui. Tidak ada task implementation yang boleh dim
 
 ### MVP-11: Connect WhatsApp CTA and basic events
 
+**Amendment impact:** Selesai di PRD v0.4; current name, price, dan slug CTA harus dibaca dari database-resolved catalog dan diuji ulang pada `MVP-CAT-05`.  
 **Acceptance:** CTA carries template/version, current price, palette, and canonical URL; catalog/detail/palette/CTA events store allowlisted non-PII properties with basic rate limit; analytics failure never blocks CTA.  
 **Verify:** WhatsApp/event tests; mobile deep-link manual check; CTA E2E.  
 **Dependencies:** `MVP-08`, `MVP-09`, `MVP-10`  
@@ -147,6 +155,7 @@ Plan dan task list sudah disetujui. Tidak ada task implementation yang boleh dim
 
 ### MVP-14: Build admin shell and template visibility
 
+**Amendment impact:** Selesai di PRD v0.4 tetapi behavior visibility-only disupersede. `MVP-CAT-02` dan `MVP-CAT-04` menggantinya dengan validated database metadata management tanpa memberi akses ke runtime contract.  
 **Acceptance:** Admin routes reveal no data to unauthenticated/non-admin actors; admin can hide/unhide registry entries but cannot alter source-controlled design/version/price.  
 **Verify:** Visibility integration test and admin E2E.  
 **Dependencies:** `MVP-08`, `MVP-13`  
@@ -155,6 +164,7 @@ Plan dan task list sudah disetujui. Tidak ada task implementation yang boleh dim
 
 ### MVP-15: Deliver customer and pending order intake
 
+**Amendment impact:** Selesai di PRD v0.4; `MVP-CAT-06` harus mengubah source current price dari code definition ke database-resolved catalog sambil mempertahankan immutable order snapshot.  
 **Acceptance:** Admin can create/find customer and record `pending` order with immutable template key/version, schema version, palette, price, photo-count, and storage quota snapshots.  
 **Verify:** Order-intake integration test including multiple orders per customer and invalid registry version.  
 **Dependencies:** `MVP-04`, `MVP-13`, `MVP-14`  
@@ -187,10 +197,86 @@ Plan dan task list sudah disetujui. Tidak ada task implementation yang boleh dim
 
 ### Checkpoint MVP-C: Operations
 
-- [ ] `MVP-12` - `MVP-18` reviewed.
-- [ ] Admin email/password dashboard auth, workspace rejection, order transitions, activation, and single-use replay defense pass.
-- [ ] Order snapshots contain exact template/schema/palette versions.
-- [ ] Customer cannot access another invitation.
+- [x] `MVP-12` - `MVP-18` implemented and focused tests pass.
+- [x] Admin email/password dashboard auth, workspace rejection, order transitions, activation, and single-use replay defense pass integration tests.
+- [x] Order snapshots contain exact template/schema/palette versions.
+- [x] Customer workspace route enforces owned invitation and active editing access.
+
+## MVP Hybrid Template Catalog Amendment
+
+Task lama tetap selesai. Tabel ini mencatat bagian yang memerlukan remediation karena keputusan arsitektur 4 Agustus 2026.
+
+| Previous task | Previous status | Required follow-up |
+|---|---|---|
+| `MVP-05` | Complete and approved | Split combined template definition into immutable runtime manifest and database catalog contract through `MVP-CAT-01`/`03` |
+| `MVP-06` | Complete and approved | Re-verify Template 1 renderer after runtime-manifest extraction; no visual redesign |
+| `MVP-07` | Complete and approved | Replace source metadata reads with resolved database catalog in `MVP-CAT-05` |
+| `MVP-08` | Complete and approved | Resolve public slug/metadata from database while keeping exact renderer/palette in code via `MVP-CAT-05` |
+| `MVP-09`, `MVP-10` | Complete and approved | Extract runtime-only manifests and reconcile existing business metadata via `MVP-CAT-02`/`03`; no visual redesign |
+| `MVP-11` | Complete and approved | Read current name/price/slug from resolved catalog and re-verify WhatsApp payload in `MVP-CAT-05` |
+| `MVP-14` | Complete and approved under superseded visibility-only contract | Replace visibility override UI with metadata management in `MVP-CAT-02`/`04` |
+| `MVP-15` | Complete and approved | Read current price from resolved catalog while preserving immutable order snapshot in `MVP-CAT-06` |
+| `MVP-12`, `MVP-13`, `MVP-16` - `MVP-18` | Complete and approved | No catalog behavior correction; run regression suites only |
+
+### MVP-CAT-01: Record hybrid catalog contract
+
+**Status:** Completed and approved 4 August 2026.  
+**Acceptance:** PRD, master plan, task impact register, and ADR define exact field ownership, immutable runtime identity, no silent fallback, slug alias lifecycle, price snapshot rule, and deployment order without changing completion status of `MVP-01` - `MVP-18`.  
+**Verify:** `git diff --check`; cross-document review.  
+**Dependencies:** `MVP-05`, `MVP-14`, product-owner approval  
+**Likely files:** `docs/PRD.md`, `docs/decisions/0006-admin-operations.md`, `docs/decisions/0007-hybrid-versioned-template-catalog.md`, `docs/templates/authoring-guide.md`, `docs/templates/launch-collection.md`, `tasks/plan.md`, `tasks/todo.md`, `tasks/template-catalog-plan.md`  
+**Scope:** Medium, 8 files
+
+### MVP-CAT-02: Establish database catalog metadata
+
+**Acceptance:** Migration replaces sparse visibility overrides with versioned catalog/category/slug-alias records, preserves existing visibility and launch metadata, applies uniqueness/nonnegative/status constraints, and provides idempotent reconciliation that inserts missing runtime versions as `DRAFT` without overwriting admin-edited fields.  
+**Verify:** Empty and existing-database migration tests; reconciliation idempotency/drift tests; `pnpm exec prisma validate`.  
+**Dependencies:** `MVP-CAT-01`  
+**Implementation gate:** Separate explicit product-owner instruction is required before work begins.  
+**Likely files:** `prisma/schema.prisma`, `prisma/migrations/*_template_catalog/migration.sql`, `scripts/reconcile-template-catalog.ts`, `tests/integration/template-catalog-migration.test.ts`, `src/features/templates/catalog-schema.ts`  
+**Scope:** Medium, 5 paths
+
+### MVP-CAT-03: Split runtime manifest and resolved catalog contract
+
+**Acceptance:** Source definitions contain only runtime identity/schema/renderer/capabilities/palette/demo contracts plus `previewStyle` when it selects code/CSS behavior; server-only resolver joins exact database metadata and runtime manifest; resolved DTO preserves nullable marketing thumbnail so runtime preview remains presentation-only; runtime-only or metadata-only pairs fail closed; referenced runtime versions cannot be removed undetected.  
+**Verify:** Runtime manifest and preview-style ownership contracts, resolver success/missing-pair, palette compatibility, and reference-scan tests.  
+**Dependencies:** `MVP-CAT-02`  
+**Likely files:** `src/features/templates/types.ts`, `src/features/templates/registry.tsx`, `src/features/templates/catalog.ts`, `src/features/templates/catalog.test.ts`, `tests/integration/template-runtime-references.test.ts`  
+**Scope:** Medium, 5 files
+
+### MVP-CAT-04: Deliver admin catalog metadata management
+
+**Acceptance:** Authenticated admin can edit validated name, description, current price, category, display order, marketing thumbnail, lifecycle status, and slug under approved alias rules; runtime identity/version/schema/renderer/capabilities/palettes/demo remain read-only; every mutation is audited and revalidated with inline errors and toast feedback.  
+**Verify:** Admin metadata component/action/integration tests including ID tampering, invalid price, duplicate slug, alias creation, hidden/retired transitions, and unauthenticated redirect.  
+**Dependencies:** `MVP-CAT-03`, `MVP-13`  
+**Likely files:** `src/app/admin/templates/page.tsx`, `src/app/admin/templates/actions.ts`, `src/features/admin/template-catalog-form.tsx`, `src/features/templates/catalog-mutations.ts`, `tests/integration/template-catalog-admin.test.ts`  
+**Scope:** Medium, 5 files
+
+### MVP-CAT-05: Integrate resolved metadata with showroom and WhatsApp
+
+**Acceptance:** Catalog, category filter, detail route, canonical slug/aliases, and WhatsApp CTA consume one resolved DTO; name/category/description/current price/order/visibility come from database, renderer/palette/demo come from exact runtime manifest; missing pairs never render or silently fall back.  
+**Verify:** Catalog/detail/alias/WhatsApp component and E2E tests; hidden/retired/missing-runtime matrix.  
+**Dependencies:** `MVP-CAT-03`, `MVP-CAT-04`  
+**Likely files:** `src/app/(showroom)/page.tsx`, `src/app/(showroom)/templates/[slug]/page.tsx`, `src/features/showroom/catalog.tsx`, `src/features/showroom/template-detail.tsx`, `e2e/template-catalog.spec.ts`  
+**Scope:** Medium, 5 files
+
+### MVP-CAT-06: Integrate order snapshots and deployment drift gate
+
+**Acceptance:** New-order selection includes only orderable resolved templates; server re-resolves selection and copies current database price plus immutable runtime/schema/palette identity into Order; later metadata edits do not alter old orders; reconciliation/reference scan blocks visible metadata without runtime and active references without runtime.  
+**Verify:** Order price-change snapshot, invalid/retired selection, concurrent metadata change, reconciliation drift, rollback compatibility, and full core-flow regression tests.  
+**Dependencies:** `MVP-CAT-03`, `MVP-CAT-04`, `MVP-15`  
+**Likely files:** `src/app/admin/orders/new/page.tsx`, `src/features/orders/data.ts`, `src/features/orders/order-form.tsx`, `tests/integration/order-intake.test.ts`, `tests/integration/template-catalog-drift.test.ts`  
+**Scope:** Medium, 5 files
+
+### Checkpoint MVP-Catalog
+
+- [x] `MVP-01` - `MVP-18` historical completion remains recorded.
+- [x] `MVP-CAT-01` decision/specification approved.
+- [ ] `MVP-CAT-02` - `MVP-CAT-06` implemented and reviewed.
+- [ ] Empty and existing databases migrate without losing visibility or catalog metadata.
+- [ ] Showroom, WhatsApp, and new orders use database metadata plus exact source runtime.
+- [ ] Old order prices remain unchanged after catalog price edits.
+- [ ] Slug aliases, fail-closed missing pairs, reference scans, and rollback compatibility pass.
 
 ## MVP Workspace and Assets
 
@@ -198,7 +284,7 @@ Plan dan task list sudah disetujui. Tidak ada task implementation yang boleh dim
 
 **Acceptance:** Workspace reads/writes mutable draft pinned to template/schema version; compare-and-swap rejects stale saves and preserves local input; locked editing rejects customer writes server-side.  
 **Verify:** Workspace-save integration and editor component tests.  
-**Dependencies:** `MVP-06`, `MVP-18`  
+**Dependencies:** `MVP-06`, `MVP-18`, Checkpoint `MVP-Catalog`  
 **Likely files:** `src/app/workspace/invitations/[invitationId]/page.tsx`, `src/features/workspace/workspace-editor.tsx`, `src/features/workspace/actions.ts`, `src/features/invitations/workspace-dto.ts`, `tests/integration/workspace-save.test.ts`  
 **Scope:** Medium, 5 files
 
@@ -295,13 +381,13 @@ Plan dan task list sudah disetujui. Tidak ada task implementation yang boleh dim
 
 **Acceptance:** E2E covers showroom -> WhatsApp -> admin pending/paid/activation -> single-use access -> draft edit -> publish -> reopen/republish snapshot isolation -> RSVP/wish; all PRD MVP criteria map to evidence.  
 **Verify:** `pnpm lint && pnpm typecheck && pnpm test && pnpm test:integration && pnpm build && pnpm test:e2e -- --grep "MVP core"`.  
-**Dependencies:** `MVP-01` - `MVP-29`  
+**Dependencies:** `MVP-01` - `MVP-29`, Checkpoint `MVP-Catalog`  
 **Likely files:** `e2e/mvp-core-flow.spec.ts`, `e2e/mvp-security.spec.ts`, `docs/mvp-validation-checklist.md`, `docs/mvp-validation-report.md`  
 **Scope:** Medium, 4 files
 
 ## MVP Gate
 
-- [ ] `MVP-01` - `MVP-30` complete and reviewed.
+- [ ] `MVP-01` - `MVP-30` and `MVP-CAT-01` - `MVP-CAT-06` complete and reviewed.
 - [ ] Core flow and security/data-integrity invariants pass.
 - [ ] Human marks MVP validated on development/staging.
 - [ ] Public launch remains blocked.

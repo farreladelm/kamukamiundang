@@ -1,10 +1,11 @@
 # PRD: MVP Undango
 
 **Status:** Approved  
-**Versi:** 0.4  
-**Tanggal:** 2 Agustus 2026  
-**Disetujui:** 2 Agustus 2026 oleh product owner  
+**Versi:** 0.5  
+**Tanggal:** 4 Agustus 2026  
+**Disetujui:** 4 Agustus 2026 oleh product owner  
 **Amandemen:** 3 Agustus 2026 - delivery dua fase; admin dashboard memakai email/password  
+**Amandemen:** 4 Agustus 2026 - hybrid versioned template catalog; metadata bisnis dikelola database  
 **Sumber visi produk:** [`docs/PRODUCT.md`](./PRODUCT.md)  
 **Target pasar:** Pasangan di Indonesia yang membutuhkan undangan pernikahan digital siap pakai.
 
@@ -24,7 +25,7 @@ MVP harus membuktikan tiga hal:
 |---|---|---|
 | Pengunjung | Menilai template sebelum memberikan data atau membuat akun | Menemukan template dan palette yang disukai, lalu menghubungi admin melalui WhatsApp |
 | Pelanggan | Menyelesaikan dan merevisi invitation yang dibeli | Mengelola konten sendiri melalui akses privat atau meminta bantuan admin |
-| Admin | Mengelola order, membantu pelanggan, dan menjaga kualitas publish | Mengaktifkan workspace dan menjadi satu-satunya pihak yang dapat publish atau unpublish |
+| Admin | Mengelola metadata katalog dan order, membantu pelanggan, serta menjaga kualitas publish | Mengaktifkan workspace, memperbarui metadata bisnis template, dan menjadi satu-satunya pihak yang dapat publish atau unpublish |
 | Tamu | Membaca invitation dan merespons | Membuka invitation published, mengirim RSVP, serta menulis ucapan |
 
 Satu pelanggan dapat memiliki lebih dari satu order atau invitation.
@@ -56,8 +57,8 @@ Keputusan berikut sudah dikonfirmasi untuk PRD ini:
 | Admin access | Admin login ke dashboard memakai email/password dan revocable session 24 jam; credential admin tidak berlaku untuk workspace customer |
 | Order lifecycle | `pending`, `paid`, `activated`, `cancelled`, dan `refunded` |
 | Invitation lifecycle | `draft`, `published`, dan `archived`; editing access dikelola terpisah dari status publik |
-| Template management | Implementasi template dan palette berada di source code; admin hanya dapat hide atau unhide |
-| Template versioning | Invitation menyimpan `templateKey`, `templateVersion`, `contentSchemaVersion`, dan `paletteKey`; versi aktif tidak boleh diubah breaking atau dihapus |
+| Template management | Runtime contract berada di source code; metadata bisnis katalog berada di database dan dapat dikelola admin |
+| Template versioning | `(templateKey, templateVersion)` adalah join contract immutable; invitation menyimpan key/version, `contentSchemaVersion`, dan `paletteKey`; runtime yang direferensikan tidak boleh dihapus |
 | Published content | Public route membaca satu immutable published snapshot; draft tetap terpisah dan full revision history ditunda |
 | Asset lifecycle | `pending` -> `processing` -> `ready` -> `failed`/`deleted`; total ready storage maksimal 250 MB per invitation |
 | Retensi | Tidak ada expiry otomatis; invitation live sampai admin archive dan data dihapus manual |
@@ -83,7 +84,7 @@ Customer magic link dibuat dashboard dan dikirim manual oleh admin melalui Whats
 
 - 3-5 template matang dengan kategori, harga, data demo realistis, dan 3-6 palette per template.
 - Katalog publik, detail template, interactive preview, dan CTA WhatsApp berkonteks.
-- Dashboard admin untuk pencatatan order manual, activation, bantuan edit, pengelolaan publish, serta pengelolaan RSVP dan ucapan.
+- Dashboard admin untuk metadata katalog, pencatatan order manual, activation, bantuan edit, pengelolaan publish, serta pengelolaan RSVP dan ucapan.
 - Workspace pelanggan passwordless dengan form, upload foto, curated palette, dan live preview.
 - Invitation publik dengan section standar, RSVP, ucapan, wedding gift, musik opsional, dan animasi ringan.
 - Event minimum untuk mengukur detail template dan klik WhatsApp; dashboard analytics lanjutan ditunda.
@@ -176,12 +177,12 @@ Kriteria journey:
 
 | ID | Requirement | Acceptance criteria |
 |---|---|---|
-| `SHW-001` | Katalog menampilkan template aktif | Setiap kartu menampilkan nama, kategori, thumbnail, dan harga Rupiah; template nonaktif tidak muncul |
+| `SHW-001` | Katalog menampilkan template aktif | Setiap kartu menampilkan nama, kategori, visual preview, dan harga Rupiah; jika `marketingThumbnail` null, resolved DTO mempertahankan null dan kartu memakai runtime preview sebagai presentation-only behavior, bukan fallback metadata; template nonaktif tidak muncul |
 | `SHW-002` | Katalog mendukung filter kategori | Pengunjung dapat memilih kategori dan mengembalikan tampilan ke semua kategori tanpa reload penuh |
 | `SHW-003` | Detail template memakai data demo realistis | Preview memuat nama, tanggal, venue, foto, dan section representatif yang cukup untuk menilai hasil akhir |
 | `SHW-004` | Setiap template menyediakan curated palette | Tersedia 3-6 palette; hanya palette milik template tersebut yang dapat dipilih |
 | `SHW-005` | Pergantian palette memperbarui preview | Warna preview berubah segera tanpa mengubah struktur, font pairing, atau konten demo |
-| `SHW-006` | Harga tampil konsisten | Harga pada kartu, detail, dan pesan WhatsApp berasal dari data template yang sama |
+| `SHW-006` | Harga tampil konsisten | Harga pada kartu, detail, pesan WhatsApp, dan order baru berasal dari metadata katalog database yang sama; order lama tetap memakai price snapshot |
 | `SHW-007` | CTA WhatsApp membawa konteks order | Pesan berisi nama template, harga, palette terpilih, dan URL detail; CTA dapat digunakan pada ponsel dan desktop |
 | `SHW-008` | Showroom dapat dibuka tanpa autentikasi | Katalog dan detail template tidak mengarahkan pengguna ke login atau form data pernikahan |
 | `SHW-009` | Interaksi funnel tercatat | View detail, pilihan palette, dan klik CTA menghasilkan event analytics vendor-neutral yang ditentukan pada bagian Analytics |
@@ -200,7 +201,8 @@ Kriteria journey:
 | `ADM-008` | Hanya admin dapat mengubah visibilitas publik | Pelanggan tidak dapat publish, unpublish, atau archive melalui UI maupun endpoint |
 | `ADM-009` | Admin dapat mengelola RSVP dan ucapan | Data dapat difilter per invitation dan menampilkan waktu submit; admin dapat hide, unhide, atau delete ucapan |
 | `ADM-010` | Admin mendapat ringkasan operasional | Dashboard menampilkan order menurut status, invitation menurut status, serta data dasar conversion dan engagement |
-| `ADM-011` | Admin dapat hide atau unhide template | Aksi hanya mengubah visibilitas katalog; kode layout, palette, demo content, dan harga tidak dapat diedit dari dashboard |
+| `ADM-011` | Admin dapat mengelola metadata katalog template | Admin dapat mengubah nama, slug sesuai lifecycle, deskripsi, harga, kategori, urutan, thumbnail marketing, dan visibilitas; layout, renderer, version, schema, capabilities, palette contract, dan demo content tetap tidak dapat diedit dari dashboard |
+| `ADM-015` | Perubahan metadata template diaudit | Perubahan metadata menyimpan aktor dan waktu; metadata yang dipakai order baru tervalidasi terhadap runtime manifest sebelum template dapat dibuat visible |
 | `ADM-012` | Order mengikuti lifecycle yang ditetapkan | Status valid adalah `pending`, `paid`, `activated`, `cancelled`, dan `refunded`; hanya `paid` dapat diaktivasi dan activation sukses menghasilkan tepat satu invitation |
 | `ADM-013` | Admin mengontrol editing setelah publish | Publish mengunci workspace; admin dapat membuka editing sambil mempertahankan snapshot publik lama, lalu publish ulang atau archive |
 | `ADM-014` | Admin login ke dashboard dengan email/password | Tidak ada registrasi admin publik; password 12-128 karakter disimpan sebagai Argon2id hash; 5 gagal login per 15 menit; reset MVP dilakukan operator |
@@ -287,13 +289,16 @@ Semua pemeriksaan authorization wajib dilakukan di server. Menyembunyikan kontro
 
 | Entitas | Data minimum | Invariant |
 |---|---|---|
-| `TemplateDefinition` | key, version, content schema version, slug, nama, kategori, harga, capabilities, data demo | Version immutable; breaking change membuat version baru; version yang direferensikan invitation aktif tidak boleh dihapus |
-| `TemplatePalette` | template key/version, palette key, nama, token warna terkurasi | Palette hanya valid untuk template version terkait |
+| `TemplateRuntimeDefinition` | key, version, content schema version, renderer, capabilities, palette contract, data demo | Berada di source code; identity immutable; breaking change membuat version baru; runtime yang direferensikan tidak boleh dihapus |
+| `TemplateCatalog` | runtime key/version, slug, nama, kategori, deskripsi, harga, thumbnail marketing opsional, display order, status, audit actor/time | Berada di database; unique runtime identity dan slug; hanya metadata yang cocok dengan runtime manifest dapat dibuat visible |
+| `TemplateCategory` | key, nama, display order, status | Berada di database; kategori inactive tidak dapat dipilih untuk metadata baru tetapi historical reference tetap terbaca |
+| `TemplateSlugAlias` | slug lama, template catalog target, current flag | Slug yang pernah dipublikasikan tidak dipakai ulang; perubahan slug setelah visible mempertahankan alias redirect |
+| `TemplatePalette` | template key/version, palette key, nama, token warna terkurasi | Berada di source code dan hanya valid untuk template version terkait; key/tokens tidak dimutasi setelah direferensikan |
 | `Customer` | ID, nama, kontak WhatsApp dan/atau email, status | Satu customer dapat memiliki banyak order dan invitation |
 | `Admin` | ID, normalized unique email, Argon2id password hash, status, timestamps | Tidak ada plaintext password; hanya admin aktif dapat membuat dashboard session |
 | `Session` | ID, hashed opaque token, actor type/ID, expiry, revoke/last-used timestamps | Token raw hanya berada di secure cookie; role/ownership diverifikasi ulang pada protected operation |
 | `MagicLink` | ID, customer/invitation scope, hashed token, expiry, consumed/revoked timestamps | Single-use; atomic consume; raw token tidak disimpan/logged |
-| `Order` | ID, customer, template/palette snapshots, price snapshot, batas foto, status, timestamps | Status hanya lifecycle yang diizinkan; activation idempotent dan satu order memiliki maksimal satu invitation |
+| `Order` | ID, customer, `templateKey`, `templateVersion`, `contentSchemaVersion`, `paletteKey`, `priceInRupiah`, batas foto, status, timestamps | Identity/runtime/schema/palette dan harga disalin saat order dibuat; status hanya lifecycle yang diizinkan; activation idempotent dan satu order memiliki maksimal satu invitation |
 | `Invitation` | ID, customer, unique order ID, template key/version, content schema version, palette key, slug, status, editing access, publish timestamps | Slug dan order ID unik; hanya `published` yang tersedia publik |
 | `InvitationContent` | Mutable draft data, content version, schema version, updated actor/time | Optimistic compare-and-swap; draft harus valid untuk pinned template/schema version |
 | `PublishedSnapshot` | Invitation ID, template key/version, schema version, palette key, content, asset references, published time | Satu current snapshot per invitation dan diganti atomik hanya oleh admin publish |
@@ -301,7 +306,7 @@ Semua pemeriksaan authorization wajib dilakukan di server. Menyembunyikan kontro
 | `RSVP` | ID, invitation, nama, kehadiran, jumlah tamu, acara opsional, timestamp | Hanya dapat dibuat untuk invitation published dan tidak menyimpan nomor kontak |
 | `Wish` | ID, invitation, nama, isi tersanitasi, visibility, timestamp | Hanya dapat dibuat untuk invitation published; hide reversible dan delete memerlukan konfirmasi |
 
-Data model tidak boleh menyimpan harga order sebagai referensi dinamis ke harga template. Database constraints/triggers harus melindungi unique order-invitation, allowed status transitions, paid-only activation, unique slug, optimistic version, dan idempotency key. Data personal dan token autentikasi tidak boleh dikirim ke analytics.
+Data model tidak boleh menyimpan harga order sebagai referensi dinamis ke harga template. Catalog resolver menggabungkan satu `TemplateCatalog` database dengan satu exact `TemplateRuntimeDefinition` source code memakai `(templateKey, templateVersion)`; tidak ada fallback diam-diam bila salah satunya hilang. Metadata tanpa runtime disembunyikan dan menjadi deployment error; runtime tanpa metadata tetap unavailable sampai direkonsiliasi. Database constraints/triggers harus melindungi unique order-invitation, allowed status transitions, paid-only activation, unique slug, optimistic version, dan idempotency key. Data personal dan token autentikasi tidak boleh dikirim ke analytics.
 
 ## 9. Analytics
 
@@ -363,6 +368,7 @@ Target angka bisnis belum ditentukan. Setelah public launch, sistem mengumpulkan
 - Publish tidak boleh menghasilkan halaman publik setengah tersimpan.
 - Perubahan bersamaan harus terdeteksi agar update lama tidak menimpa update baru tanpa peringatan.
 - Timestamp order, activation, publish, dan perubahan konten disimpan untuk audit dasar.
+- Reconciliation/deployment check gagal bila metadata visible tidak memiliki exact runtime manifest, runtime yang direferensikan order/invitation/snapshot hilang, atau palette/schema pin tidak kompatibel.
 
 ### 10.5 Asset Storage
 
@@ -393,13 +399,13 @@ Stack yang sudah ada dan menjadi baseline repository:
 | Styling | Tailwind CSS | 4.x |
 | Lint | ESLint dengan Next.js Core Web Vitals dan TypeScript | 9.x |
 | Package manager | pnpm | Lockfile tersedia |
-| Database | PostgreSQL | Versi ditetapkan pada planning sesuai dukungan VPS dan Prisma |
-| ORM | Prisma | Approved, belum terpasang |
+| Database | PostgreSQL | 18 current minor, approved pada plan |
+| ORM | Prisma | 7.6 dengan `@prisma/adapter-pg`, tersedia |
 | Asset storage | Filesystem VPS | Approved untuk MVP |
-| Unit/component test | Vitest dan Testing Library | Approved, belum terpasang |
-| Browser automation | Playwright | Approved, belum terpasang |
+| Unit/component test | Vitest dan Testing Library | Tersedia |
+| Browser automation | Playwright | Tersedia |
 
-Email provider hanya diperlukan jika recovery otomatis dipilih pada Production Readiness. Analytics provider, versi PostgreSQL, dan detail deployment VPS belum diputuskan. Object storage eksternal tidak digunakan pada MVP.
+Email provider hanya diperlukan jika recovery otomatis dipilih pada Production Readiness. Provider analytics eksternal tidak diperlukan untuk MVP; detail host dan credential deployment VPS ditentukan saat Production Readiness. Object storage eksternal tidak digunakan pada MVP.
 
 ## 12. Commands
 
@@ -410,8 +416,10 @@ Email provider hanya diperlukan jika recovery otomatis dipilih pada Production R
 | Production build | `pnpm build` | Tersedia |
 | Production server | `pnpm start` | Tersedia setelah build |
 | Lint | `pnpm lint` | Tersedia |
-| Unit dan component test | `pnpm test` | Target script Vitest; belum tersedia |
-| End-to-end test | `pnpm test:e2e` | Target script Playwright; belum tersedia |
+| Type check | `pnpm typecheck` | Tersedia |
+| Unit dan component test | `pnpm test` | Tersedia |
+| Integration test | `pnpm test:integration` | Tersedia |
+| End-to-end test | `pnpm test:e2e` | Tersedia |
 
 ## 13. Project Structure
 
@@ -458,22 +466,23 @@ export function buildWhatsAppOrderMessage(
 
 ## 15. Testing Strategy
 
-Vitest, Testing Library, dan Playwright sudah dipilih tetapi belum terpasang. Setup test runner dan scripts menjadi task pertama sebelum implementasi behavior.
+Vitest, Testing Library, dan Playwright beserta scripts unit, component, integration, dan end-to-end sudah tersedia.
 
 | Level | Fokus | Lokasi target |
 |---|---|---|
 | Unit | Price snapshot, validasi, lifecycle, authorization policy, formatter, dan WhatsApp message builder dengan Vitest | Dekat source sebagai `*.test.ts` |
 | Component | Form state, palette selector, preview, published lock state, error state, dan accessible controls dengan Testing Library | Dekat component sebagai `*.test.tsx` |
-| Integration | Auth passwordless, invitation-scoped access, persistence, upload policy, publish visibility, RSVP, dan abuse protection | `tests/` |
+| Integration | Hybrid template catalog/runtime reconciliation, price snapshot, auth passwordless, invitation-scoped access, persistence, upload policy, publish visibility, RSVP, dan abuse protection | `tests/` |
 | End-to-end | Discovery ke WhatsApp, activation ke workspace, single-use auth, admin publish/republish, draft/public isolation, RSVP, dan ucapan dengan Playwright | `e2e/` |
 | Manual | Visual quality setiap template pada mobile, musik, animasi, Maps, dan WhatsApp deep link pada perangkat nyata | Checklist release |
 
 Coverage requirement:
 
 - Seluruh cabang aturan authorization, lifecycle, price snapshot, dan visibilitas publish harus diuji.
+- Catalog tests membuktikan metadata bisnis berasal dari database, runtime contract berasal dari source code, dan missing pair gagal tertutup tanpa fallback diam-diam.
 - Setiap bug behavior wajib memiliki regression test.
 - Threshold coverage global ditetapkan setelah framework dan baseline test tersedia; tidak boleh dipakai sebagai pengganti pengujian journey kritis.
-- `pnpm lint`, `pnpm test`, `pnpm test:e2e`, dan `pnpm build` wajib lulus sebelum perubahan fitur dianggap selesai.
+- `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm test:integration`, `pnpm test:e2e`, dan `pnpm build` wajib lulus sebelum perubahan fitur dianggap selesai.
 
 ## 16. Boundaries
 
@@ -482,6 +491,7 @@ Coverage requirement:
 - Pertahankan katalog dan preview tanpa login.
 - Validasi input dan authorization di server.
 - Simpan price snapshot pada order.
+- Resolve katalog melalui exact database metadata + source runtime pair sebelum menampilkan template atau membuat order.
 - Batasi opsi pelanggan pada konfigurasi template yang dikurasi.
 - Pastikan hanya admin dapat publish, unpublish, dan archive.
 - Kunci workspace setelah publish; hanya admin dapat membuka editing dan publish ulang current draft.
@@ -516,6 +526,7 @@ Coverage requirement:
 MVP siap ditinjau sebagai hasil validasi ketika seluruh kondisi berikut terpenuhi:
 
 - 3-5 template aktif tersedia; masing-masing memiliki kategori, data demo realistis, harga, dan 3-6 palette.
+- Admin dapat mengubah metadata bisnis katalog tanpa deployment; perubahan tidak memutasi runtime contract atau order snapshot lama.
 - Pengunjung dapat browse, mencoba palette, dan membuka pesan WhatsApp lengkap tanpa login.
 - Admin dapat mencatat order manual, mengonfirmasi pembayaran, membuat invitation, dan mengaktifkan akses customer.
 - Admin dapat login hanya ke dashboard dengan email/password; customer workspace tetap hanya menerima customer session dari magic link.
@@ -530,7 +541,7 @@ MVP siap ditinjau sebagai hasil validasi ketika seluruh kondisi berikut terpenuh
 - Asset mengikuti lifecycle eksplisit, cleanup gagal/temp berjalan, dan quota 250 MB terjaga.
 - Event analytics minimum tercatat tanpa payload PII dan dapat dipakai menghitung indikator awal.
 - Journey kritis memiliki automated test; visual template, Maps, audio, animasi, dan WhatsApp diverifikasi manual pada perangkat nyata.
-- `pnpm lint`, `pnpm test`, `pnpm test:e2e`, dan `pnpm build` lulus pada revision release.
+- `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm test:integration`, `pnpm test:e2e`, dan `pnpm build` lulus pada revision release.
 
 ### 17.1 MVP Validation Gate
 
@@ -549,10 +560,9 @@ Tidak ada open question produk yang tersisa. Keputusan teknis berikut sengaja di
 
 1. Jika recovery otomatis disetujui pada Production Readiness, pilih provider email dengan opsi gratis, delivery monitoring, dan rate limiting.
 2. Tetapkan implementation analytics dasar MVP dan dashboard lanjutan Production Readiness tanpa payload PII.
-3. Tetapkan versi PostgreSQL dan Prisma yang kompatibel dengan VPS dan framework.
-4. Tetapkan layout direktori asset development/VPS; backup frequency, restore procedure, disk alert threshold, dan recovery objective diselesaikan pada Production Readiness.
-5. Tetapkan deployment pipeline, HTTPS termination, secret management, dan rollback procedure pada VPS.
-6. Setelah 30 hari data produksi tersedia, tetapkan target detail-to-WhatsApp conversion, activation rate, dan waktu sampai publish.
+3. Tetapkan layout direktori asset development/VPS; backup frequency, restore procedure, disk alert threshold, dan recovery objective diselesaikan pada Production Readiness.
+4. Tetapkan deployment pipeline, HTTPS termination, secret management, dan rollback procedure pada VPS.
+5. Setelah 30 hari data produksi tersedia, tetapkan target detail-to-WhatsApp conversion, activation rate, dan waktu sampai publish.
 
 ## 19. Approval Gate
 

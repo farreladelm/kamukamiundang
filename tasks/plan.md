@@ -1,11 +1,12 @@
 # Implementation Plan: Undango
 
-**Status:** Approved - implementation paused  
-**Versi:** 0.3  
-**Tanggal:** 3 Agustus 2026  
-**Disetujui:** 3 Agustus 2026 oleh product owner  
-**Specification:** [`docs/PRD.md`](../docs/PRD.md) v0.4 Approved  
+**Status:** Approved - MVP-01 through MVP-18 complete; template catalog amendment pending implementation  
+**Versi:** 0.4  
+**Tanggal:** 4 Agustus 2026  
+**Disetujui:** 4 Agustus 2026 oleh product owner  
+**Specification:** [`docs/PRD.md`](../docs/PRD.md) v0.5 Approved  
 **Task checklist:** [`tasks/todo.md`](./todo.md)  
+**Supplemental plan:** [`tasks/template-catalog-plan.md`](./template-catalog-plan.md)  
 
 ## 1. Guardrail
 
@@ -14,7 +15,7 @@ Dokumen ini mencakup roadmap lengkap, tetapi delivery dipisahkan menjadi dua gat
 1. **Phase 1 - MVP Core Flow:** membuktikan alur produk pada development/staging.
 2. **Phase 2 - Production Readiness:** membuat hasil MVP aman dan operable untuk public launch.
 
-Approval plan tidak otomatis mengizinkan implementation. `tasks/todo.md` tetap blocked sampai human reviewer menyetujui plan dan task list. Tidak ada task Phase 2 yang menjadi syarat untuk menyatakan core flow MVP selesai, tetapi public launch dilarang sampai Production Readiness selesai.
+Approval plan tidak otomatis mengizinkan implementation. `MVP-01` - `MVP-18` tetap tercatat selesai dan approved. Amandemen `MVP-CAT-01` - `MVP-CAT-06` mencatat remediation baru tanpa menulis ulang evidence completion task lama; amendment harus selesai sebelum `MVP-19` dan MVP Gate. Tidak ada task Phase 2 yang menjadi syarat untuk menyatakan core flow MVP selesai, tetapi public launch dilarang sampai Production Readiness selesai.
 
 ## 2. Delivery Definition
 
@@ -49,7 +50,7 @@ Phase ini menambahkan:
 
 ## 3. Architecture Decisions
 
-Keputusan berikut proposed sampai plan disetujui.
+Keputusan berikut sudah disetujui untuk plan ini.
 
 | Area | Decision | Delivery phase |
 |---|---|---|
@@ -64,7 +65,7 @@ Keputusan berikut proposed sampai plan disetujui.
 | Admin auth | Email/password untuk dashboard admin -> revocable session 24 jam; no public registration | MVP |
 | Customer link delivery | Dashboard generates single-use link; admin copies and sends it manually through WhatsApp | MVP |
 | Recovery email | External email provider only if automated recovery is approved | Production Readiness, conditional |
-| Templates | Source-controlled version registry; breaking change membuat version baru | MVP |
+| Templates | Hybrid versioned catalog: runtime manifest source-controlled, metadata bisnis database-controlled, exact key/version resolver, breaking runtime change membuat version baru | MVP |
 | Content | Mutable draft + one immutable current published snapshot; no full history | MVP |
 | Assets | Filesystem storage, explicit lifecycle, 250 MB ready quota per invitation | MVP |
 | Analytics | Basic first-party catalog/detail/palette/WhatsApp events, no PII/cookie/IP | MVP |
@@ -108,25 +109,24 @@ Rules:
 
 ## 5. Data and Lifecycle Design
 
-### 5.1 Template Versioning
+### 5.1 Hybrid Template Catalog and Versioning
 
-Each source-controlled template version exposes:
+Each source-controlled runtime manifest exposes `templateKey`, `templateVersion`, `contentSchemaVersion`, stable palette keys/tokens, content schema, capabilities, demo content, renderer, and any preview style that selects code behavior.
 
-- `templateKey`
-- `templateVersion`
-- `contentSchemaVersion`
-- Stable palette keys and semantic tokens
-- Content validation schema
-- Capability set and demo content
-- Renderer for that exact version
+Each database catalog record owns public slug, name, category, description, current price, marketing thumbnail, display order, lifecycle status, and audit actor/time. A server-only resolver joins both records using exact `(templateKey, templateVersion)` identity. Catalog, detail, WhatsApp, and order intake consume only resolved DTOs.
 
-Invitation and published snapshot persist all four identity fields: `templateKey`, `templateVersion`, `contentSchemaVersion`, and `paletteKey`.
+Invitation and published snapshot persist `templateKey`, `templateVersion`, `contentSchemaVersion`, and `paletteKey`. Order also persists current price as an immutable snapshot.
 
 Rules:
 
-- Non-breaking visual fix may update existing version only when output contract and content interpretation stay compatible.
+- `(templateKey, templateVersion)` is immutable and is the only code/database join contract.
+- Non-breaking visual fixes may update an existing runtime version only when output contract and content interpretation stay compatible.
 - Any breaking layout/content/schema change creates a new template or schema version.
-- A version referenced by any non-deleted invitation or published snapshot cannot be removed.
+- Runtime versions referenced by any order, invitation, or published snapshot cannot disappear.
+- Runtime without metadata remains unavailable until reconciliation inserts a `DRAFT` catalog record.
+- Visible metadata without exact runtime support fails closed and blocks deployment; there is no source metadata fallback.
+- Catalog status follows `DRAFT -> VISIBLE -> HIDDEN|RETIRED`; hidden/retired records remain available to historical operations.
+- Slug is freely editable before first visibility; later changes retain permanent aliases and retired slugs are never reused.
 - Full content migration tooling is deferred; old renderer versions remain available.
 
 ### 5.2 Draft and Published Snapshot
@@ -333,7 +333,9 @@ flowchart TD
   C --> D[Showroom + WhatsApp]
   B --> E[Admin auth + orders]
   E --> F[Paid activation + single-use link]
-  C --> G[Draft workspace]
+  C --> R[Hybrid catalog amendment]
+  E --> R
+  R --> G[Draft workspace]
   F --> G
   G --> H[Asset lifecycle]
   H --> I[Published snapshot + locking]
@@ -362,6 +364,7 @@ Detailed acceptance criteria and verification commands live in `tasks/todo.md`.
 | Foundation | `MVP-01` - `MVP-04` | ADRs, test harness, Prisma, constrained core schema |
 | Showroom | `MVP-05` - `MVP-11` | Three versioned templates, catalog/detail/palette, WhatsApp, basic events |
 | Operations | `MVP-12` - `MVP-18` | Admin credential/session, customers/orders, activation, manual WhatsApp single-use access |
+| Template catalog amendment | `MVP-CAT-01` - `MVP-CAT-06` | Preserve completed MVP evidence while remediating runtime/catalog ownership, metadata operations, and drift checks |
 | Workspace | `MVP-19` - `MVP-24` | Versioned draft forms, preview, image/music asset lifecycle |
 | Publish and guests | `MVP-25` - `MVP-29` | Snapshot publish/republish, locked editing, public route, RSVP/wishes management |
 | MVP acceptance | `MVP-30` | Entire core journey passes on development/staging |
@@ -370,6 +373,7 @@ Detailed acceptance criteria and verification commands live in `tasks/todo.md`.
 
 - Core journey passes Playwright and focused integration tests.
 - Database constraints, template pinning, snapshot isolation, auth replay defense, asset cleanup/quota, and guest idempotency pass.
+- Hybrid catalog verification proves database metadata, source runtime contracts, immutable price snapshots, slug aliases, and fail-closed drift behavior.
 - Three templates pass mobile/desktop visual and license review.
 - `pnpm lint`, `pnpm typecheck`, `pnpm test`, `pnpm test:integration`, `pnpm build`, and MVP E2E pass.
 - Human marks MVP validated. Public launch remains blocked.
@@ -405,6 +409,7 @@ Sequential requirements:
 
 - Prisma migrations touching same schema.
 - Template version contract before any template implementation.
+- `MVP-CAT-01` - `MVP-CAT-06` before `MVP-19`; workspace must consume the final runtime/catalog contract rather than the superseded combined definition.
 - Admin auth before protected order operations.
 - Paid activation before customer access.
 - Draft/asset model before published snapshot.
@@ -416,6 +421,9 @@ Sequential requirements:
 | Risk | Phase | Mitigation |
 |---|---|---|
 | Template code changes break active invitation | MVP | Pin template/schema version; retain old renderer; breaking changes create new version |
+| Database metadata and deployed runtime drift | MVP | Exact key/version resolver, idempotent reconciliation, fail-closed public/order reads, deployment reference scan |
+| Template slug change breaks saved showroom links | MVP | Immutable first-publication history, permanent slug alias, no retired slug reuse |
+| Catalog price change mutates historical order | MVP | Current price from catalog metadata; immutable price snapshot copied into each order |
 | Magic link replay | MVP | Single-use atomic consume, hash at rest, expiry/revoke, no token logs |
 | Published invitation changes during customer edit | MVP | Separate draft/current snapshot; public reads snapshot only; admin republish atomically |
 | Order activated twice or from wrong state | MVP | Unique order relation, locked transaction, DB trigger, idempotency key |
@@ -452,5 +460,7 @@ Sequential requirements:
 - [x] Human approves two-phase split and architecture decisions.
 - [x] Human accepts defaults in Section 16.
 - [x] Human approves task scopes/order in `tasks/todo.md`.
+- [x] Human approves hybrid versioned catalog amendment and slug alias lifecycle on 4 August 2026.
 - [x] Plan status is `Approved` with reviewer/date.
-- [x] Implementation remains paused until product owner gives a separate explicit start instruction.
+- [x] `MVP-01` - `MVP-18` completion remains preserved; amendment tasks are tracked separately.
+- [ ] Product owner gives a separate explicit instruction before `MVP-CAT-02` implementation begins.

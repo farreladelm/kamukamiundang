@@ -27,6 +27,8 @@ Section opsional tidak boleh meninggalkan wrapper kosong, spacing kosong, atau h
 
 `TemplateContentViewModel` adalah kontrak renderer. Renderer hanya menerima `content` dan `palette`; jangan membaca database, URL request, atau environment variable dari template.
 
+Runtime manifest di source code hanya memiliki identity/version, content schema, renderer, capabilities, palette contract, demo content, dan pilihan preview yang mengaktifkan behavior code/CSS. Nama publik, slug, kategori, deskripsi marketing, harga, thumbnail marketing, urutan, dan lifecycle katalog dimiliki PostgreSQL sesuai ADR-0007. Renderer tidak boleh membaca atau menyediakan fallback untuk metadata bisnis tersebut.
+
 Field inti:
 
 - `cover`, `couple`, `profiles`, `opening`, `quote`.
@@ -90,17 +92,19 @@ UI demo boleh memakai state lokal, tetapi tidak boleh berpura-pura menyimpan dat
 ## Membuat Template Baru
 
 1. Tambahkan folder `src/features/templates/<template>/v1/`.
-2. Buat `definition.ts` dengan identity, palette, capabilities, demo content, dan renderer.
+2. Buat `definition.ts` dengan `templateKey`, `templateVersion`, `contentSchemaVersion`, content validation schema, palette, capabilities, demo content, dan renderer.
 3. Buat renderer tipis yang menggunakan `InvitationExperience` atau komposisi shared section yang setara.
 4. Pilih section optional secara eksplisit melalui demo data.
 5. Daftarkan definition di `registry.tsx`.
-6. Tambahkan renderer test untuk nama, tanggal, event, Maps, dan optional section.
-7. Tambahkan lisensi untuk semua asset non-CSS.
-8. Jalankan `pnpm lint`, `pnpm typecheck`, `pnpm test`, dan `pnpm build`.
+6. Jalankan reconciliation catalog untuk membuat metadata `DRAFT`; jangan menambahkan metadata bisnis sebagai runtime authority.
+7. Lengkapi metadata melalui admin dan buat visible hanya setelah exact runtime/catalog validation lulus.
+8. Tambahkan renderer test untuk nama demo, tanggal, event, Maps, dan optional section.
+9. Tambahkan lisensi untuk semua asset non-CSS.
+10. Jalankan drift check, `pnpm lint`, `pnpm typecheck`, `pnpm test`, dan `pnpm build`.
 
 ## Versioning
 
-Breaking content atau visual interpretation harus membuat template/schema version baru. Versi yang sudah dipakai published snapshot tidak boleh dihapus. Perubahan saat ini memakai template v1 dengan `contentSchemaVersion: 2` karena repository belum memiliki published invitation aktif; setelah snapshot production ada, gunakan v2 renderer.
+Breaking content atau visual interpretation harus membuat `templateVersion` baru; perubahan bentuk content juga menaikkan `contentSchemaVersion`. Versi yang sudah direferensikan order, invitation, atau published snapshot tidak boleh dihapus atau diganti renderernya. Perubahan saat ini memakai template v1 dengan `contentSchemaVersion: 2` karena repository belum memiliki published invitation aktif; setelah production mereferensikan v1, pertahankan entry/renderer v1 dan tambahkan entry/renderer v2 untuk perubahan breaking.
 
 ## Checklist Review
 
@@ -113,4 +117,6 @@ Breaking content atau visual interpretation harus membuat template/schema versio
 - Form memiliki label dan status sukses.
 - Placeholder atau foto memiliki alternative text.
 - Renderer tidak memiliki database access.
+- Runtime manifest tidak menjadi fallback metadata bisnis.
+- Exact runtime/catalog pair dan reference scan lulus sebelum visible/deploy.
 - Test dan build lulus.
