@@ -57,6 +57,21 @@ export type Admin = Prisma.AdminModel
  */
 export type TemplateVisibility = Prisma.TemplateVisibilityModel
 /**
+ * Model TemplateCategory
+ * 
+ */
+export type TemplateCategory = Prisma.TemplateCategoryModel
+/**
+ * Model TemplateCatalog
+ * 
+ */
+export type TemplateCatalog = Prisma.TemplateCatalogModel
+/**
+ * Model TemplateSlugAlias
+ * 
+ */
+export type TemplateSlugAlias = Prisma.TemplateSlugAliasModel
+/**
  * Model Order
  * 
  */

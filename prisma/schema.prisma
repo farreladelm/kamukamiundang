@@ -50,6 +50,13 @@ enum WishVisibility {
   HIDDEN
 }
 
+enum TemplateCatalogStatus {
+  DRAFT
+  VISIBLE
+  HIDDEN
+  RETIRED
+}
+
 model Customer {
   id          String       @id @default(uuid()) @db.Uuid
   name        String
@@ -64,69 +71,117 @@ model Customer {
 }
 
 model Admin {
-  id           String      @id @default(uuid()) @db.Uuid
-  email        String      @unique
-  passwordHash String
-  isActive     Boolean     @default(true)
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
-   sessions     Session[]
-   templateVisibilities TemplateVisibility[]
+  id                     String               @id @default(uuid()) @db.Uuid
+  email                  String               @unique
+  passwordHash           String
+  isActive               Boolean              @default(true)
+  createdAt              DateTime             @default(now())
+  updatedAt              DateTime             @updatedAt
+  sessions               Session[]
+  templateVisibilities   TemplateVisibility[]
+  templateCatalogUpdates TemplateCatalog[]    @relation("TemplateCatalogUpdatedBy")
 }
 
 model TemplateVisibility {
-  id              String   @id @default(uuid()) @db.Uuid
-  templateKey     String
-  templateVersion Int
-  isVisible       Boolean  @default(true)
-  updatedByAdminId String  @db.Uuid
-  updatedAt       DateTime @updatedAt
-  createdAt       DateTime @default(now())
-  updatedByAdmin  Admin    @relation(fields: [updatedByAdminId], references: [id], onDelete: Restrict)
+  id               String   @id @default(uuid()) @db.Uuid
+  templateKey      String
+  templateVersion  Int
+  isVisible        Boolean  @default(true)
+  updatedByAdminId String   @db.Uuid
+  updatedAt        DateTime @updatedAt
+  createdAt        DateTime @default(now())
+  updatedByAdmin   Admin    @relation(fields: [updatedByAdminId], references: [id], onDelete: Restrict)
 
   @@unique([templateKey, templateVersion])
   @@index([updatedByAdminId])
 }
 
+model TemplateCategory {
+  id           String            @id @default(uuid()) @db.Uuid
+  key          String            @unique
+  name         String
+  displayOrder Int
+  isActive     Boolean           @default(true)
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  templates    TemplateCatalog[]
+
+  @@index([isActive, displayOrder])
+}
+
+model TemplateCatalog {
+  id                 String                @id @default(uuid()) @db.Uuid
+  templateKey        String
+  templateVersion    Int
+  slug               String                @unique
+  name               String
+  categoryId         String                @db.Uuid
+  description        String
+  priceInRupiah      Int
+  marketingThumbnail String?
+  displayOrder       Int
+  status             TemplateCatalogStatus @default(DRAFT)
+  updatedByAdminId   String?               @db.Uuid
+  createdAt          DateTime              @default(now())
+  updatedAt          DateTime              @updatedAt
+  category           TemplateCategory      @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  updatedByAdmin     Admin?                @relation("TemplateCatalogUpdatedBy", fields: [updatedByAdminId], references: [id], onDelete: Restrict)
+  slugAliases        TemplateSlugAlias[]
+
+  @@unique([templateKey, templateVersion])
+  @@index([categoryId, status, displayOrder])
+  @@index([updatedByAdminId])
+}
+
+model TemplateSlugAlias {
+  id                String          @id @default(uuid()) @db.Uuid
+  slug              String          @unique
+  templateCatalogId String          @db.Uuid
+  isCurrent         Boolean         @default(false)
+  createdAt         DateTime        @default(now())
+  templateCatalog   TemplateCatalog @relation(fields: [templateCatalogId], references: [id], onDelete: Restrict)
+
+}
+
 model Order {
-  id                    String      @id @default(uuid()) @db.Uuid
-  customerId            String      @db.Uuid
-  templateKey           String
-  templateVersion       Int
-  contentSchemaVersion  Int
-  paletteKey            String
-  priceInRupiah         Int
-  photoLimit            Int
-  storageQuotaBytes     BigInt
-  status                OrderStatus @default(PENDING)
-  paidAt                DateTime?
-  activatedAt           DateTime?
-  refundedAt            DateTime?
-  createdAt             DateTime    @default(now())
-  updatedAt             DateTime    @updatedAt
-  customer              Customer    @relation(fields: [customerId], references: [id], onDelete: Restrict)
-  invitation            Invitation?
+  id                   String      @id @default(uuid()) @db.Uuid
+  customerId           String      @db.Uuid
+  templateKey          String
+  templateVersion      Int
+  contentSchemaVersion Int
+  paletteKey           String
+  priceInRupiah        Int
+  photoLimit           Int
+  storageQuotaBytes    BigInt
+  status               OrderStatus @default(PENDING)
+  paidAt               DateTime?
+  activatedAt          DateTime?
+  refundedAt           DateTime?
+  createdAt            DateTime    @default(now())
+  updatedAt            DateTime    @updatedAt
+  customer             Customer    @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  invitation           Invitation?
 
   @@index([customerId])
 }
 
 model Invitation {
-  id                   String           @id @default(uuid()) @db.Uuid
-  customerId           String           @db.Uuid
-  orderId              String           @unique @db.Uuid
+  id                   String             @id @default(uuid()) @db.Uuid
+  customerId           String             @db.Uuid
+  orderId              String             @unique @db.Uuid
   templateKey          String
   templateVersion      Int
   contentSchemaVersion Int
   paletteKey           String
-  slug                 String           @unique
-  status               InvitationStatus @default(DRAFT)
-  editingEnabled       Boolean          @default(true)
+  slug                 String             @unique
+  status               InvitationStatus   @default(DRAFT)
+  editingEnabled       Boolean            @default(true)
   publishedAt          DateTime?
   archivedAt           DateTime?
-  createdAt            DateTime         @default(now())
-  updatedAt            DateTime         @updatedAt
-  customer             Customer         @relation(fields: [customerId], references: [id], onDelete: Restrict)
-  order                Order            @relation(fields: [orderId], references: [id], onDelete: Restrict)
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+  customer             Customer           @relation(fields: [customerId], references: [id], onDelete: Restrict)
+  order                Order              @relation(fields: [orderId], references: [id], onDelete: Restrict)
   content              InvitationContent?
   snapshot             PublishedSnapshot?
   assets               Asset[]
@@ -138,16 +193,16 @@ model Invitation {
 }
 
 model InvitationContent {
-  id                   String     @id @default(uuid()) @db.Uuid
-  invitationId         String     @unique @db.Uuid
+  id                   String           @id @default(uuid()) @db.Uuid
+  invitationId         String           @unique @db.Uuid
   content              Json
-  contentVersion       Int        @default(0)
+  contentVersion       Int              @default(0)
   contentSchemaVersion Int
   updatedByActorType   SessionActorType
-  updatedByActorId     String     @db.Uuid
-  createdAt            DateTime   @default(now())
-  updatedAt            DateTime   @updatedAt
-  invitation           Invitation @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+  updatedByActorId     String           @db.Uuid
+  createdAt            DateTime         @default(now())
+  updatedAt            DateTime         @updatedAt
+  invitation           Invitation       @relation(fields: [invitationId], references: [id], onDelete: Cascade)
 }
 
 model PublishedSnapshot {
@@ -174,35 +229,35 @@ model SnapshotAsset {
 }
 
 model Asset {
-  id          String      @id @default(uuid()) @db.Uuid
-  invitationId String     @db.Uuid
-  type        AssetType
-  status      AssetStatus @default(PENDING)
-  storagePath String      @unique
-  byteSize    BigInt      @default(0)
-  metadata    Json?
-  failureCode String?
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  deletedAt   DateTime?
-  invitation  Invitation  @relation(fields: [invitationId], references: [id], onDelete: Cascade)
-  snapshots   SnapshotAsset[]
+  id           String          @id @default(uuid()) @db.Uuid
+  invitationId String          @db.Uuid
+  type         AssetType
+  status       AssetStatus     @default(PENDING)
+  storagePath  String          @unique
+  byteSize     BigInt          @default(0)
+  metadata     Json?
+  failureCode  String?
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+  deletedAt    DateTime?
+  invitation   Invitation      @relation(fields: [invitationId], references: [id], onDelete: Cascade)
+  snapshots    SnapshotAsset[]
 
   @@index([invitationId, status])
 }
 
 model Session {
-  id            String           @id @default(uuid()) @db.Uuid
-  tokenHash     String           @unique
-  actorType     SessionActorType
-  customerId    String?          @db.Uuid
-  adminId       String?          @db.Uuid
-  expiresAt     DateTime
-  revokedAt     DateTime?
-  lastUsedAt    DateTime?
-  createdAt     DateTime         @default(now())
-  customer      Customer?        @relation(fields: [customerId], references: [id], onDelete: Cascade)
-  admin         Admin?           @relation(fields: [adminId], references: [id], onDelete: Cascade)
+  id         String           @id @default(uuid()) @db.Uuid
+  tokenHash  String           @unique
+  actorType  SessionActorType
+  customerId String?          @db.Uuid
+  adminId    String?          @db.Uuid
+  expiresAt  DateTime
+  revokedAt  DateTime?
+  lastUsedAt DateTime?
+  createdAt  DateTime         @default(now())
+  customer   Customer?        @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  admin      Admin?           @relation(fields: [adminId], references: [id], onDelete: Cascade)
 
   @@index([customerId])
   @@index([adminId])
@@ -264,14 +319,14 @@ model AnalyticsEvent {
 }
 
 model AuditEvent {
-  id          String           @id @default(uuid()) @db.Uuid
-  actorType   SessionActorType?
-  actorId     String?          @db.Uuid
-  entityType  String
-  entityId    String           @db.Uuid
-  action      String
-  properties  Json?
-  createdAt   DateTime         @default(now())
+  id         String            @id @default(uuid()) @db.Uuid
+  actorType  SessionActorType?
+  actorId    String?           @db.Uuid
+  entityType String
+  entityId   String            @db.Uuid
+  action     String
+  properties Json?
+  createdAt  DateTime          @default(now())
 
   @@index([entityType, entityId, createdAt])
 }

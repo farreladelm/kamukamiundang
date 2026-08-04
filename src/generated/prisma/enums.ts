@@ -71,3 +71,13 @@ export const WishVisibility = {
 } as const
 
 export type WishVisibility = (typeof WishVisibility)[keyof typeof WishVisibility]
+
+
+export const TemplateCatalogStatus = {
+  DRAFT: 'DRAFT',
+  VISIBLE: 'VISIBLE',
+  HIDDEN: 'HIDDEN',
+  RETIRED: 'RETIRED'
+} as const
+
+export type TemplateCatalogStatus = (typeof TemplateCatalogStatus)[keyof typeof TemplateCatalogStatus]

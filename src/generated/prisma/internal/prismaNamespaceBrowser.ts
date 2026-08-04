@@ -54,6 +54,9 @@ export const ModelName = {
   Customer: 'Customer',
   Admin: 'Admin',
   TemplateVisibility: 'TemplateVisibility',
+  TemplateCategory: 'TemplateCategory',
+  TemplateCatalog: 'TemplateCatalog',
+  TemplateSlugAlias: 'TemplateSlugAlias',
   Order: 'Order',
   Invitation: 'Invitation',
   InvitationContent: 'InvitationContent',
@@ -119,6 +122,50 @@ export const TemplateVisibilityScalarFieldEnum = {
 } as const
 
 export type TemplateVisibilityScalarFieldEnum = (typeof TemplateVisibilityScalarFieldEnum)[keyof typeof TemplateVisibilityScalarFieldEnum]
+
+
+export const TemplateCategoryScalarFieldEnum = {
+  id: 'id',
+  key: 'key',
+  name: 'name',
+  displayOrder: 'displayOrder',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TemplateCategoryScalarFieldEnum = (typeof TemplateCategoryScalarFieldEnum)[keyof typeof TemplateCategoryScalarFieldEnum]
+
+
+export const TemplateCatalogScalarFieldEnum = {
+  id: 'id',
+  templateKey: 'templateKey',
+  templateVersion: 'templateVersion',
+  slug: 'slug',
+  name: 'name',
+  categoryId: 'categoryId',
+  description: 'description',
+  priceInRupiah: 'priceInRupiah',
+  marketingThumbnail: 'marketingThumbnail',
+  displayOrder: 'displayOrder',
+  status: 'status',
+  updatedByAdminId: 'updatedByAdminId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type TemplateCatalogScalarFieldEnum = (typeof TemplateCatalogScalarFieldEnum)[keyof typeof TemplateCatalogScalarFieldEnum]
+
+
+export const TemplateSlugAliasScalarFieldEnum = {
+  id: 'id',
+  slug: 'slug',
+  templateCatalogId: 'templateCatalogId',
+  isCurrent: 'isCurrent',
+  createdAt: 'createdAt'
+} as const
+
+export type TemplateSlugAliasScalarFieldEnum = (typeof TemplateSlugAliasScalarFieldEnum)[keyof typeof TemplateSlugAliasScalarFieldEnum]
 
 
 export const OrderScalarFieldEnum = {

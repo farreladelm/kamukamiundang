@@ -1,6 +1,6 @@
 # Task List: Undango
 
-**Status:** MVP-01 - MVP-18 complete and approved; hybrid template catalog amendment approved, implementation pending  
+**Status:** MVP-01 - MVP-18 and MVP-CAT-02 complete and approved; remaining hybrid template catalog amendment tasks pending  
 **Specification:** [`docs/PRD.md`](../docs/PRD.md) v0.5 Approved  
 **Plan:** [`tasks/plan.md`](./plan.md) v0.4 Approved  
 **Template catalog plan:** [`tasks/template-catalog-plan.md`](./template-catalog-plan.md)  
@@ -229,6 +229,7 @@ Task lama tetap selesai. Tabel ini mencatat bagian yang memerlukan remediation k
 
 ### MVP-CAT-02: Establish database catalog metadata
 
+**Status:** Completed and verified 4 August 2026.  
 **Acceptance:** Migration replaces sparse visibility overrides with versioned catalog/category/slug-alias records, preserves existing visibility and launch metadata, applies uniqueness/nonnegative/status constraints, and provides idempotent reconciliation that inserts missing runtime versions as `DRAFT` without overwriting admin-edited fields.  
 **Verify:** Empty and existing-database migration tests; reconciliation idempotency/drift tests; `pnpm exec prisma validate`.  
 **Dependencies:** `MVP-CAT-01`  
@@ -272,7 +273,7 @@ Task lama tetap selesai. Tabel ini mencatat bagian yang memerlukan remediation k
 
 - [x] `MVP-01` - `MVP-18` historical completion remains recorded.
 - [x] `MVP-CAT-01` decision/specification approved.
-- [ ] `MVP-CAT-02` - `MVP-CAT-06` implemented and reviewed.
+- [x] `MVP-CAT-02` implemented and reviewed; `MVP-CAT-03` - `MVP-CAT-06` remain pending.
 - [ ] Empty and existing databases migrate without losing visibility or catalog metadata.
 - [ ] Showroom, WhatsApp, and new orders use database metadata plus exact source runtime.
 - [ ] Old order prices remain unchanged after catalog price edits.

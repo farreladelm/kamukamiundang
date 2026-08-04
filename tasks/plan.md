@@ -463,4 +463,4 @@ Sequential requirements:
 - [x] Human approves hybrid versioned catalog amendment and slug alias lifecycle on 4 August 2026.
 - [x] Plan status is `Approved` with reviewer/date.
 - [x] `MVP-01` - `MVP-18` completion remains preserved; amendment tasks are tracked separately.
-- [ ] Product owner gives a separate explicit instruction before `MVP-CAT-02` implementation begins.
+- [x] Product owner gave separate explicit instruction before `MVP-CAT-02` implementation began.
