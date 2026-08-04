@@ -9,5 +9,7 @@ import {
 export type { TemplateCatalogReconciliationReport } from "./catalog-reconciliation-core";
 
 export async function reconcileTemplateCatalog(): Promise<TemplateCatalogReconciliationReport> {
-  return db.$transaction((tx) => reconcileTemplateCatalogWithClient(tx));
+  return db.$transaction((tx) =>
+    reconcileTemplateCatalogWithClient(tx as unknown as Parameters<typeof reconcileTemplateCatalogWithClient>[0]),
+  );
 }

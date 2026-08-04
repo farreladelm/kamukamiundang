@@ -1,17 +1,11 @@
 import { TemplateTwoRenderer } from "@/features/templates/template-2/v1/renderer";
-import type { TemplateDefinition } from "@/features/templates/types";
+import type { TemplateRuntimeManifest } from "@/features/templates/types";
 
-export const templateTwoV1: TemplateDefinition = {
+export const templateTwoV1: TemplateRuntimeManifest = {
   templateKey: "template-2",
   templateVersion: 1,
   contentSchemaVersion: 2,
-  slug: "pesisir-senja",
-  name: "Pesisir Senja",
-  category: "Modern",
-  description: "Modern hangat dengan garis horison, ruang lega, dan warna matahari sore.",
-  priceInRupiah: 700000,
   previewStyle: "coast",
-  isVisible: true,
   capabilities: ["gallery", "gift", "map", "music", "rsvp", "wishes"],
   palettes: [
     {

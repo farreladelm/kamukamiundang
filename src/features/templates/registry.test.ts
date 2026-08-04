@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
-  getTemplateDefinition,
+  assertUniqueRuntimeIdentities,
+  getTemplateRuntimeManifest,
   templateRegistry,
 } from "@/features/templates/registry";
 
@@ -17,11 +18,29 @@ describe("templateRegistry", () => {
         template.palettes.length,
       );
       expect(template.renderer).toBeTypeOf("function");
+      expect(template).not.toHaveProperty("name");
+      expect(template).not.toHaveProperty("priceInRupiah");
+      expect(template).not.toHaveProperty("slug");
     }
   });
 
   it("resolves only an exact pinned template version", () => {
-    expect(getTemplateDefinition("template-1", 1)?.slug).toBe("larasati");
-    expect(getTemplateDefinition("template-1", 2)).toBeUndefined();
+    expect(getTemplateRuntimeManifest("template-1", 1)?.previewStyle).toBe("arch");
+    expect(getTemplateRuntimeManifest("template-1", 2)).toBeUndefined();
+  });
+
+  it("rejects duplicate runtime identities", () => {
+    expect(() =>
+      assertUniqueRuntimeIdentities([templateRegistry[0], templateRegistry[0]]),
+    ).toThrow("Duplicate runtime identity template-1:1");
+  });
+
+  it("rejects a demo palette that is not in runtime palette contract", () => {
+    expect(() =>
+      assertUniqueRuntimeIdentities([{
+        ...templateRegistry[0],
+        demo: { ...templateRegistry[0].demo, paletteKey: "missing" },
+      }]),
+    ).toThrow("Unknown demo palette template-1:1:missing");
   });
 });

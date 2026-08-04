@@ -1,17 +1,11 @@
 import { TemplateOneRenderer } from "@/features/templates/template-1/v1/renderer";
-import type { TemplateDefinition } from "@/features/templates/types";
+import type { TemplateRuntimeManifest } from "@/features/templates/types";
 
-export const templateOneV1: TemplateDefinition = {
+export const templateOneV1: TemplateRuntimeManifest = {
   templateKey: "template-1",
   templateVersion: 1,
   contentSchemaVersion: 2,
-  slug: "larasati",
-  name: "Larasati",
-  category: "Klasik",
-  description: "Klasik Jawa yang tenang, dengan ritme editorial dan detail berbingkai.",
-  priceInRupiah: 650000,
   previewStyle: "arch",
-  isVisible: true,
   capabilities: ["gallery", "gift", "map", "music", "story", "wishes"],
   palettes: [
     {

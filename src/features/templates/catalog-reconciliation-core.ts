@@ -1,8 +1,20 @@
+import {
+  findTemplateRuntimeReferenceDrift,
+  getRuntimeReferenceContracts,
+} from "./catalog";
 import { templateRegistry } from "./registry";
 import {
   getCatalogBootstrap,
   templateCategoryBootstrap,
 } from "./catalog-schema";
+
+type TemplateRuntimeReferenceRow = {
+  id: string;
+  templateKey: string;
+  templateVersion: number;
+  contentSchemaVersion: number;
+  paletteKey: string;
+};
 
 type CatalogTransaction = {
   templateCategory: {
@@ -28,6 +40,15 @@ type CatalogTransaction = {
     findUnique(args: { where: { slug: string } }): Promise<{ templateCatalogId: string } | null>;
     create(args: { data: Record<string, unknown> }): Promise<unknown>;
   };
+  order: {
+    findMany(args: { select: Record<string, boolean> }): Promise<TemplateRuntimeReferenceRow[]>;
+  };
+  invitation: {
+    findMany(args: { select: Record<string, boolean> }): Promise<TemplateRuntimeReferenceRow[]>;
+  };
+  publishedSnapshot: {
+    findMany(args: { select: Record<string, boolean> }): Promise<TemplateRuntimeReferenceRow[]>;
+  };
 };
 
 export type TemplateCatalogReconciliationReport = {
@@ -37,6 +58,7 @@ export type TemplateCatalogReconciliationReport = {
   runtimeOnly: string[];
   metadataOnly: string[];
   conflicts: string[];
+  referencedRuntimeDrift: string[];
   hasDrift: boolean;
 };
 
@@ -73,6 +95,7 @@ export async function reconcileTemplateCatalogWithClient(
     runtimeOnly: [] as string[],
     metadataOnly: [] as string[],
     conflicts: [] as string[],
+    referencedRuntimeDrift: [] as string[],
   };
 
   for (const category of templateCategoryBootstrap) {
@@ -163,10 +186,33 @@ export async function reconcileTemplateCatalogWithClient(
     report.createdAliasRecords += 1;
   }
 
+  const referenceSelect = {
+    id: true,
+    templateKey: true,
+    templateVersion: true,
+    contentSchemaVersion: true,
+    paletteKey: true,
+  } as const;
+  const [orders, invitations, snapshots] = await Promise.all([
+    db.order.findMany({ select: referenceSelect }),
+    db.invitation.findMany({ select: referenceSelect }),
+    db.publishedSnapshot.findMany({ select: referenceSelect }),
+  ]);
+  const references = [
+    ...orders.map((reference) => ({ ...reference, source: "order" as const })),
+    ...invitations.map((reference) => ({ ...reference, source: "invitation" as const })),
+    ...snapshots.map((reference) => ({ ...reference, source: "publishedSnapshot" as const })),
+  ];
+  report.referencedRuntimeDrift = findTemplateRuntimeReferenceDrift(
+    references,
+    getRuntimeReferenceContracts(),
+  );
+
   return {
     ...report,
     hasDrift: report.runtimeOnly.length > 0
       || report.metadataOnly.length > 0
-      || report.conflicts.length > 0,
+      || report.conflicts.length > 0
+      || report.referencedRuntimeDrift.length > 0,
   };
 }

@@ -1,11 +1,11 @@
 import type { ReactElement } from "react";
 import type {
   TemplateContentViewModel,
-  TemplateDefinition,
+  TemplateRuntimeManifest,
 } from "@/features/templates/types";
 
 export function renderTemplate(
-  template: TemplateDefinition,
+  template: TemplateRuntimeManifest,
   paletteKey: string,
   content: TemplateContentViewModel,
 ): ReactElement {

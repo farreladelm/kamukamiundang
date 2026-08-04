@@ -239,6 +239,7 @@ Task lama tetap selesai. Tabel ini mencatat bagian yang memerlukan remediation k
 
 ### MVP-CAT-03: Split runtime manifest and resolved catalog contract
 
+**Status:** Completed and verified 4 August 2026.  
 **Acceptance:** Source definitions contain only runtime identity/schema/renderer/capabilities/palette/demo contracts plus `previewStyle` when it selects code/CSS behavior; server-only resolver joins exact database metadata and runtime manifest; resolved DTO preserves nullable marketing thumbnail so runtime preview remains presentation-only; runtime-only or metadata-only pairs fail closed; referenced runtime versions cannot be removed undetected.  
 **Verify:** Runtime manifest and preview-style ownership contracts, resolver success/missing-pair, palette compatibility, and reference-scan tests.  
 **Dependencies:** `MVP-CAT-02`  
@@ -273,7 +274,8 @@ Task lama tetap selesai. Tabel ini mencatat bagian yang memerlukan remediation k
 
 - [x] `MVP-01` - `MVP-18` historical completion remains recorded.
 - [x] `MVP-CAT-01` decision/specification approved.
-- [x] `MVP-CAT-02` implemented and reviewed; `MVP-CAT-03` - `MVP-CAT-06` remain pending.
+- [x] `MVP-CAT-02` and `MVP-CAT-03` implemented and reviewed; `MVP-CAT-04` - `MVP-CAT-06` remain pending.
+- [x] Runtime manifests, exact resolver, compatibility checks, and order/invitation/snapshot reference scan pass.
 - [ ] Empty and existing databases migrate without losing visibility or catalog metadata.
 - [ ] Showroom, WhatsApp, and new orders use database metadata plus exact source runtime.
 - [ ] Old order prices remain unchanged after catalog price edits.

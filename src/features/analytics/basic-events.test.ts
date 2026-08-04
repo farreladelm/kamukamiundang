@@ -5,18 +5,54 @@ import {
   createBasicEventRateLimiter,
   parseBasicShowroomEvent,
 } from "./basic-events";
+import { templateRegistry } from "@/features/templates/registry";
+import type { EventDependencies } from "./basic-events";
+
+const runtime = templateRegistry[0];
+const resolvedTemplate = {
+  templateKey: runtime.templateKey,
+  templateVersion: runtime.templateVersion,
+  slug: "larasati",
+  name: "Larasati",
+  category: "Klasik",
+  description: "Klasik Jawa",
+  priceInRupiah: 650000,
+  marketingThumbnail: null,
+  displayOrder: 10,
+  status: "VISIBLE" as const,
+  isVisible: true,
+  contentSchemaVersion: runtime.contentSchemaVersion,
+  previewStyle: runtime.previewStyle,
+  capabilities: runtime.capabilities,
+  palettes: runtime.palettes,
+  demo: runtime.demo,
+};
+const dependencies: EventDependencies = {
+  resolveTemplate: async (_templateKey, _templateVersion, options) => {
+    if (options?.paletteKey === "unknown") {
+      return {
+        ok: false,
+        reason: "INCOMPATIBLE_RUNTIME" as const,
+        templateKey: runtime.templateKey,
+        templateVersion: runtime.templateVersion,
+      };
+    }
+    return resolvedTemplate;
+  },
+  listCategories: async () => ["Klasik"],
+};
 
 describe("parseBasicShowroomEvent", () => {
-  it("accepts only allowlisted registry-backed properties and derives current price", () => {
+  it("accepts only allowlisted catalog-backed properties and derives current price", async () => {
     expect(
-      parseBasicShowroomEvent({
+      await parseBasicShowroomEvent({
         name: "whatsapp_cta_clicked",
         properties: {
           templateKey: "template-1",
           templateVersion: 1,
           paletteKey: "gading",
         },
-      }),
+      }, dependencies),
     ).toEqual({
       name: "whatsapp_cta_clicked",
       properties: {
@@ -28,7 +64,7 @@ describe("parseBasicShowroomEvent", () => {
     });
   });
 
-  it("rejects unexpected properties and values outside visible template registry", () => {
+  it("rejects unexpected properties and values outside visible catalog", async () => {
     expect(
       parseBasicShowroomEvent({
         name: "whatsapp_cta_clicked",
@@ -38,8 +74,8 @@ describe("parseBasicShowroomEvent", () => {
           paletteKey: "gading",
           email: "visitor@example.com",
         },
-      }),
-    ).toBeNull();
+      }, dependencies),
+    ).resolves.toBeNull();
     expect(
       parseBasicShowroomEvent({
         name: "template_palette_selected",
@@ -48,19 +84,19 @@ describe("parseBasicShowroomEvent", () => {
           templateVersion: 1,
           paletteKey: "unknown",
         },
-      }),
-    ).toBeNull();
+      }, dependencies),
+    ).resolves.toBeNull();
   });
 
-  it("derives detail category without accepting a client-supplied palette", () => {
+  it("derives detail category without accepting a client-supplied palette", async () => {
     expect(
-      parseBasicShowroomEvent({
+      await parseBasicShowroomEvent({
         name: "template_detail_viewed",
         properties: {
           templateKey: "template-1",
           templateVersion: 1,
         },
-      }),
+      }, dependencies),
     ).toEqual({
       name: "template_detail_viewed",
       properties: {

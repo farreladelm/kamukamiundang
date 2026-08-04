@@ -1,16 +1,35 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import { TemplateDetail } from "@/features/showroom/template-detail";
+import { templateRegistry } from "@/features/templates/registry";
+import type { TemplateCatalogItem } from "@/features/templates/types";
+
+const template = templateRegistry[0];
+const catalogTemplate: TemplateCatalogItem = {
+  templateKey: template.templateKey,
+  templateVersion: template.templateVersion,
+  slug: "larasati",
+  name: "Larasati",
+  category: "Klasik",
+  description: "Klasik Jawa",
+  priceInRupiah: 650000,
+  marketingThumbnail: null,
+  displayOrder: 10,
+  status: "VISIBLE",
+  isVisible: true,
+  contentSchemaVersion: template.contentSchemaVersion,
+  previewStyle: template.previewStyle,
+  capabilities: template.capabilities,
+  palettes: template.palettes,
+  demo: template.demo,
+};
 
 describe("TemplateDetail", () => {
   afterEach(cleanup);
 
   it("renders pinned demo and applies only selected compatible palette colors", () => {
     render(
-      <TemplateDetail
-        templateKey="template-1"
-        templateVersion={1}
-      />,
+      <TemplateDetail template={catalogTemplate} />,
     );
 
     const demo = screen.getByTestId("template-demo");
@@ -41,10 +60,7 @@ describe("TemplateDetail", () => {
 
   it("renders as a mobile invitation with desktop cover and fixed palette control", () => {
     render(
-      <TemplateDetail
-        templateKey="template-1"
-        templateVersion={1}
-      />,
+      <TemplateDetail template={catalogTemplate} />,
     );
 
     expect(screen.getByTestId("preview-cover")).toBeInTheDocument();

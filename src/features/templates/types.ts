@@ -110,17 +110,11 @@ export type TemplateRendererProps = {
   palette: TemplatePalette;
 };
 
-export type TemplateDefinition = {
+export type TemplateRuntimeManifest = {
   templateKey: string;
   templateVersion: number;
   contentSchemaVersion: number;
-  slug: string;
-  name: string;
-  category: "Botanical" | "Klasik" | "Modern";
-  description: string;
-  priceInRupiah: number;
   previewStyle: "arch" | "coast" | "garden";
-  isVisible: boolean;
   capabilities: readonly TemplateCapability[];
   palettes: readonly TemplatePalette[];
   demo: {
@@ -130,16 +124,23 @@ export type TemplateDefinition = {
   renderer: ComponentType<TemplateRendererProps>;
 };
 
-export type TemplateCatalogItem = Pick<
-  TemplateDefinition,
-  | "templateKey"
-  | "templateVersion"
-  | "slug"
-  | "name"
-  | "category"
-  | "description"
-  | "priceInRupiah"
-  | "previewStyle"
-  | "isVisible"
-  | "palettes"
->;
+export type TemplateCatalogStatus = "DRAFT" | "VISIBLE" | "HIDDEN" | "RETIRED";
+
+export type TemplateCatalogItem = {
+  templateKey: string;
+  templateVersion: number;
+  slug: string;
+  name: string;
+  category: string;
+  description: string;
+  priceInRupiah: number;
+  marketingThumbnail: string | null;
+  displayOrder: number;
+  status: TemplateCatalogStatus;
+  isVisible: boolean;
+  contentSchemaVersion: number;
+  previewStyle: TemplateRuntimeManifest["previewStyle"];
+  capabilities: readonly TemplateCapability[];
+  palettes: readonly TemplatePalette[];
+  demo: TemplateRuntimeManifest["demo"];
+};

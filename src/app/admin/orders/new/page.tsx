@@ -1,8 +1,9 @@
-import { templateRegistry } from "@/features/templates/registry";
+import { getVisibleTemplateCatalog } from "@/features/templates/catalog";
 import { OrderForm } from "@/features/orders/order-form";
 
-export default function NewOrderPage() {
-  const templateSelections = templateRegistry.flatMap((template) =>
+export default async function NewOrderPage() {
+  const templates = await getVisibleTemplateCatalog();
+  const templateSelections = templates.flatMap((template) =>
     template.palettes.map((palette) => ({
       value: `${template.templateKey}|${template.templateVersion}|${palette.key}`,
       label: `${template.name} · ${palette.name}`,

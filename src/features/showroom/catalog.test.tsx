@@ -2,12 +2,32 @@ import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import { Catalog } from "@/features/showroom/catalog";
 import { templateRegistry } from "@/features/templates/registry";
+import type { TemplateCatalogItem } from "@/features/templates/types";
+
+const catalogTemplates: TemplateCatalogItem[] = templateRegistry.map((template, index) => ({
+  templateKey: template.templateKey,
+  templateVersion: template.templateVersion,
+  slug: ["larasati", "pesisir-senja", "taman-aksara"][index],
+  name: ["Larasati", "Pesisir Senja", "Taman Aksara"][index],
+  category: ["Klasik", "Modern", "Botanical"][index],
+  description: "Deskripsi katalog",
+  priceInRupiah: 650000 + index * 50000,
+  marketingThumbnail: null,
+  displayOrder: (index + 1) * 10,
+  status: "VISIBLE",
+  isVisible: true,
+  contentSchemaVersion: template.contentSchemaVersion,
+  previewStyle: template.previewStyle,
+  capabilities: template.capabilities,
+  palettes: template.palettes,
+  demo: template.demo,
+}));
 
 describe("Catalog", () => {
   afterEach(cleanup);
 
   it("filters templates by category and resets to complete collection", () => {
-    render(<Catalog templates={templateRegistry} />);
+    render(<Catalog templates={catalogTemplates} />);
 
     expect(screen.getByText("Larasati")).toBeInTheDocument();
     expect(screen.getByText("Pesisir Senja")).toBeInTheDocument();
@@ -26,7 +46,7 @@ describe("Catalog", () => {
   it("does not render hidden template versions", () => {
     render(
       <Catalog
-        templates={templateRegistry.map((template, index) => ({
+        templates={catalogTemplates.map((template, index) => ({
           ...template,
           isVisible: index === 0,
         }))}
@@ -38,7 +58,7 @@ describe("Catalog", () => {
   });
 
   it("offers preview and contact actions for each visible template", () => {
-    render(<Catalog templates={templateRegistry} canonicalOrigin="https://undango.test" />);
+    render(<Catalog templates={catalogTemplates} canonicalOrigin="https://undango.test" />);
 
     expect(screen.getByRole("link", { name: "Lihat preview Larasati" })).toHaveAttribute(
       "href",

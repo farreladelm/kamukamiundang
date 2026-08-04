@@ -27,7 +27,7 @@ export async function POST(request: Request): Promise<Response> {
     return new Response(null, { status: 400 });
   }
 
-  const event = parseBasicShowroomEvent(input);
+  const event = await parseBasicShowroomEvent(input);
 
   if (!event) {
     return new Response(null, { status: 400 });

@@ -3,9 +3,12 @@ import { db } from "@/lib/server/db";
 import { upsertAdminCredential } from "@/features/auth/admin-auth";
 import { activatePaidOrder, transitionOrder } from "@/features/orders/activation";
 import { createPendingOrder } from "@/features/orders/data";
+import { reconcileTemplateCatalog } from "@/features/templates/catalog-reconciliation";
 
 beforeEach(async () => {
   await db.$executeRawUnsafe('TRUNCATE TABLE "TemplateVisibility", "AuditEvent", "MagicLink", "Session", "InvitationContent", "Invitation", "Order", "Customer", "Admin" CASCADE');
+  await reconcileTemplateCatalog();
+  await db.templateCatalog.updateMany({ data: { status: "VISIBLE" } });
 });
 
 describe("order intake and activation", () => {

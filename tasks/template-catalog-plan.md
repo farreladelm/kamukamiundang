@@ -1,6 +1,6 @@
 # Supplemental Implementation Plan: Hybrid Versioned Template Catalog
 
-**Status:** Approved specification; implementation not started  
+**Status:** Approved specification; MVP-CAT-03 implementation completed and verified  
 **Date:** 4 August 2026  
 **Approved by:** Product owner  
 **Specification:** [`docs/PRD.md`](../docs/PRD.md) v0.5  
@@ -147,10 +147,10 @@ Implementation order:
 
 Checkpoint B:
 
-- Renderer tests still pass unchanged.
-- Runtime-only and metadata-only pairs fail closed.
-- Exact palette/schema compatibility is checked.
-- Active references to missing runtime fail verification.
+- [x] Renderer tests still pass unchanged.
+- [x] Runtime-only and metadata-only pairs fail closed.
+- [x] Exact palette/schema compatibility is checked.
+- [x] Active references to missing runtime fail verification.
 
 ### Phase C: Operations and Public Surfaces
 

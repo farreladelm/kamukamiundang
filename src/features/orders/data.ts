@@ -1,7 +1,7 @@
 import "server-only";
 
 import { db } from "@/lib/server/db";
-import { getTemplateDefinition } from "@/features/templates/registry";
+import { resolveTemplateCatalogByIdentity } from "@/features/templates/catalog";
 
 const DEFAULT_STORAGE_QUOTA_BYTES = BigInt(250) * BigInt(1024) * BigInt(1024);
 
@@ -96,10 +96,12 @@ export async function createPendingOrder({
   photoLimit: number;
   storageQuotaBytes?: bigint;
 }) {
-  const template = getTemplateDefinition(templateKey, templateVersion);
-  const palette = template?.palettes.find((candidate) => candidate.key === paletteKey);
+  const template = await resolveTemplateCatalogByIdentity(templateKey, templateVersion, {
+    paletteKey,
+    requireVisible: true,
+  });
 
-  if (!template || !palette) throw new Error("Unknown template version or palette");
+  if ("ok" in template) throw new Error("Unknown template version or palette");
   if (!Number.isInteger(photoLimit) || photoLimit < 0) throw new Error("Invalid photo limit");
   if (storageQuotaBytes < BigInt(0)) throw new Error("Invalid storage quota");
 
@@ -111,7 +113,7 @@ export async function createPendingOrder({
       templateKey: template.templateKey,
       templateVersion: template.templateVersion,
       contentSchemaVersion: template.contentSchemaVersion,
-      paletteKey: palette.key,
+      paletteKey,
       priceInRupiah: template.priceInRupiah,
       photoLimit,
       storageQuotaBytes,

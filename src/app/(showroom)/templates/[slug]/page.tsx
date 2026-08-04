@@ -1,6 +1,6 @@
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { TemplateDetail } from "@/features/showroom/template-detail";
-import { getVisibleTemplateCatalogFromDatabase } from "@/features/templates/visibility";
+import { resolveTemplateCatalogBySlug } from "@/features/templates/catalog";
 
 export default async function TemplateDetailPage({
   params,
@@ -11,20 +11,23 @@ export default async function TemplateDetailPage({
 }) {
   const { slug } = await params;
   const { to } = await searchParams;
-  const template = (await getVisibleTemplateCatalogFromDatabase()).find(
-    (candidate) => candidate.slug === slug,
-  );
+  const recipientName = (Array.isArray(to) ? to[0] : to)?.trim().slice(0, 100) || "Nama Tamu";
+  const template = await resolveTemplateCatalogBySlug(slug);
 
-  if (!template) {
+  if ("ok" in template) {
     notFound();
   }
 
-  const recipientName = (Array.isArray(to) ? to[0] : to)?.trim().slice(0, 100) || "Nama Tamu";
+  if (template.slug !== slug) {
+    const query = recipientName === "Nama Tamu"
+      ? ""
+      : `?to=${encodeURIComponent(recipientName)}`;
+    permanentRedirect(`/templates/${template.slug}${query}`);
+  }
 
   return (
     <TemplateDetail
-      templateKey={template.templateKey}
-      templateVersion={template.templateVersion}
+      template={template}
       recipientName={recipientName}
     />
   );

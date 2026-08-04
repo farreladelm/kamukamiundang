@@ -13,7 +13,11 @@ async function main(): Promise<void> {
   const db = new PrismaClient({ adapter: new PrismaPg({ connectionString: databaseUrl }) });
 
   try {
-    const report = await db.$transaction((tx) => reconcileTemplateCatalogWithClient(tx));
+    const report = await db.$transaction((tx) =>
+      reconcileTemplateCatalogWithClient(
+        tx as unknown as Parameters<typeof reconcileTemplateCatalogWithClient>[0],
+      ),
+    );
     process.stdout.write(`${JSON.stringify(report)}\n`);
     if (report.hasDrift) process.exitCode = 1;
   } finally {

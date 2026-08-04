@@ -1,17 +1,11 @@
 import { TemplateThreeRenderer } from "@/features/templates/template-3/v1/renderer";
-import type { TemplateDefinition } from "@/features/templates/types";
+import type { TemplateRuntimeManifest } from "@/features/templates/types";
 
-export const templateThreeV1: TemplateDefinition = {
+export const templateThreeV1: TemplateRuntimeManifest = {
   templateKey: "template-3",
   templateVersion: 1,
   contentSchemaVersion: 2,
-  slug: "taman-aksara",
-  name: "Taman Aksara",
-  category: "Botanical",
-  description: "Botanical kontemporer untuk perayaan intim dengan aksara yang lembut.",
-  priceInRupiah: 750000,
   previewStyle: "garden",
-  isVisible: true,
   capabilities: ["gallery", "gift", "map", "rsvp", "story", "wishes"],
   palettes: [
     {

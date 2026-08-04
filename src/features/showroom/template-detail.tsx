@@ -2,21 +2,20 @@
 
 import { useEffect, useState } from "react";
 import { renderTemplate } from "@/features/templates/render-template";
-import { getTemplateDefinition } from "@/features/templates/registry";
+import { getTemplateRuntimeManifest } from "@/features/templates/registry";
+import type { TemplateCatalogItem } from "@/features/templates/types";
 
 export function TemplateDetail({
-  templateKey,
-  templateVersion,
+  template,
   recipientName = "Nama Tamu",
 }: {
-  templateKey: string;
-  templateVersion: number;
+  template: TemplateCatalogItem;
   recipientName?: string;
 }) {
-  const template = getTemplateDefinition(templateKey, templateVersion);
+  const runtime = getTemplateRuntimeManifest(template.templateKey, template.templateVersion);
 
-  if (!template) {
-    throw new Error(`Unknown template ${templateKey} v${templateVersion}`);
+  if (!runtime) {
+    throw new Error(`Unknown template ${template.templateKey} v${template.templateVersion}`);
   }
 
   const [paletteKey, setPaletteKey] = useState(template.demo.paletteKey);
@@ -27,12 +26,12 @@ export function TemplateDetail({
     void fetch("/api/analytics/events", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        name: "template_detail_viewed",
-        properties: { templateKey, templateVersion },
+        body: JSON.stringify({
+          name: "template_detail_viewed",
+          properties: { templateKey: template.templateKey, templateVersion: template.templateVersion },
       }),
     }).catch(() => undefined);
-  }, [templateKey, templateVersion]);
+  }, [template.templateKey, template.templateVersion]);
 
   function selectPalette(nextPaletteKey: string) {
     setPaletteKey(nextPaletteKey);
@@ -42,7 +41,11 @@ export function TemplateDetail({
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         name: "template_palette_selected",
-        properties: { templateKey, templateVersion, paletteKey: nextPaletteKey },
+        properties: {
+          templateKey: template.templateKey,
+          templateVersion: template.templateVersion,
+          paletteKey: nextPaletteKey,
+        },
       }),
     }).catch(() => undefined);
   }
@@ -103,9 +106,9 @@ export function TemplateDetail({
             className="h-fit w-full overflow-hidden bg-white"
           >
             <div data-testid="template-demo">
-              {renderTemplate(template, paletteKey, {
-                ...template.demo.content,
-                cover: { ...template.demo.content.cover, recipientName },
+      {renderTemplate(runtime, paletteKey, {
+                 ...template.demo.content,
+                 cover: { ...template.demo.content.cover, recipientName },
               })}
             </div>
           </div>

@@ -1,11 +1,11 @@
 import "server-only";
 
-import { getTemplateDefinition, templateRegistry } from "@/features/templates/registry";
-
-const listCategories = new Set([
-  "Semua",
-  ...templateRegistry.map((template) => template.category),
-]);
+import {
+  listTemplateCategoryNames,
+  resolveTemplateCatalogByIdentity,
+  type ResolvedTemplateCatalog,
+  type UnavailableCatalog,
+} from "@/features/templates/catalog";
 
 type BasicShowroomEvent =
   | {
@@ -44,7 +44,24 @@ function hasExactKeys(record: Record<string, unknown>, keys: readonly string[]):
   return recordKeys.length === keys.length && recordKeys.every((key) => keys.includes(key));
 }
 
-function parseTemplatePalette(properties: Record<string, unknown>) {
+export type EventDependencies = {
+  resolveTemplate: (
+    templateKey: string,
+    templateVersion: number,
+    options?: { paletteKey?: string; requireVisible?: boolean },
+  ) => Promise<ResolvedTemplateCatalog | UnavailableCatalog>;
+  listCategories: () => Promise<string[]>;
+};
+
+const defaultEventDependencies: EventDependencies = {
+  resolveTemplate: resolveTemplateCatalogByIdentity,
+  listCategories: listTemplateCategoryNames,
+};
+
+async function parseTemplatePalette(
+  properties: Record<string, unknown>,
+  dependencies: EventDependencies,
+) {
   if (
     !hasExactKeys(properties, ["templateKey", "templateVersion", "paletteKey"]) ||
     typeof properties.templateKey !== "string" ||
@@ -55,19 +72,20 @@ function parseTemplatePalette(properties: Record<string, unknown>) {
     return null;
   }
 
-  const template = getTemplateDefinition(
+  const template = await dependencies.resolveTemplate(
     properties.templateKey,
     properties.templateVersion,
+    { paletteKey: properties.paletteKey, requireVisible: true },
   );
 
-  if (!template?.isVisible || !template.palettes.some((palette) => palette.key === properties.paletteKey)) {
+  if ("ok" in template) {
     return null;
   }
 
   return { template, paletteKey: properties.paletteKey };
 }
 
-function parseTemplate(properties: Record<string, unknown>) {
+async function parseTemplate(properties: Record<string, unknown>, dependencies: EventDependencies) {
   if (
     !hasExactKeys(properties, ["templateKey", "templateVersion"]) ||
     typeof properties.templateKey !== "string" ||
@@ -77,15 +95,19 @@ function parseTemplate(properties: Record<string, unknown>) {
     return null;
   }
 
-  const template = getTemplateDefinition(
+  const template = await dependencies.resolveTemplate(
     properties.templateKey,
     properties.templateVersion,
+    { requireVisible: true },
   );
 
-  return template?.isVisible ? template : null;
+  return "ok" in template ? null : template;
 }
 
-export function parseBasicShowroomEvent(input: unknown): BasicShowroomEvent | null {
+export async function parseBasicShowroomEvent(
+  input: unknown,
+  dependencies: EventDependencies = defaultEventDependencies,
+): Promise<BasicShowroomEvent | null> {
   if (!isRecord(input) || !hasExactKeys(input, ["name", "properties"]) || !isRecord(input.properties)) {
     return null;
   }
@@ -94,7 +116,8 @@ export function parseBasicShowroomEvent(input: unknown): BasicShowroomEvent | nu
     if (
       !hasExactKeys(input.properties, ["category"]) ||
       typeof input.properties.category !== "string" ||
-      !listCategories.has(input.properties.category)
+      !(input.properties.category === "Semua" ||
+        (await dependencies.listCategories()).includes(input.properties.category))
     ) {
       return null;
     }
@@ -103,7 +126,7 @@ export function parseBasicShowroomEvent(input: unknown): BasicShowroomEvent | nu
   }
 
   if (input.name === "template_detail_viewed") {
-    const template = parseTemplate(input.properties);
+    const template = await parseTemplate(input.properties, dependencies);
 
     if (!template) {
       return null;
@@ -119,7 +142,7 @@ export function parseBasicShowroomEvent(input: unknown): BasicShowroomEvent | nu
     };
   }
 
-  const templatePalette = parseTemplatePalette(input.properties);
+  const templatePalette = await parseTemplatePalette(input.properties, dependencies);
 
   if (!templatePalette) {
     return null;

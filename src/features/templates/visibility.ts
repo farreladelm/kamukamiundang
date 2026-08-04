@@ -1,11 +1,15 @@
 import "server-only";
 
 import { db } from "@/lib/server/db";
-import { getTemplateDefinition, templateRegistry } from "./registry";
+import {
+  getVisibleTemplateCatalog,
+  resolveTemplateCatalogRecord,
+} from "./catalog";
+import { getTemplateRuntimeManifest } from "./registry";
 import type { TemplateCatalogItem } from "./types";
 
 export function assertTemplateVersionExists(templateKey: string, templateVersion: number): void {
-  if (!getTemplateDefinition(templateKey, templateVersion)) {
+  if (!getTemplateRuntimeManifest(templateKey, templateVersion)) {
     throw new Error("Unknown template version");
   }
 }
@@ -23,61 +27,46 @@ export async function setTemplateVisibility({
 }) {
   assertTemplateVersionExists(templateKey, templateVersion);
 
-  return db.templateVisibility.upsert({
+  const catalog = await db.templateCatalog.findUnique({
     where: { templateKey_templateVersion: { templateKey, templateVersion } },
-    create: { templateKey, templateVersion, isVisible, updatedByAdminId: adminId },
-    update: { isVisible, updatedByAdminId: adminId },
-    select: { templateKey: true, templateVersion: true, isVisible: true },
+    select: { id: true, status: true },
+  });
+
+  if (!catalog) throw new Error("Template catalog metadata not found");
+  if (catalog.status === "RETIRED") throw new Error("Retired template cannot change visibility");
+
+  return db.templateCatalog.update({
+    where: { id: catalog.id },
+    data: { status: isVisible ? "VISIBLE" : "HIDDEN", updatedByAdminId: adminId },
+    select: { templateKey: true, templateVersion: true, status: true },
   });
 }
 
 export async function getVisibleTemplateCatalogFromDatabase(): Promise<TemplateCatalogItem[]> {
-  const overrides = await db.templateVisibility.findMany({
-    select: { templateKey: true, templateVersion: true, isVisible: true },
-  });
-  const overrideMap = new Map(
-    overrides.map((override) => [
-      `${override.templateKey}:${override.templateVersion}`,
-      override.isVisible,
-    ]),
-  );
-
-  const sourceCatalog = templateRegistry.map((template) => ({
-    templateKey: template.templateKey,
-    templateVersion: template.templateVersion,
-    slug: template.slug,
-    name: template.name,
-    category: template.category,
-    description: template.description,
-    priceInRupiah: template.priceInRupiah,
-    previewStyle: template.previewStyle,
-    isVisible: template.isVisible,
-    palettes: template.palettes,
-  }));
-
-  return sourceCatalog.filter((template) => {
-    const key = `${template.templateKey}:${template.templateVersion}`;
-    return overrideMap.get(key) ?? template.isVisible;
-  });
+  return getVisibleTemplateCatalog();
 }
 
 export async function listTemplateVisibility() {
-  const overrides = await db.templateVisibility.findMany({
-    select: { templateKey: true, templateVersion: true, isVisible: true },
+  const records = await db.templateCatalog.findMany({
+    orderBy: [{ displayOrder: "asc" }, { templateKey: "asc" }, { templateVersion: "asc" }],
+    select: {
+      id: true,
+      templateKey: true,
+      templateVersion: true,
+      slug: true,
+      name: true,
+      description: true,
+      priceInRupiah: true,
+      marketingThumbnail: true,
+      displayOrder: true,
+      status: true,
+      category: { select: { key: true, name: true } },
+      slugAliases: { select: { slug: true, isCurrent: true } },
+    },
   });
-  const overrideMap = new Map(
-    overrides.map((override) => [
-      `${override.templateKey}:${override.templateVersion}`,
-      override.isVisible,
-    ]),
-  );
 
-  return templateRegistry.map((template) => ({
-    templateKey: template.templateKey,
-    templateVersion: template.templateVersion,
-    name: template.name,
-    category: template.category,
-    priceInRupiah: template.priceInRupiah,
-    isVisible: overrideMap.get(`${template.templateKey}:${template.templateVersion}`) ?? template.isVisible,
-  }));
+  return records.flatMap((record) => {
+    const resolved = resolveTemplateCatalogRecord(record);
+    return "ok" in resolved ? [] : [resolved];
+  });
 }

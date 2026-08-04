@@ -2,10 +2,19 @@
 
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-const create = vi.fn();
+const { create, resolveTemplate, listCategories } = vi.hoisted(() => ({
+  create: vi.fn(),
+  resolveTemplate: vi.fn(),
+  listCategories: vi.fn(),
+}));
 
 vi.mock("@/lib/server/db", () => ({
   db: { analyticsEvent: { create } },
+}));
+
+vi.mock("@/features/templates/catalog", () => ({
+  resolveTemplateCatalogByIdentity: resolveTemplate,
+  listTemplateCategoryNames: listCategories,
 }));
 
 import { POST } from "./route";
@@ -14,6 +23,25 @@ describe("POST /api/analytics/events", () => {
   beforeEach(() => {
     create.mockReset();
     create.mockResolvedValue({});
+    resolveTemplate.mockResolvedValue({
+      templateKey: "template-1",
+      templateVersion: 1,
+      slug: "larasati",
+      name: "Larasati",
+      category: "Klasik",
+      description: "Klasik Jawa",
+      priceInRupiah: 650000,
+      marketingThumbnail: null,
+      displayOrder: 10,
+      status: "VISIBLE",
+      isVisible: true,
+      contentSchemaVersion: 2,
+      previewStyle: "arch",
+      capabilities: [],
+      palettes: [{ key: "gading", name: "Gading", tokens: {} }],
+      demo: { paletteKey: "gading", content: {} },
+    });
+    listCategories.mockResolvedValue(["Klasik"]);
   });
 
   it("stores only derived allowlisted event fields", async () => {
