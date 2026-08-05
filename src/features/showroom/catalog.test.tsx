@@ -60,7 +60,8 @@ describe("Catalog", () => {
   it("offers preview and contact actions for each visible template", () => {
     render(<Catalog templates={catalogTemplates} canonicalOrigin="https://undango.test" />);
 
-    expect(screen.getByRole("link", { name: "Preview" })).toHaveAttribute(
+    expect(screen.getAllByRole("link", { name: "Preview" })).toHaveLength(3);
+    expect(screen.getAllByRole("link", { name: "Preview" })[0]).toHaveAttribute(
       "href",
       "/templates/larasati",
     );
