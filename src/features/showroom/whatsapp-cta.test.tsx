@@ -26,7 +26,7 @@ describe("WhatsAppCta", () => {
       />,
     );
 
-    const link = screen.getByRole("link", { name: "Pesan via WhatsApp" });
+    const link = screen.getByRole("link", { name: "Pesan" });
     const preventNavigation = (event: MouseEvent) => event.preventDefault();
     link.addEventListener("click", preventNavigation);
 
