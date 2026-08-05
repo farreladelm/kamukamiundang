@@ -8,10 +8,11 @@
     "start": "next start",
     "admin:credential": "tsx scripts/admin-credential.ts",
     "templates:reconcile": "tsx scripts/reconcile-template-catalog.ts",
+    "test:db:prepare": "tsx scripts/prepare-test-database.ts",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "test": "vitest run src --no-file-parallelism",
-    "test:integration": "tsx scripts/test-integration.ts",
+    "test:integration": "vitest run tests/integration --passWithNoTests --no-file-parallelism",
     "test:e2e": "playwright test"
   },
   "dependencies": {
