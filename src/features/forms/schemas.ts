@@ -10,12 +10,6 @@ export const adminLoginSchema = z.object({
     .max(128, "Kata sandi maksimal 128 karakter."),
 });
 
-export const templateVisibilitySchema = z.object({
-  templateKey: z.string().trim().min(1, "Template wajib dipilih."),
-  templateVersion: z.coerce.number().int().nonnegative("Versi template tidak valid."),
-  isVisible: z.enum(["true", "false"], "Status visibilitas tidak valid."),
-});
-
 export const orderIntakeSchema = z.object({
   customerId: optionalText,
   customerName: z.string().trim().min(1, "Nama customer wajib diisi."),

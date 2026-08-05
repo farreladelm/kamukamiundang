@@ -149,6 +149,7 @@ export const TemplateCatalogScalarFieldEnum = {
   marketingThumbnail: 'marketingThumbnail',
   displayOrder: 'displayOrder',
   status: 'status',
+  hasBeenVisible: 'hasBeenVisible',
   updatedByAdminId: 'updatedByAdminId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'

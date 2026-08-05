@@ -121,6 +121,7 @@ model TemplateCatalog {
   marketingThumbnail String?
   displayOrder       Int
   status             TemplateCatalogStatus @default(DRAFT)
+  hasBeenVisible     Boolean               @default(false)
   updatedByAdminId   String?               @db.Uuid
   createdAt          DateTime              @default(now())
   updatedAt          DateTime              @updatedAt

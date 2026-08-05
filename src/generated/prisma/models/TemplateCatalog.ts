@@ -50,6 +50,7 @@ export type TemplateCatalogMinAggregateOutputType = {
   marketingThumbnail: string | null
   displayOrder: number | null
   status: $Enums.TemplateCatalogStatus | null
+  hasBeenVisible: boolean | null
   updatedByAdminId: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -67,6 +68,7 @@ export type TemplateCatalogMaxAggregateOutputType = {
   marketingThumbnail: string | null
   displayOrder: number | null
   status: $Enums.TemplateCatalogStatus | null
+  hasBeenVisible: boolean | null
   updatedByAdminId: string | null
   createdAt: Date | null
   updatedAt: Date | null
@@ -84,6 +86,7 @@ export type TemplateCatalogCountAggregateOutputType = {
   marketingThumbnail: number
   displayOrder: number
   status: number
+  hasBeenVisible: number
   updatedByAdminId: number
   createdAt: number
   updatedAt: number
@@ -115,6 +118,7 @@ export type TemplateCatalogMinAggregateInputType = {
   marketingThumbnail?: true
   displayOrder?: true
   status?: true
+  hasBeenVisible?: true
   updatedByAdminId?: true
   createdAt?: true
   updatedAt?: true
@@ -132,6 +136,7 @@ export type TemplateCatalogMaxAggregateInputType = {
   marketingThumbnail?: true
   displayOrder?: true
   status?: true
+  hasBeenVisible?: true
   updatedByAdminId?: true
   createdAt?: true
   updatedAt?: true
@@ -149,6 +154,7 @@ export type TemplateCatalogCountAggregateInputType = {
   marketingThumbnail?: true
   displayOrder?: true
   status?: true
+  hasBeenVisible?: true
   updatedByAdminId?: true
   createdAt?: true
   updatedAt?: true
@@ -253,6 +259,7 @@ export type TemplateCatalogGroupByOutputType = {
   marketingThumbnail: string | null
   displayOrder: number
   status: $Enums.TemplateCatalogStatus
+  hasBeenVisible: boolean
   updatedByAdminId: string | null
   createdAt: Date
   updatedAt: Date
@@ -293,6 +300,7 @@ export type TemplateCatalogWhereInput = {
   marketingThumbnail?: Prisma.StringNullableFilter<"TemplateCatalog"> | string | null
   displayOrder?: Prisma.IntFilter<"TemplateCatalog"> | number
   status?: Prisma.EnumTemplateCatalogStatusFilter<"TemplateCatalog"> | $Enums.TemplateCatalogStatus
+  hasBeenVisible?: Prisma.BoolFilter<"TemplateCatalog"> | boolean
   updatedByAdminId?: Prisma.UuidNullableFilter<"TemplateCatalog"> | string | null
   createdAt?: Prisma.DateTimeFilter<"TemplateCatalog"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"TemplateCatalog"> | Date | string
@@ -313,6 +321,7 @@ export type TemplateCatalogOrderByWithRelationInput = {
   marketingThumbnail?: Prisma.SortOrderInput | Prisma.SortOrder
   displayOrder?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  hasBeenVisible?: Prisma.SortOrder
   updatedByAdminId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -337,6 +346,7 @@ export type TemplateCatalogWhereUniqueInput = Prisma.AtLeast<{
   marketingThumbnail?: Prisma.StringNullableFilter<"TemplateCatalog"> | string | null
   displayOrder?: Prisma.IntFilter<"TemplateCatalog"> | number
   status?: Prisma.EnumTemplateCatalogStatusFilter<"TemplateCatalog"> | $Enums.TemplateCatalogStatus
+  hasBeenVisible?: Prisma.BoolFilter<"TemplateCatalog"> | boolean
   updatedByAdminId?: Prisma.UuidNullableFilter<"TemplateCatalog"> | string | null
   createdAt?: Prisma.DateTimeFilter<"TemplateCatalog"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"TemplateCatalog"> | Date | string
@@ -357,6 +367,7 @@ export type TemplateCatalogOrderByWithAggregationInput = {
   marketingThumbnail?: Prisma.SortOrderInput | Prisma.SortOrder
   displayOrder?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  hasBeenVisible?: Prisma.SortOrder
   updatedByAdminId?: Prisma.SortOrderInput | Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -382,6 +393,7 @@ export type TemplateCatalogScalarWhereWithAggregatesInput = {
   marketingThumbnail?: Prisma.StringNullableWithAggregatesFilter<"TemplateCatalog"> | string | null
   displayOrder?: Prisma.IntWithAggregatesFilter<"TemplateCatalog"> | number
   status?: Prisma.EnumTemplateCatalogStatusWithAggregatesFilter<"TemplateCatalog"> | $Enums.TemplateCatalogStatus
+  hasBeenVisible?: Prisma.BoolWithAggregatesFilter<"TemplateCatalog"> | boolean
   updatedByAdminId?: Prisma.UuidNullableWithAggregatesFilter<"TemplateCatalog"> | string | null
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"TemplateCatalog"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"TemplateCatalog"> | Date | string
@@ -398,6 +410,7 @@ export type TemplateCatalogCreateInput = {
   marketingThumbnail?: string | null
   displayOrder: number
   status?: $Enums.TemplateCatalogStatus
+  hasBeenVisible?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   category: Prisma.TemplateCategoryCreateNestedOneWithoutTemplatesInput
@@ -417,6 +430,7 @@ export type TemplateCatalogUncheckedCreateInput = {
   marketingThumbnail?: string | null
   displayOrder: number
   status?: $Enums.TemplateCatalogStatus
+  hasBeenVisible?: boolean
   updatedByAdminId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -434,6 +448,7 @@ export type TemplateCatalogUpdateInput = {
   marketingThumbnail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayOrder?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumTemplateCatalogStatusFieldUpdateOperationsInput | $Enums.TemplateCatalogStatus
+  hasBeenVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   category?: Prisma.TemplateCategoryUpdateOneRequiredWithoutTemplatesNestedInput
@@ -453,6 +468,7 @@ export type TemplateCatalogUncheckedUpdateInput = {
   marketingThumbnail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayOrder?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumTemplateCatalogStatusFieldUpdateOperationsInput | $Enums.TemplateCatalogStatus
+  hasBeenVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   updatedByAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -471,6 +487,7 @@ export type TemplateCatalogCreateManyInput = {
   marketingThumbnail?: string | null
   displayOrder: number
   status?: $Enums.TemplateCatalogStatus
+  hasBeenVisible?: boolean
   updatedByAdminId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -487,6 +504,7 @@ export type TemplateCatalogUpdateManyMutationInput = {
   marketingThumbnail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayOrder?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumTemplateCatalogStatusFieldUpdateOperationsInput | $Enums.TemplateCatalogStatus
+  hasBeenVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -503,6 +521,7 @@ export type TemplateCatalogUncheckedUpdateManyInput = {
   marketingThumbnail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayOrder?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumTemplateCatalogStatusFieldUpdateOperationsInput | $Enums.TemplateCatalogStatus
+  hasBeenVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   updatedByAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -535,6 +554,7 @@ export type TemplateCatalogCountOrderByAggregateInput = {
   marketingThumbnail?: Prisma.SortOrder
   displayOrder?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  hasBeenVisible?: Prisma.SortOrder
   updatedByAdminId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -558,6 +578,7 @@ export type TemplateCatalogMaxOrderByAggregateInput = {
   marketingThumbnail?: Prisma.SortOrder
   displayOrder?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  hasBeenVisible?: Prisma.SortOrder
   updatedByAdminId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -575,6 +596,7 @@ export type TemplateCatalogMinOrderByAggregateInput = {
   marketingThumbnail?: Prisma.SortOrder
   displayOrder?: Prisma.SortOrder
   status?: Prisma.SortOrder
+  hasBeenVisible?: Prisma.SortOrder
   updatedByAdminId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
@@ -704,6 +726,7 @@ export type TemplateCatalogCreateWithoutUpdatedByAdminInput = {
   marketingThumbnail?: string | null
   displayOrder: number
   status?: $Enums.TemplateCatalogStatus
+  hasBeenVisible?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   category: Prisma.TemplateCategoryCreateNestedOneWithoutTemplatesInput
@@ -722,6 +745,7 @@ export type TemplateCatalogUncheckedCreateWithoutUpdatedByAdminInput = {
   marketingThumbnail?: string | null
   displayOrder: number
   status?: $Enums.TemplateCatalogStatus
+  hasBeenVisible?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   slugAliases?: Prisma.TemplateSlugAliasUncheckedCreateNestedManyWithoutTemplateCatalogInput
@@ -768,6 +792,7 @@ export type TemplateCatalogScalarWhereInput = {
   marketingThumbnail?: Prisma.StringNullableFilter<"TemplateCatalog"> | string | null
   displayOrder?: Prisma.IntFilter<"TemplateCatalog"> | number
   status?: Prisma.EnumTemplateCatalogStatusFilter<"TemplateCatalog"> | $Enums.TemplateCatalogStatus
+  hasBeenVisible?: Prisma.BoolFilter<"TemplateCatalog"> | boolean
   updatedByAdminId?: Prisma.UuidNullableFilter<"TemplateCatalog"> | string | null
   createdAt?: Prisma.DateTimeFilter<"TemplateCatalog"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"TemplateCatalog"> | Date | string
@@ -784,6 +809,7 @@ export type TemplateCatalogCreateWithoutCategoryInput = {
   marketingThumbnail?: string | null
   displayOrder: number
   status?: $Enums.TemplateCatalogStatus
+  hasBeenVisible?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   updatedByAdmin?: Prisma.AdminCreateNestedOneWithoutTemplateCatalogUpdatesInput
@@ -801,6 +827,7 @@ export type TemplateCatalogUncheckedCreateWithoutCategoryInput = {
   marketingThumbnail?: string | null
   displayOrder: number
   status?: $Enums.TemplateCatalogStatus
+  hasBeenVisible?: boolean
   updatedByAdminId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -844,6 +871,7 @@ export type TemplateCatalogCreateWithoutSlugAliasesInput = {
   marketingThumbnail?: string | null
   displayOrder: number
   status?: $Enums.TemplateCatalogStatus
+  hasBeenVisible?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
   category: Prisma.TemplateCategoryCreateNestedOneWithoutTemplatesInput
@@ -862,6 +890,7 @@ export type TemplateCatalogUncheckedCreateWithoutSlugAliasesInput = {
   marketingThumbnail?: string | null
   displayOrder: number
   status?: $Enums.TemplateCatalogStatus
+  hasBeenVisible?: boolean
   updatedByAdminId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -894,6 +923,7 @@ export type TemplateCatalogUpdateWithoutSlugAliasesInput = {
   marketingThumbnail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayOrder?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumTemplateCatalogStatusFieldUpdateOperationsInput | $Enums.TemplateCatalogStatus
+  hasBeenVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   category?: Prisma.TemplateCategoryUpdateOneRequiredWithoutTemplatesNestedInput
@@ -912,6 +942,7 @@ export type TemplateCatalogUncheckedUpdateWithoutSlugAliasesInput = {
   marketingThumbnail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayOrder?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumTemplateCatalogStatusFieldUpdateOperationsInput | $Enums.TemplateCatalogStatus
+  hasBeenVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   updatedByAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -929,6 +960,7 @@ export type TemplateCatalogCreateManyUpdatedByAdminInput = {
   marketingThumbnail?: string | null
   displayOrder: number
   status?: $Enums.TemplateCatalogStatus
+  hasBeenVisible?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -944,6 +976,7 @@ export type TemplateCatalogUpdateWithoutUpdatedByAdminInput = {
   marketingThumbnail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayOrder?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumTemplateCatalogStatusFieldUpdateOperationsInput | $Enums.TemplateCatalogStatus
+  hasBeenVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   category?: Prisma.TemplateCategoryUpdateOneRequiredWithoutTemplatesNestedInput
@@ -962,6 +995,7 @@ export type TemplateCatalogUncheckedUpdateWithoutUpdatedByAdminInput = {
   marketingThumbnail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayOrder?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumTemplateCatalogStatusFieldUpdateOperationsInput | $Enums.TemplateCatalogStatus
+  hasBeenVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   slugAliases?: Prisma.TemplateSlugAliasUncheckedUpdateManyWithoutTemplateCatalogNestedInput
@@ -979,6 +1013,7 @@ export type TemplateCatalogUncheckedUpdateManyWithoutUpdatedByAdminInput = {
   marketingThumbnail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayOrder?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumTemplateCatalogStatusFieldUpdateOperationsInput | $Enums.TemplateCatalogStatus
+  hasBeenVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -994,6 +1029,7 @@ export type TemplateCatalogCreateManyCategoryInput = {
   marketingThumbnail?: string | null
   displayOrder: number
   status?: $Enums.TemplateCatalogStatus
+  hasBeenVisible?: boolean
   updatedByAdminId?: string | null
   createdAt?: Date | string
   updatedAt?: Date | string
@@ -1010,6 +1046,7 @@ export type TemplateCatalogUpdateWithoutCategoryInput = {
   marketingThumbnail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayOrder?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumTemplateCatalogStatusFieldUpdateOperationsInput | $Enums.TemplateCatalogStatus
+  hasBeenVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedByAdmin?: Prisma.AdminUpdateOneWithoutTemplateCatalogUpdatesNestedInput
@@ -1027,6 +1064,7 @@ export type TemplateCatalogUncheckedUpdateWithoutCategoryInput = {
   marketingThumbnail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayOrder?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumTemplateCatalogStatusFieldUpdateOperationsInput | $Enums.TemplateCatalogStatus
+  hasBeenVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   updatedByAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1044,6 +1082,7 @@ export type TemplateCatalogUncheckedUpdateManyWithoutCategoryInput = {
   marketingThumbnail?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   displayOrder?: Prisma.IntFieldUpdateOperationsInput | number
   status?: Prisma.EnumTemplateCatalogStatusFieldUpdateOperationsInput | $Enums.TemplateCatalogStatus
+  hasBeenVisible?: Prisma.BoolFieldUpdateOperationsInput | boolean
   updatedByAdminId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
@@ -1092,6 +1131,7 @@ export type TemplateCatalogSelect<ExtArgs extends runtime.Types.Extensions.Inter
   marketingThumbnail?: boolean
   displayOrder?: boolean
   status?: boolean
+  hasBeenVisible?: boolean
   updatedByAdminId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -1113,6 +1153,7 @@ export type TemplateCatalogSelectCreateManyAndReturn<ExtArgs extends runtime.Typ
   marketingThumbnail?: boolean
   displayOrder?: boolean
   status?: boolean
+  hasBeenVisible?: boolean
   updatedByAdminId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -1132,6 +1173,7 @@ export type TemplateCatalogSelectUpdateManyAndReturn<ExtArgs extends runtime.Typ
   marketingThumbnail?: boolean
   displayOrder?: boolean
   status?: boolean
+  hasBeenVisible?: boolean
   updatedByAdminId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
@@ -1151,12 +1193,13 @@ export type TemplateCatalogSelectScalar = {
   marketingThumbnail?: boolean
   displayOrder?: boolean
   status?: boolean
+  hasBeenVisible?: boolean
   updatedByAdminId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type TemplateCatalogOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "templateKey" | "templateVersion" | "slug" | "name" | "categoryId" | "description" | "priceInRupiah" | "marketingThumbnail" | "displayOrder" | "status" | "updatedByAdminId" | "createdAt" | "updatedAt", ExtArgs["result"]["templateCatalog"]>
+export type TemplateCatalogOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "templateKey" | "templateVersion" | "slug" | "name" | "categoryId" | "description" | "priceInRupiah" | "marketingThumbnail" | "displayOrder" | "status" | "hasBeenVisible" | "updatedByAdminId" | "createdAt" | "updatedAt", ExtArgs["result"]["templateCatalog"]>
 export type TemplateCatalogInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   category?: boolean | Prisma.TemplateCategoryDefaultArgs<ExtArgs>
   updatedByAdmin?: boolean | Prisma.TemplateCatalog$updatedByAdminArgs<ExtArgs>
@@ -1191,6 +1234,7 @@ export type $TemplateCatalogPayload<ExtArgs extends runtime.Types.Extensions.Int
     marketingThumbnail: string | null
     displayOrder: number
     status: $Enums.TemplateCatalogStatus
+    hasBeenVisible: boolean
     updatedByAdminId: string | null
     createdAt: Date
     updatedAt: Date
@@ -1631,6 +1675,7 @@ export interface TemplateCatalogFieldRefs {
   readonly marketingThumbnail: Prisma.FieldRef<"TemplateCatalog", 'String'>
   readonly displayOrder: Prisma.FieldRef<"TemplateCatalog", 'Int'>
   readonly status: Prisma.FieldRef<"TemplateCatalog", 'TemplateCatalogStatus'>
+  readonly hasBeenVisible: Prisma.FieldRef<"TemplateCatalog", 'Boolean'>
   readonly updatedByAdminId: Prisma.FieldRef<"TemplateCatalog", 'String'>
   readonly createdAt: Prisma.FieldRef<"TemplateCatalog", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"TemplateCatalog", 'DateTime'>
