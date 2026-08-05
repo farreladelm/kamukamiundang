@@ -58,7 +58,7 @@ export function WhatsAppCta({
 
   return (
     <a className={className} href={href} onClick={() => recordWhatsAppCtaClick({ template, palette })}>
-      Pesan via WhatsApp
+      Pesan
     </a>
   );
 }

@@ -121,7 +121,7 @@ export function Catalog({
                     href={`/templates/${template.slug}`}
                     className="inline-flex min-h-11 items-center justify-center border border-stone-900 px-3 text-center text-sm font-semibold text-stone-900 transition-colors hover:bg-stone-900 hover:text-stone-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-900"
                   >
-                    Lihat preview {template.name}
+                    Preview
                   </Link>
                   <WhatsAppCta
                     whatsappNumber="6282131401640"
