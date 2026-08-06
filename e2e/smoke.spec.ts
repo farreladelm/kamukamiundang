@@ -23,9 +23,9 @@ test("catalog filters and resets template collection", async ({ page }) => {
 test("catalog exposes preview and WhatsApp contact actions", async ({ page }) => {
   await page.goto("/");
 
-  await expect(page.getByRole("link", { name: "Lihat preview Larasati" })).toHaveAttribute(
+  await expect(page.getByRole("link", { name: "Preview" })).toHaveAttribute(
     "href",
     "/templates/larasati",
   );
-  await expect(page.getByRole("link", { name: "Pesan via WhatsApp" })).toHaveCount(3);
+  await expect(page.getByRole("link", { name: "Pesan" })).toHaveCount(3);
 });

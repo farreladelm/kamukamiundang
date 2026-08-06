@@ -8,10 +8,11 @@
     "start": "next start",
     "admin:credential": "tsx scripts/admin-credential.ts",
     "templates:reconcile": "tsx scripts/reconcile-template-catalog.ts",
+    "test:db:prepare": "tsx scripts/prepare-test-database.ts",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "test": "vitest run src --no-file-parallelism",
-    "test:integration": "tsx scripts/test-integration.ts",
+    "test:integration": "vitest run tests/integration --passWithNoTests --no-file-parallelism",
     "test:e2e": "playwright test"
   },
   "dependencies": {
@@ -19,6 +20,7 @@
     "@prisma/client": "7.6.0",
     "argon2": "^0.44.0",
     "next": "16.2.12",
+    "openai": "^7.4.0",
     "pg": "^8.22.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",

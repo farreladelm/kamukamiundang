@@ -292,6 +292,23 @@ describe("template catalog migration foundation", () => {
       for (const statement of splitSqlStatements(guardMigration)) {
         if (statement.trim()) await tx.$executeRawUnsafe(statement);
       }
+      const advisoryLockMigration = await readFile(
+        join(process.cwd(), "prisma", "migrations", "20260805091000_template_catalog_slug_advisory_lock", "migration.sql"),
+        "utf8",
+      );
+      for (const statement of splitSqlStatements(advisoryLockMigration)) {
+        if (statement.trim()) await tx.$executeRawUnsafe(statement);
+      }
+      await tx.$executeRawUnsafe(
+        'INSERT INTO "TemplateCatalog" ("id", "templateKey", "templateVersion", "slug", "name", "categoryId", "description", "priceInRupiah", "displayOrder", "status", "createdAt", "updatedAt") VALUES (\'91111111-1111-4111-8111-111111111111\', \'backfill-draft\', 1, \'backfill-draft\', \'Backfill Draft\', \'11111111-1111-4111-8111-111111111111\', \'Draft\', 1, 1, \'DRAFT\', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP), (\'91111111-1111-4111-8111-111111111112\', \'backfill-visible\', 1, \'backfill-visible\', \'Backfill Visible\', \'11111111-1111-4111-8111-111111111111\', \'Visible\', 1, 2, \'VISIBLE\', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP), (\'91111111-1111-4111-8111-111111111113\', \'backfill-hidden\', 1, \'backfill-hidden\', \'Backfill Hidden\', \'11111111-1111-4111-8111-111111111111\', \'Hidden\', 1, 3, \'HIDDEN\', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP), (\'91111111-1111-4111-8111-111111111114\', \'backfill-retired\', 1, \'backfill-retired\', \'Backfill Retired\', \'11111111-1111-4111-8111-111111111111\', \'Retired\', 1, 4, \'RETIRED\', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)',
+      );
+      const publicationHistoryMigration = await readFile(
+        join(process.cwd(), "prisma", "migrations", "20260805090000_template_catalog_publication_history", "migration.sql"),
+        "utf8",
+      );
+      for (const statement of splitSqlStatements(publicationHistoryMigration)) {
+        if (statement.trim()) await tx.$executeRawUnsafe(statement);
+      }
 
       const rows = await tx.$queryRawUnsafe<Array<{ status: string; updatedByAdminId: string }>>(
         'SELECT "status", "updatedByAdminId" FROM "TemplateCatalog" WHERE "templateKey" = \'template-2\' AND "templateVersion" = 1',
@@ -312,6 +329,15 @@ describe("template catalog migration foundation", () => {
           slug: "historical-invitation",
           content: { version: "before" },
         }),
+      ]);
+      const backfillRows = await tx.$queryRawUnsafe<Array<{ status: string; hasBeenVisible: boolean }>>(
+        'SELECT "status", "hasBeenVisible" FROM "TemplateCatalog" WHERE "templateKey" LIKE \'backfill-%\' ORDER BY CASE "status" WHEN \'DRAFT\' THEN 1 WHEN \'VISIBLE\' THEN 2 WHEN \'HIDDEN\' THEN 3 WHEN \'RETIRED\' THEN 4 END',
+      );
+      expect(backfillRows).toEqual([
+        { status: "DRAFT", hasBeenVisible: false },
+        { status: "VISIBLE", hasBeenVisible: true },
+        { status: "HIDDEN", hasBeenVisible: true },
+        { status: "RETIRED", hasBeenVisible: true },
       ]);
       await tx.$executeRawUnsafe('DROP SCHEMA "template_catalog_migration_fixture" CASCADE');
     });
