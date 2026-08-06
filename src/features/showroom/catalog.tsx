@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import type { TemplateCatalogItem } from "@/features/templates/types";
 import { WhatsAppCta } from "@/features/showroom/whatsapp-cta";
+import type { MatchResult } from "@/features/ai-match/match";
 
 const allCategoriesLabel = "Semua";
 
@@ -18,9 +19,11 @@ function formatRupiah(priceInRupiah: number): string {
 export function Catalog({
   templates,
   canonicalOrigin = "",
+  matchResults,
 }: {
   templates: readonly TemplateCatalogItem[];
   canonicalOrigin?: string;
+  matchResults?: readonly MatchResult[];
 }) {
   const visibleTemplates = templates.filter((template) => template.isVisible);
   const categories = [
@@ -28,10 +31,19 @@ export function Catalog({
     ...Array.from(new Set(visibleTemplates.map((template) => template.category))),
   ];
   const [activeCategory, setActiveCategory] = useState(allCategoriesLabel);
-  const filteredTemplates = visibleTemplates.filter(
-    (template) =>
-      activeCategory === allCategoriesLabel || template.category === activeCategory,
-  );
+  const rankByTemplateKey = new Map(matchResults?.map((result, index) => [result.templateKey, index]));
+  const bestMatch = matchResults?.[0];
+  const filteredTemplates = visibleTemplates
+    .filter(
+      (template) =>
+        activeCategory === allCategoriesLabel || template.category === activeCategory,
+    )
+    .slice()
+    .sort(
+      (a, b) =>
+        (rankByTemplateKey.get(a.templateKey) ?? Infinity) -
+        (rankByTemplateKey.get(b.templateKey) ?? Infinity),
+    );
 
   useEffect(() => {
     void fetch("/api/analytics/events", {
@@ -89,7 +101,11 @@ export function Catalog({
 
       <div className="mt-6 grid gap-6 md:grid-cols-3">
         {filteredTemplates.map((template) => {
-          const palette = template.palettes[0];
+          const isRecommended =
+            bestMatch !== undefined && bestMatch.score > 0 && bestMatch.templateKey === template.templateKey;
+          const palette =
+            (isRecommended && template.palettes.find((candidate) => candidate.key === bestMatch.paletteKey)) ||
+            template.palettes[0];
 
           return (
             <article key={`${template.templateKey}-${template.templateVersion}`} className="border border-stone-300 bg-white p-3">
@@ -111,7 +127,15 @@ export function Catalog({
                 <p className="text-xs font-semibold tracking-[0.15em] text-stone-500 uppercase">
                   {template.category}
                 </p>
+                {isRecommended && (
+                  <p className="mt-2 inline-block bg-amber-900 px-2 py-1 text-xs font-semibold text-amber-50">
+                    Cocok untukmu
+                  </p>
+                )}
                 <h3 className="mt-2 font-serif text-3xl text-stone-900">{template.name}</h3>
+                {isRecommended && bestMatch.reasons.length > 0 && (
+                  <p className="mt-1 text-xs text-amber-900">{bestMatch.reasons.join(", ")}</p>
+                )}
                 <p className="mt-3 min-h-12 text-sm leading-6 text-stone-600">{template.description}</p>
                 <p className="mt-5 border-t border-stone-200 pt-4 text-sm font-semibold text-stone-900">
                   Mulai {formatRupiah(template.priceInRupiah)}
