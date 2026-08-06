@@ -6,13 +6,14 @@ import { getVisibleTemplateCatalogFromDatabase } from "@/features/templates/visi
 export const runtime = "nodejs";
 
 export async function POST(request: Request): Promise<Response> {
-  let body: { cerita?: unknown };
+  let parsed: unknown;
   try {
-    body = JSON.parse(await request.text());
+    parsed = JSON.parse(await request.text());
   } catch {
     return Response.json({ pesan: "Body bukan JSON yang sah." }, { status: 400 });
   }
 
+  const body = parsed && typeof parsed === "object" ? (parsed as { cerita?: unknown }) : {};
   const cerita = typeof body.cerita === "string" ? body.cerita.trim() : "";
   if (!cerita) {
     return Response.json({ pesan: "Cerita tidak boleh kosong." }, { status: 400 });

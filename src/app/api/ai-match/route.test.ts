@@ -55,6 +55,18 @@ describe("POST /api/ai-match", () => {
     expect(response.status).toBe(400);
   });
 
+  it("rejects a JSON body that parses successfully but isn't an object", async () => {
+    const response = await POST(
+      new Request("https://undango.example/api/ai-match", {
+        method: "POST",
+        body: JSON.stringify(null),
+      }),
+    );
+    expect(response.status).toBe(400);
+    const body = await response.json();
+    expect(typeof body.pesan).toBe("string");
+  });
+
   it("uses the LLM brief and reports source llm when parsing succeeds", async () => {
     parseWithLlm.mockResolvedValue({ kategori: "klasik", nuansa: "warm" });
 
