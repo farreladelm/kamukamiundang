@@ -1,5 +1,5 @@
 import { headers } from "next/headers";
-import { Catalog } from "@/features/showroom/catalog";
+import { ShowroomExperience } from "@/features/showroom/showroom-experience";
 import { getVisibleTemplateCatalogFromDatabase } from "@/features/templates/visibility";
 
 export default async function ShowroomPage() {
@@ -39,7 +39,7 @@ export default async function ShowroomPage() {
         </div>
       </section>
       <div id="koleksi">
-        <Catalog templates={templates} canonicalOrigin={`${protocol}://${host}`} />
+        <ShowroomExperience templates={templates} canonicalOrigin={`${protocol}://${host}`} />
       </div>
     </main>
   );
