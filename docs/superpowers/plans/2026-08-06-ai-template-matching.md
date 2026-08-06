@@ -14,8 +14,8 @@
 - No dynamic color engine, no content prefill (names/date/venue) — out of scope per the approved spec (`docs/superpowers/specs/2026-08-06-ai-template-matching-design.md`).
 - Every template always appears in match results (score 0 included); never drop a template from the response.
 - The API route must always return `200` for a well-formed request, even when the LLM fails — `source: "fallback"` signals degraded mode, never an HTTP error.
-- Test runner in this environment: `pnpm` is not on `PATH` directly. Use `corepack pnpm <script>` for package scripts (e.g. `corepack pnpm test`, `corepack pnpm add openai`) and `npx vitest run <path> --no-file-parallelism` to run a single test file, run from `D:\Claude\kamukamiundang`.
-- A pre-existing, unrelated failing test exists in `src/features/showroom/catalog.test.tsx` (`"Lihat preview Larasati"` / `"Pesan via WhatsApp"` aria-label assertions that don't match current markup). It predates this feature — do not fix it as part of this plan, and do not let it block: run new/modified tests by exact file+name, not blind pass/fail on the whole suite.
+- Test runner in this environment: `pnpm` is not on `PATH` directly. Use `corepack pnpm <script>` for package scripts (e.g. `corepack pnpm test`, `corepack pnpm add openai`) and `npx vitest run <path> --no-file-parallelism` to run a single test file. Requires `DATABASE_URL` to be set (present in `.env`, loaded automatically by the test setup) — run from the worktree root at `D:\Claude\kamukamiundang\.claude\worktrees\ai-template-matching`.
+- Baseline confirmed clean in this isolated worktree with a fresh `pnpm install`: all 23 test files / 66 tests pass. Any test failure you see is real — do not assume it's pre-existing.
 - Do not push to GitHub. Run everything on `localhost` and get explicit confirmation the feature works before any push — this was the user's explicit instruction.
 
 ---
@@ -875,7 +875,7 @@ Leave the rest of the file (price line, preview/WhatsApp links, closing tags) un
 - [ ] **Step 4: Run tests to verify they pass**
 
 Run: `npx vitest run src/features/showroom/catalog.test.tsx --no-file-parallelism`
-Expected: PASS for the 2 new tests. (The pre-existing `"Lihat preview Larasati"` test may still fail per the Global Constraints note — confirm it fails for the *same* reason as before your change, not a new one.)
+Expected: PASS — all tests in the file, including the pre-existing ones.
 
 - [ ] **Step 5: Commit**
 
@@ -1238,7 +1238,7 @@ This task is manual — it is the "run di localhost dulu sebelum dipush ke githu
 - [ ] **Step 1: Run the full automated test suite**
 
 Run: `corepack pnpm test`
-Expected: every test file passes except the pre-existing, unrelated `catalog.test.tsx` aria-label failure noted in Global Constraints (confirm no *new* failures were introduced).
+Expected: every test file passes (baseline was clean — see Global Constraints).
 
 - [ ] **Step 2: Run lint**
 
