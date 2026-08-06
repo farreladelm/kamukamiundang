@@ -71,4 +71,46 @@ describe("Catalog", () => {
       expect.stringContaining("undango.test%2Ftemplates%2Flarasati"),
     );
   });
+
+  it("promotes the top match to the front, badges it, and applies its recommended palette", () => {
+    render(
+      <Catalog
+        templates={catalogTemplates}
+        canonicalOrigin="https://undango.test"
+        matchResults={[
+          {
+            templateKey: "template-3",
+            templateVersion: 1,
+            slug: "taman-aksara",
+            score: 3,
+            reasons: ['cocok dengan kategori "botanical"'],
+            paletteKey: "mawar",
+          },
+          { templateKey: "template-1", templateVersion: 1, slug: "larasati", score: 0, reasons: [], paletteKey: "gading" },
+          { templateKey: "template-2", templateVersion: 1, slug: "pesisir-senja", score: 0, reasons: [], paletteKey: "terakota" },
+        ]}
+      />,
+    );
+
+    const headings = screen.getAllByRole("heading", { level: 3 }).map((heading) => heading.textContent);
+    expect(headings[0]).toBe("Taman Aksara");
+    expect(screen.getByText("Cocok untukmu")).toBeInTheDocument();
+    expect(screen.getByText('cocok dengan kategori "botanical"')).toBeInTheDocument();
+  });
+
+  it("does not badge any card when the top match score is zero", () => {
+    render(
+      <Catalog
+        templates={catalogTemplates}
+        canonicalOrigin="https://undango.test"
+        matchResults={[
+          { templateKey: "template-1", templateVersion: 1, slug: "larasati", score: 0, reasons: [], paletteKey: "gading" },
+          { templateKey: "template-2", templateVersion: 1, slug: "pesisir-senja", score: 0, reasons: [], paletteKey: "terakota" },
+          { templateKey: "template-3", templateVersion: 1, slug: "taman-aksara", score: 0, reasons: [], paletteKey: "lumut" },
+        ]}
+      />,
+    );
+
+    expect(screen.queryByText("Cocok untukmu")).not.toBeInTheDocument();
+  });
 });
