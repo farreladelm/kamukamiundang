@@ -52,6 +52,24 @@ describe("AiMatchBox", () => {
     expect(onMatched).not.toHaveBeenCalled();
   });
 
+  it("shows the generic fallback message when the error response body isn't JSON", async () => {
+    const onMatched = vi.fn();
+    (fetch as ReturnType<typeof vi.fn>).mockResolvedValue({
+      ok: false,
+      json: () => Promise.reject(new Error("not json")),
+    });
+
+    render(<AiMatchBox onMatched={onMatched} />);
+
+    fireEvent.change(screen.getByLabelText("Ceritakan pernikahanmu"), {
+      target: { value: "Cerita apa saja" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Cocokkan template" }));
+
+    expect(await screen.findByRole("alert")).toHaveTextContent("Gagal mencocokkan template.");
+    expect(onMatched).not.toHaveBeenCalled();
+  });
+
   it("disables submit until the textarea has content", () => {
     render(<AiMatchBox onMatched={vi.fn()} />);
     expect(screen.getByRole("button", { name: "Cocokkan template" })).toBeDisabled();

@@ -98,4 +98,59 @@ describe("POST /api/ai-match", () => {
     expect(body.source).toBe("fallback");
     expect(body.results[0]).toMatchObject({ templateKey: "template-1", paletteKey: "soga" });
   });
+
+  it("rejects a request whose content-length exceeds the body size cap", async () => {
+    parseWithLlm.mockResolvedValue(null);
+
+    const cerita = "a".repeat(5_000);
+    const response = await POST(
+      new Request("https://undango.example/api/ai-match", {
+        method: "POST",
+        headers: { "content-length": String(cerita.length) },
+        body: JSON.stringify({ cerita }),
+      }),
+    );
+
+    expect(response.status).toBe(413);
+  });
+
+  it("truncates an overly long cerita instead of rejecting the request", async () => {
+    parseWithLlm.mockResolvedValue(null);
+
+    const cerita = "adat Jawa hangat ".repeat(150); // well over 2000 chars but under body cap headers omitted
+    const response = await POST(
+      new Request("https://undango.example/api/ai-match", {
+        method: "POST",
+        body: JSON.stringify({ cerita }),
+      }),
+    );
+
+    expect(response.status).toBe(200);
+  });
+
+  it("rate limits rapid requests, returning 429 once the limit is exceeded", async () => {
+    // The rate limiter is module-level state; reset the module registry so
+    // this test starts from a fresh limiter unaffected by earlier tests in
+    // this file, then re-import POST with the same mocks applied.
+    vi.resetModules();
+    const { POST: freshPost } = await import("./route");
+    parseWithLlm.mockResolvedValue(null);
+
+    const makeRequest = () =>
+      freshPost(
+        new Request("https://undango.example/api/ai-match", {
+          method: "POST",
+          body: JSON.stringify({ cerita: "Pernikahan adat Jawa yang hangat" }),
+        }),
+      );
+
+    const responses = [];
+    for (let i = 0; i < 11; i += 1) {
+      responses.push(await makeRequest());
+    }
+
+    const statuses = responses.map((response) => response.status);
+    expect(statuses.slice(0, 10)).toEqual(Array(10).fill(200));
+    expect(statuses[10]).toBe(429);
+  });
 });

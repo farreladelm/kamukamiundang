@@ -27,7 +27,13 @@ export function AiMatchBox({ onMatched }: { onMatched: (response: AiMatchRespons
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ cerita: trimmed }),
       });
-      const body = await response.json();
+
+      let body: { pesan?: string } = {};
+      try {
+        body = await response.json();
+      } catch {
+        // non-JSON response body — fall through to the generic error message
+      }
 
       if (!response.ok) {
         throw new Error(body.pesan ?? "Gagal mencocokkan template.");
