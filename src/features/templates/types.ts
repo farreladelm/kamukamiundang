@@ -66,6 +66,8 @@ export type TemplatePhoto = {
   id: string;
   alt: string;
   tone: "sand" | "rose" | "leaf" | "sky" | "night";
+  /** Optional real photo path (e.g. "/images/stock/larasati-1.jpg"). Falls back to a tinted placeholder when absent. */
+  src?: string;
 };
 
 export type TemplateGallery = {
@@ -114,7 +116,7 @@ export type TemplateRuntimeManifest = {
   templateKey: string;
   templateVersion: number;
   contentSchemaVersion: number;
-  previewStyle: "arch" | "coast" | "garden";
+  previewStyle: "arch" | "coast" | "garden" | "crescent" | "noir" | "line";
   capabilities: readonly TemplateCapability[];
   palettes: readonly TemplatePalette[];
   demo: {

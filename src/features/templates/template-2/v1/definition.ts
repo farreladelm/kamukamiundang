@@ -68,11 +68,11 @@ export const templateTwoV1: TemplateRuntimeManifest = {
       ],
       gallery: {
         photos: [
-          { id: "nara-01", alt: "Nara dan Dimas di tepi pantai", tone: "sky" },
-          { id: "nara-02", alt: "Nara dan Dimas melihat cakrawala", tone: "sand" },
-          { id: "nara-03", alt: "Potret pasangan di bawah matahari", tone: "rose" },
-          { id: "nara-04", alt: "Momen santai Nara dan Dimas", tone: "sky" },
-          { id: "nara-05", alt: "Detail bunga pernikahan", tone: "sand" },
+          { id: "nara-01", alt: "Nara dan Dimas di tepi pantai", tone: "sky", src: "/images/stock/pesisir-1.jpg" },
+          { id: "nara-02", alt: "Nara dan Dimas melihat cakrawala", tone: "sand", src: "/images/stock/pesisir-2.jpg" },
+          { id: "nara-03", alt: "Potret pasangan di bawah matahari", tone: "rose", src: "/images/stock/pesisir-3.jpg" },
+          { id: "nara-04", alt: "Momen santai Nara dan Dimas", tone: "sky", src: "/images/stock/pesisir-1.jpg" },
+          { id: "nara-05", alt: "Detail bunga pernikahan", tone: "sand", src: "/images/stock/pesisir-4.jpg" },
         ],
       },
       gift: {
@@ -88,7 +88,7 @@ export const templateTwoV1: TemplateRuntimeManifest = {
         entries: [{ name: "Rani & Fajar", message: "Semoga perjalanan baru ini selalu punya cakrawala yang indah." }],
       },
       closing: "Kehadiran dan doa baik Anda akan melengkapi senja paling istimewa bagi kami.",
-      branding: "Undangan oleh Undango",
+      branding: "Undangan oleh kamukamiundang",
     },
   },
   renderer: TemplateTwoRenderer,

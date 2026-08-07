@@ -1,25 +1,50 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f7f4ed;
-  --foreground: #292524;
+  --background: #f8f4ea;
+  --foreground: #221d16;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-body-sans);
+  --font-serif: var(--font-display-serif);
   --font-mono: var(--font-geist-mono);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  font-family: var(--font-body-sans), Arial, Helvetica, sans-serif;
 }
 
 .font-serif {
-  font-family: Georgia, "Times New Roman", serif;
+  font-family: var(--font-display-serif), Georgia, serif;
+  font-optical-sizing: auto;
+}
+
+/* Fixed, pointer-events-none noise overlay to break up flat cream sections. */
+.grain-overlay {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  opacity: 0.05;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  background-size: 180px 180px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .grain-overlay {
+    opacity: 0.08;
+    mix-blend-mode: overlay;
+  }
 }
 
 .invitation-experience {
@@ -36,6 +61,18 @@ body {
 
 .invitation-garden > main > section:first-child {
   background-image: radial-gradient(circle at 12% 16%, color-mix(in srgb, currentColor 10%, transparent) 0 18%, transparent 19%), radial-gradient(circle at 90% 82%, color-mix(in srgb, currentColor 8%, transparent) 0 20%, transparent 21%);
+}
+
+.invitation-crescent > main > section:first-child {
+  background-image: radial-gradient(circle at 85% 15%, color-mix(in srgb, currentColor 12%, transparent) 0 16%, transparent 17%), linear-gradient(170deg, transparent 40%, color-mix(in srgb, currentColor 7%, transparent));
+}
+
+.invitation-noir > main > section:first-child {
+  background-image: radial-gradient(circle at 50% 0%, color-mix(in srgb, currentColor 16%, transparent) 0%, transparent 55%);
+}
+
+.invitation-line > main > section:first-child {
+  background-image: linear-gradient(180deg, transparent 92%, color-mix(in srgb, currentColor 16%, transparent) 92%);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -137,4 +174,59 @@ body {
   height: 11rem;
   border: 1px solid var(--thumbnail-accent);
   border-radius: 100% 0 0;
+}
+
+/* crescent: a shallow dome arc with a slim minaret line — evokes mosque architecture without literal iconography */
+.template-thumbnail-crescent::before {
+  top: 18%;
+  right: 14%;
+  left: 14%;
+  height: 38%;
+  border: 1px solid var(--thumbnail-accent);
+  border-bottom: 0;
+  border-radius: 100% 100% 0 0;
+}
+
+.template-thumbnail-crescent::after {
+  top: 4%;
+  left: 50%;
+  width: 1px;
+  height: 15%;
+  background: var(--thumbnail-accent);
+}
+
+/* noir: a rotated hairline diamond over a base rule — art-deco, quietly luxurious */
+.template-thumbnail-noir::before {
+  top: 50%;
+  left: 50%;
+  width: 3.4rem;
+  height: 3.4rem;
+  margin: -1.7rem 0 0 -1.7rem;
+  border: 1px solid var(--thumbnail-accent);
+  transform: rotate(45deg);
+}
+
+.template-thumbnail-noir::after {
+  right: 14%;
+  bottom: 16%;
+  left: 14%;
+  height: 0;
+  border-top: 1px solid var(--thumbnail-accent);
+}
+
+/* line: two short typographic rules — the least amount of ornament on purpose */
+.template-thumbnail-line::before {
+  top: 24%;
+  left: 14%;
+  width: 40%;
+  height: 0;
+  border-top: 1px solid var(--thumbnail-accent);
+}
+
+.template-thumbnail-line::after {
+  top: 33%;
+  left: 14%;
+  width: 24%;
+  height: 0;
+  border-top: 1px solid var(--thumbnail-accent);
 }
