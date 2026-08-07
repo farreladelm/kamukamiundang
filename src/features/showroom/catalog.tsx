@@ -57,8 +57,8 @@ export function Catalog({
   }, [activeCategory]);
 
   return (
-    <section className="mx-auto max-w-6xl px-5 pb-20 sm:px-8" aria-labelledby="collection-title">
-      <div className="border-t border-stone-300 pt-8 sm:flex sm:items-end sm:justify-between">
+    <section className="mx-auto max-w-6xl px-5 pt-6 pb-20 sm:px-8 sm:pt-10 sm:pb-28" aria-labelledby="collection-title">
+      <div className="sm:flex sm:items-end sm:justify-between">
         <div>
           <p className="text-sm font-medium tracking-[0.16em] text-stone-500 uppercase">
             Koleksi perdana
@@ -68,7 +68,8 @@ export function Catalog({
           </h2>
         </div>
         <p className="mt-4 max-w-sm text-sm leading-6 text-stone-600 sm:text-right">
-          Tiga desain siap personalisasi, dengan palet terkurasi dan harga yang jelas.
+          Kami udah kurasi tiga desain, tinggal kalian sesuaikan ceritanya — biar tamu yang buka
+          langsung kerasa bedanya.
         </p>
       </div>
 
@@ -77,7 +78,7 @@ export function Catalog({
           <button
             key={category}
             type="button"
-            className="border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 transition-colors hover:border-stone-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-900 aria-pressed:bg-stone-900 aria-pressed:text-stone-50"
+            className="rounded-full border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 transition-colors hover:border-stone-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-900 aria-pressed:border-stone-900 aria-pressed:bg-stone-900 aria-pressed:text-stone-50"
             aria-pressed={activeCategory === category}
             onClick={() => setActiveCategory(category)}
           >
@@ -108,9 +109,25 @@ export function Catalog({
             template.palettes[0];
 
           return (
-            <article key={`${template.templateKey}-${template.templateVersion}`} className="border border-stone-300 bg-white p-3">
+            <article
+              key={`${template.templateKey}-${template.templateVersion}`}
+              className="group relative flex flex-col overflow-hidden rounded-3xl bg-white p-3 shadow-[0_2px_10px_-4px_rgba(41,37,36,0.12)] transition-all duration-300 hover:-translate-y-1.5 hover:shadow-[0_35px_60px_-30px_rgba(41,37,36,0.35)]"
+              onMouseMove={(event) => {
+                const rect = event.currentTarget.getBoundingClientRect();
+                event.currentTarget.style.setProperty("--spot-x", `${event.clientX - rect.left}px`);
+                event.currentTarget.style.setProperty("--spot-y", `${event.clientY - rect.top}px`);
+              }}
+            >
               <div
-                className={`template-thumbnail template-thumbnail-${template.previewStyle} aspect-[4/5] p-5`}
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-0 z-10 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                style={{
+                  background:
+                    "radial-gradient(280px circle at var(--spot-x, 50%) var(--spot-y, 50%), rgba(180, 131, 61, 0.16), transparent 70%)",
+                }}
+              />
+              <div
+                className={`template-thumbnail template-thumbnail-${template.previewStyle} aspect-[4/5] overflow-hidden rounded-2xl p-5 transition-transform duration-500 group-hover:scale-[1.02]`}
                 style={{
                   backgroundColor: palette.tokens.canvas,
                   color: palette.tokens.ink,
@@ -123,12 +140,12 @@ export function Catalog({
                 <span className="template-thumbnail-mark">{template.name.slice(0, 1)}</span>
                 <span className="template-thumbnail-copy">{template.category}</span>
               </div>
-              <div className="px-2 pb-2 pt-5">
+              <div className="flex flex-1 flex-col px-2 pt-5 pb-2">
                 <p className="text-xs font-semibold tracking-[0.15em] text-stone-500 uppercase">
                   {template.category}
                 </p>
                 {isRecommended && (
-                  <p className="mt-2 inline-block bg-amber-900 px-2 py-1 text-xs font-semibold text-amber-50">
+                  <p className="mt-2 inline-block w-fit rounded-full bg-amber-900 px-3 py-1 text-xs font-semibold text-amber-50">
                     Cocok untukmu
                   </p>
                 )}
@@ -137,13 +154,14 @@ export function Catalog({
                   <p className="mt-1 text-xs text-amber-900">{bestMatch.reasons.join(", ")}</p>
                 )}
                 <p className="mt-3 min-h-12 text-sm leading-6 text-stone-600">{template.description}</p>
+                <div className="flex-1" />
                 <p className="mt-5 border-t border-stone-200 pt-4 text-sm font-semibold text-stone-900">
                   Mulai {formatRupiah(template.priceInRupiah)}
                 </p>
                 <div className="mt-5 grid gap-2 sm:grid-cols-2">
                   <Link
                     href={`/templates/${template.slug}`}
-                    className="inline-flex min-h-11 items-center justify-center border border-stone-900 px-3 text-center text-sm font-semibold text-stone-900 transition-colors hover:bg-stone-900 hover:text-stone-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-900"
+                    className="inline-flex min-h-11 items-center justify-center rounded-full border border-stone-900 px-3 text-center text-sm font-semibold text-stone-900 transition-colors hover:bg-stone-900 hover:text-stone-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-900"
                   >
                     Preview
                   </Link>
@@ -152,7 +170,7 @@ export function Catalog({
                     canonicalUrl={`${canonicalOrigin}/templates/${template.slug}`}
                     template={template}
                     palette={palette}
-                    className="inline-flex min-h-11 items-center justify-center bg-stone-900 px-3 text-center text-sm font-semibold text-stone-50 transition-colors hover:bg-amber-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-900"
+                    className="inline-flex min-h-11 items-center justify-center rounded-full bg-stone-900 px-3 text-center text-sm font-semibold text-stone-50 transition-colors hover:bg-amber-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-900"
                   />
                 </div>
               </div>

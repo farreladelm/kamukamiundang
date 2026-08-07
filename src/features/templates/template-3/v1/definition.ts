@@ -68,12 +68,12 @@ export const templateThreeV1: TemplateRuntimeManifest = {
       ],
       gallery: {
         photos: [
-          { id: "svara-01", alt: "Svara dan Raka di kebun", tone: "leaf" },
-          { id: "svara-02", alt: "Svara dan Raka membaca bersama", tone: "sand" },
-          { id: "svara-03", alt: "Potret pasangan di antara bunga", tone: "rose" },
-          { id: "svara-04", alt: "Momen hangat Svara dan Raka", tone: "leaf" },
-          { id: "svara-05", alt: "Detail meja pernikahan", tone: "sand" },
-          { id: "svara-06", alt: "Svara dan Raka tersenyum", tone: "night" },
+          { id: "svara-01", alt: "Svara dan Raka di kebun", tone: "leaf", src: "/images/stock/taman-2.jpg" },
+          { id: "svara-02", alt: "Svara dan Raka membaca bersama", tone: "sand", src: "/images/stock/taman-1.jpg" },
+          { id: "svara-03", alt: "Potret pasangan di antara bunga", tone: "rose", src: "/images/stock/taman-4.jpg" },
+          { id: "svara-04", alt: "Momen hangat Svara dan Raka", tone: "leaf", src: "/images/stock/taman-2.jpg" },
+          { id: "svara-05", alt: "Detail meja pernikahan", tone: "sand", src: "/images/stock/taman-3.jpg" },
+          { id: "svara-06", alt: "Svara dan Raka tersenyum", tone: "night", src: "/images/stock/taman-4.jpg" },
         ],
       },
       story: {
@@ -82,12 +82,12 @@ export const templateThreeV1: TemplateRuntimeManifest = {
           {
             title: "Di antara buku",
             text: "Kami bertemu di antara tumpukan buku dan kopi sore, lalu menemukan bahwa percakapan paling baik selalu memberi ruang untuk bertumbuh.",
-            photo: { id: "svara-story-01", alt: "Svara dan Raka membaca buku", tone: "sand" },
+            photo: { id: "svara-story-01", alt: "Svara dan Raka membaca buku", tone: "sand", src: "/images/stock/taman-1.jpg" },
           },
           {
             title: "Tumbuh bersama",
             text: "Hari-hari sederhana menjadi tempat kami belajar mendengar, memaafkan, dan memilih satu sama lain.",
-            photo: { id: "svara-story-02", alt: "Svara dan Raka berjalan di taman", tone: "leaf" },
+            photo: { id: "svara-story-02", alt: "Svara dan Raka berjalan di taman", tone: "leaf", src: "/images/stock/taman-2.jpg" },
           },
         ],
       },
@@ -105,7 +105,7 @@ export const templateThreeV1: TemplateRuntimeManifest = {
         entries: [{ name: "Dita", message: "Semoga rumah baru kalian selalu dipenuhi cahaya dan ruang untuk bertumbuh." }],
       },
       closing: "Terima kasih telah merawat doa baik untuk hari baru kami.",
-      branding: "Undangan oleh Undango",
+      branding: "Undangan oleh kamukamiundang",
     },
   },
   renderer: TemplateThreeRenderer,

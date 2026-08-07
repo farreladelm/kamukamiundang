@@ -33,6 +33,9 @@ export const templateCategoryBootstrap: readonly TemplateCategoryBootstrap[] = [
   { key: "klasik", name: "Klasik", displayOrder: 10, isActive: true },
   { key: "modern", name: "Modern", displayOrder: 20, isActive: true },
   { key: "botanical", name: "Botanical", displayOrder: 30, isActive: true },
+  { key: "islami", name: "Islami", displayOrder: 40, isActive: true },
+  { key: "elegant", name: "Elegant", displayOrder: 50, isActive: true },
+  { key: "minimalis", name: "Minimalis", displayOrder: 60, isActive: true },
 ];
 
 export const templateCatalogBootstrap: readonly TemplateCatalogBootstrap[] = [
@@ -68,6 +71,39 @@ export const templateCatalogBootstrap: readonly TemplateCatalogBootstrap[] = [
     priceInRupiah: 750000,
     marketingThumbnail: null,
     displayOrder: 30,
+  },
+  {
+    templateKey: "template-4",
+    templateVersion: 1,
+    slug: "cahaya-hati",
+    name: "Cahaya Hati",
+    categoryKey: "islami",
+    description: "Islami yang tenang, dengan lengkung mihrab dan sentuhan emas yang menenangkan.",
+    priceInRupiah: 700000,
+    marketingThumbnail: null,
+    displayOrder: 40,
+  },
+  {
+    templateKey: "template-5",
+    templateVersion: 1,
+    slug: "ratri-kirana",
+    name: "Ratri Kirana",
+    categoryKey: "elegant",
+    description: "Mewah dan senyap, permainan emas di atas gelap untuk perayaan yang berkesan.",
+    priceInRupiah: 950000,
+    marketingThumbnail: null,
+    displayOrder: 50,
+  },
+  {
+    templateKey: "template-6",
+    templateVersion: 1,
+    slug: "alinea-baru",
+    name: "Alinea Baru",
+    categoryKey: "minimalis",
+    description: "Minimalis dan lega, tipografi bersih untuk pasangan yang percaya less is more.",
+    priceInRupiah: 680000,
+    marketingThumbnail: null,
+    displayOrder: 60,
   },
 ];
 
