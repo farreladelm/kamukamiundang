@@ -45,3 +45,5 @@ next-env.d.ts
 # local agent tooling (not part of the project)
 .claude/
 dev-*.log
+.opencode/
+/AGENTS.md
