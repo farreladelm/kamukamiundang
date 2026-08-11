@@ -18,7 +18,7 @@ export default async function MagicLinkConfirmationPage({
   }
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-lg items-center px-6 py-12">
+    <main className="mx-auto flex min-h-dvh max-w-lg items-center px-6 py-12">
       <section className="w-full border border-stone-300 bg-white p-8 shadow-sm">
         <p className="text-xs font-semibold tracking-[0.18em] text-stone-500 uppercase">Akses privat</p>
         <h1 className="mt-3 font-serif text-4xl text-stone-900">Buka workspace undangan</h1>

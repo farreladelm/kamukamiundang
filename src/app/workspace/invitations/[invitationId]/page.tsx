@@ -16,7 +16,7 @@ export default async function CustomerInvitationWorkspacePage({
   }
 
   return (
-    <main className="mx-auto min-h-screen max-w-4xl px-5 py-10 sm:px-8">
+    <main className="mx-auto min-h-dvh max-w-4xl px-5 py-10 sm:px-8">
       <p className="text-xs font-semibold tracking-[0.18em] text-stone-500 uppercase">Workspace customer</p>
       <h1 className="mt-3 font-serif text-5xl">Isi invitation</h1>
       <p className="mt-4 text-sm text-stone-600">{invitation.templateKey} v{invitation.templateVersion} · akses editing aktif.</p>

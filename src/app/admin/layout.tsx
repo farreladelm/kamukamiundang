@@ -12,7 +12,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   return (
     <AdminToastProvider>
-      <div className="min-h-screen bg-stone-100 text-stone-900">
+      <div className="min-h-dvh bg-stone-100 text-stone-900">
       <AdminNav email={actor.admin.email} />
       <main className="mx-auto max-w-6xl px-5 py-8 sm:px-8">{children}</main>
       </div>
