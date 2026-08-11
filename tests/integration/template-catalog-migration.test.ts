@@ -30,8 +30,19 @@ function splitSqlStatements(sql: string): string[] {
   return statements;
 }
 
+async function deleteFixtureCatalog(templateKey: string) {
+  const catalog = await db.templateCatalog.findUnique({
+    where: { templateKey_templateVersion: { templateKey, templateVersion: 1 } },
+    select: { id: true },
+  });
+  if (!catalog) return;
+
+  await db.templateSlugAlias.deleteMany({ where: { templateCatalogId: catalog.id } });
+  await db.templateCatalog.delete({ where: { id: catalog.id } });
+}
+
 beforeEach(async () => {
-  await db.templateCatalog.deleteMany({ where: { templateKey: "template-4" } });
+  await deleteFixtureCatalog("fixture-template-collision");
   const retired = await db.templateCatalog.findUnique({
     where: { templateKey_templateVersion: { templateKey: "retired-runtime", templateVersion: 1 } },
     select: { id: true },
@@ -67,7 +78,7 @@ beforeEach(async () => {
 });
 
 afterEach(async () => {
-  await db.templateCatalog.deleteMany({ where: { templateKey: "template-4" } });
+  await deleteFixtureCatalog("fixture-template-collision");
   await db.templateSlugAlias.deleteMany({
     where: { slug: { in: ["historical-slug", "current-alias-one", "current-alias-two"] } },
   });
@@ -94,10 +105,10 @@ afterEach(async () => {
 
 describe("template catalog migration foundation", () => {
   it("preserves launch metadata and effective visibility for all three templates", async () => {
-    const templates = await db.templateCatalog.findMany({
+    const templates = (await db.templateCatalog.findMany({
       orderBy: { displayOrder: "asc" },
       include: { category: true, slugAliases: true },
-    });
+    })).filter((template) => ["template-1", "template-2", "template-3"].includes(template.templateKey));
 
     expect(templates).toMatchObject([
       {
@@ -211,7 +222,7 @@ describe("template catalog migration foundation", () => {
     await expect(
       db.templateCatalog.create({
         data: {
-          templateKey: "template-4",
+          templateKey: "fixture-template-collision",
           templateVersion: 1,
           slug: "historical-slug",
           name: "Collision",
