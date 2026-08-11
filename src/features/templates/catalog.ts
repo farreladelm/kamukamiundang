@@ -8,6 +8,13 @@ import type {
   TemplateRuntimeManifest,
 } from "./types";
 
+export {
+  findTemplateRuntimeReferenceDrift,
+  getRuntimeReferenceContracts,
+  type RuntimeReferenceContract,
+  type TemplateRuntimeReference,
+} from "./runtime-reference-contracts";
+
 export type TemplateCatalogDatabaseRecord = {
   id: string;
   templateKey: string;
@@ -41,10 +48,6 @@ export type UnavailableCatalog = {
 };
 
 export type ResolvedTemplateCatalog = TemplateCatalogItem;
-
-function identity(templateKey: string, templateVersion: number): string {
-  return `${templateKey}:${templateVersion}`;
-}
 
 function unavailable(
   reason: UnavailableCatalog["reason"],
@@ -233,63 +236,4 @@ export async function listTemplateCategoryNamesWithClient(
 
 export async function listTemplateCategoryNames(): Promise<string[]> {
   return listTemplateCategoryNamesWithClient(db as unknown as CatalogClient);
-}
-
-export type TemplateRuntimeReference = {
-  source: "order" | "invitation" | "publishedSnapshot";
-  id: string;
-  templateKey: string;
-  templateVersion: number;
-  contentSchemaVersion: number;
-  paletteKey: string;
-};
-
-export type RuntimeReferenceContract = {
-  templateKey: string;
-  templateVersion: number;
-  contentSchemaVersion: number;
-  paletteKeys: readonly string[];
-};
-
-export function findTemplateRuntimeReferenceDrift(
-  references: readonly TemplateRuntimeReference[],
-  runtimes: readonly RuntimeReferenceContract[],
-): string[] {
-  const runtimeMap = new Map(
-    runtimes.map((runtime) => [identity(runtime.templateKey, runtime.templateVersion), runtime]),
-  );
-  const drift: string[] = [];
-
-  for (const reference of references) {
-    const runtime = runtimeMap.get(identity(reference.templateKey, reference.templateVersion));
-    if (!runtime) {
-      drift.push(
-        `missing:${reference.source}:${reference.id}:${identity(reference.templateKey, reference.templateVersion)}`,
-      );
-      continue;
-    }
-
-    if (
-      runtime.contentSchemaVersion !== reference.contentSchemaVersion ||
-      !runtime.paletteKeys.includes(reference.paletteKey)
-    ) {
-      const mismatch = runtime.contentSchemaVersion !== reference.contentSchemaVersion
-        ? "schema"
-        : "palette";
-      drift.push(
-        `incompatible:${reference.source}:${reference.id}:${identity(reference.templateKey, reference.templateVersion)}:${mismatch}`,
-      );
-    }
-  }
-
-  return drift;
-}
-
-export function getRuntimeReferenceContracts(): RuntimeReferenceContract[] {
-  return templateRegistry.map((runtime) => ({
-    templateKey: runtime.templateKey,
-    templateVersion: runtime.templateVersion,
-    contentSchemaVersion: runtime.contentSchemaVersion,
-    paletteKeys: runtime.palettes.map((palette) => palette.key),
-  }));
 }
