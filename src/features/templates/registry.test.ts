@@ -6,11 +6,11 @@ import {
 } from "@/features/templates/registry";
 
 describe("templateRegistry", () => {
-  it("keeps three launch concepts versioned with stable palettes and renderers", () => {
-    expect(templateRegistry).toHaveLength(3);
+  it("keeps six launch concepts versioned with stable palettes and renderers", () => {
+    expect(templateRegistry).toHaveLength(6);
 
     for (const template of templateRegistry) {
-      expect(template.templateKey).toMatch(/^template-[1-3]$/);
+      expect(template.templateKey).toMatch(/^template-[1-6]$/);
       expect(template.templateVersion).toBe(1);
       expect(template.contentSchemaVersion).toBe(2);
       expect(template.palettes).toHaveLength(3);
