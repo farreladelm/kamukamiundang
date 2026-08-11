@@ -15,14 +15,20 @@ export function ShowroomExperience({
   const [match, setMatch] = useState<AiMatchResponse | null>(null);
 
   return (
-    <>
-      <AiMatchBox onMatched={setMatch} />
-      {match?.source === "fallback" && (
-        <p role="status" className="mx-auto max-w-3xl px-5 pb-6 text-xs leading-relaxed text-amber-900 sm:px-8">
-          Pakai mode sederhana — hasilnya mungkin kurang presisi.
-        </p>
-      )}
-      <Catalog templates={templates} canonicalOrigin={canonicalOrigin} matchResults={match?.results} />
-    </>
+    <Catalog
+      templates={templates}
+      canonicalOrigin={canonicalOrigin}
+      matchResults={match?.results}
+      afterIntro={
+        <>
+          <AiMatchBox onMatched={setMatch} />
+          {match?.source === "fallback" && (
+            <p role="status" className="mt-2 text-xs leading-relaxed text-amber-900">
+              Pakai mode sederhana — hasilnya mungkin kurang presisi.
+            </p>
+          )}
+        </>
+      }
+    />
   );
 }
