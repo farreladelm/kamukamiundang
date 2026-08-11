@@ -1,4 +1,14 @@
 import { headers } from "next/headers";
+import { Navbar } from "@/components/site/navbar";
+import { Footer } from "@/components/site/footer";
+import { InvitationPhone } from "@/components/site/invitation-phone";
+import { StatsStrip } from "@/components/site/stats-strip";
+import { BentoFeatures } from "@/components/site/bento-features";
+import { HowItWorks } from "@/components/site/how-it-works";
+import { Comparison } from "@/components/site/comparison";
+import { SocialProof } from "@/components/site/social-proof";
+import { Faq } from "@/components/site/faq";
+import { Reveal } from "@/components/motion/reveal";
 import { ShowroomExperience } from "@/features/showroom/showroom-experience";
 import { getVisibleTemplateCatalogFromDatabase } from "@/features/templates/visibility";
 
@@ -9,38 +19,63 @@ export default async function ShowroomPage() {
   const protocol = requestHeaders.get("x-forwarded-proto") ?? "http";
 
   return (
-    <main className="bg-[#f7f4ed] text-stone-900">
-      <section className="mx-auto grid min-h-[42rem] max-w-6xl gap-10 px-5 py-10 sm:px-8 lg:grid-cols-[1.15fr_0.85fr] lg:items-center lg:py-16">
-        <div>
-          <p className="text-sm font-semibold tracking-[0.18em] text-stone-600 uppercase">Undango / Undangan digital</p>
-          <h1 className="mt-7 max-w-3xl font-serif text-5xl leading-[0.94] sm:text-7xl lg:text-8xl">
-            Dirancang untuk hari yang ingin selalu diingat.
-          </h1>
-          <p className="mt-8 max-w-xl text-lg leading-8 text-stone-700">
-            Pilih undangan pernikahan yang terasa personal, lalu isi ceritanya tanpa perlu mendesain dari nol.
-          </p>
-          <a
-            href="#koleksi"
-            className="mt-9 inline-flex border-b-2 border-stone-900 pb-2 text-sm font-semibold tracking-[0.08em] uppercase transition-colors hover:border-amber-800 hover:text-amber-800 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-stone-900"
-          >
-            Lihat koleksi
-          </a>
-        </div>
-        <div className="relative mx-auto w-full max-w-md border border-stone-300 bg-[#e8ddc9] p-5 sm:p-7">
-          <div className="border border-stone-400 bg-[#f9f5ec] px-8 py-14 text-center sm:px-12 sm:py-20">
-            <p className="text-xs font-semibold tracking-[0.2em] text-amber-900 uppercase">Untuk kisah yang dimulai</p>
-            <div className="mx-auto mt-7 flex size-24 items-center justify-center rounded-full border border-amber-900 font-serif text-3xl italic text-amber-900 sm:size-28">
-              U
+    <div id="top" className="bg-[#f8f4ea] text-stone-900">
+      <div className="grain-overlay" aria-hidden="true" />
+      <Navbar />
+      <main>
+        <section className="mx-auto grid max-w-6xl gap-16 px-5 pt-14 pb-20 sm:px-8 sm:pt-20 sm:pb-28 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+          <Reveal>
+            <p className="text-sm font-semibold tracking-[0.18em] text-stone-600 uppercase">
+              kamukamiundang / Undangan digital
+            </p>
+            <h1 className="mt-7 max-w-xl text-5xl leading-[1.02] font-serif text-stone-900 sm:text-6xl lg:text-7xl">
+              <span className="text-amber-800 italic">Kami mengundang kamu.</span> Bukan basa-basi.
+            </h1>
+            <p className="mt-8 max-w-xl text-lg leading-8 text-stone-700">
+              kamukamiundang bantu kalian bikin undangan digital yang personal — mulai dari cerita,
+              galeri, sampai RSVP — biar tamu yang buka linknya beneran ngerasa diundang, bukan
+              cuma di-forward.
+            </p>
+            <div className="mt-9 flex flex-wrap items-center gap-6">
+              <a
+                href="#koleksi"
+                className="inline-flex min-h-12 items-center justify-center rounded-full bg-stone-900 px-7 text-sm font-semibold tracking-[0.03em] text-stone-50 transition-transform hover:-translate-y-0.5 hover:bg-amber-900 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-stone-900 active:translate-y-0"
+              >
+                Lihat koleksi
+              </a>
+              <a
+                href="#cara-kerja"
+                className="inline-flex items-center gap-2 border-b-2 border-stone-900/30 pb-1 text-sm font-semibold tracking-[0.03em] text-stone-700 transition-colors hover:border-stone-900 hover:text-stone-950"
+              >
+                Lihat cara kerjanya
+              </a>
             </div>
-            <p className="mt-8 font-serif text-4xl leading-tight">Sederhana, hangat, dan milik kalian.</p>
-            <div className="mx-auto mt-8 h-px w-16 bg-amber-900" />
-            <p className="mt-5 text-sm leading-6 text-stone-600">Tiga konsep. Palet terkurasi. Siap dibagikan.</p>
-          </div>
+            <p className="mt-12 text-xs font-medium tracking-[0.14em] text-stone-500 uppercase">
+              Dipakai pasangan di Yogyakarta &middot; Bandung &middot; Solo &middot; Purwokerto
+            </p>
+          </Reveal>
+          <Reveal delay={0.15}>
+            <InvitationPhone />
+          </Reveal>
+        </section>
+
+        <StatsStrip />
+
+        <BentoFeatures />
+
+        <HowItWorks />
+
+        <div id="koleksi" className="scroll-mt-20">
+          <ShowroomExperience templates={templates} canonicalOrigin={`${protocol}://${host}`} />
         </div>
-      </section>
-      <div id="koleksi">
-        <ShowroomExperience templates={templates} canonicalOrigin={`${protocol}://${host}`} />
-      </div>
-    </main>
+
+        <Comparison />
+
+        <SocialProof />
+
+        <Faq />
+      </main>
+      <Footer />
+    </div>
   );
 }
