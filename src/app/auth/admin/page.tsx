@@ -9,9 +9,9 @@ export default async function AdminLoginPage({
   const initialError = reason === "session-expired" ? "Sesi admin berakhir. Silakan masuk lagi." : "";
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-md items-center px-6 py-12">
+    <main className="mx-auto flex min-h-dvh max-w-md items-center px-6 py-12">
       <section className="w-full border border-stone-300 bg-white p-8 shadow-sm">
-        <p className="text-xs font-semibold tracking-[0.18em] text-stone-500 uppercase">Undango admin</p>
+        <p className="text-xs font-semibold tracking-[0.18em] text-stone-500 uppercase">kamukamiundang admin</p>
         <h1 className="mt-3 font-serif text-4xl text-stone-900">Masuk dashboard</h1>
         <AdminLoginForm initialError={initialError} />
       </section>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import type {
   TemplateContentViewModel,
   TemplatePalette,
@@ -8,7 +9,7 @@ import type {
 } from "@/features/templates/types";
 import { rsvpDemoSchema, wishDemoSchema } from "@/features/forms/schemas";
 
-type InvitationVariant = "classic" | "coast" | "garden";
+type InvitationVariant = "classic" | "coast" | "garden" | "crescent" | "noir" | "line";
 
 type InvitationExperienceProps = {
   content: TemplateContentViewModel;
@@ -27,6 +28,20 @@ const toneColors: Record<TemplatePhoto["tone"], string> = {
 };
 
 function PlaceholderPhoto({ photo, palette }: { photo: TemplatePhoto; palette: TemplatePalette }) {
+  if (photo.src) {
+    return (
+      <div className="relative min-h-40 overflow-hidden">
+        <Image
+          src={photo.src}
+          alt={photo.alt}
+          fill
+          sizes="(min-width: 640px) 240px, 50vw"
+          className="object-cover"
+        />
+      </div>
+    );
+  }
+
   return (
     <div
       role="img"

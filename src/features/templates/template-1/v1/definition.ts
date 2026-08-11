@@ -91,12 +91,12 @@ export const templateOneV1: TemplateRuntimeManifest = {
       gallery: {
         videoLabel: "Putar film kecil kami",
         photos: [
-          { id: "aruna-01", alt: "Potret Aruna dan Bima di taman", tone: "leaf" },
-          { id: "aruna-02", alt: "Aruna dan Bima berjalan bersama", tone: "sand" },
-          { id: "aruna-03", alt: "Momen hangat Aruna dan Bima", tone: "rose" },
-          { id: "aruna-04", alt: "Potret pasangan di sore hari", tone: "sky" },
-          { id: "aruna-05", alt: "Aruna dan Bima tersenyum", tone: "night" },
-          { id: "aruna-06", alt: "Detail bunga dan cincin pernikahan", tone: "sand" },
+          { id: "aruna-01", alt: "Potret Aruna dan Bima di taman", tone: "leaf", src: "/images/stock/larasati-1.jpg" },
+          { id: "aruna-02", alt: "Aruna dan Bima berjalan bersama", tone: "sand", src: "/images/stock/larasati-2.jpg" },
+          { id: "aruna-03", alt: "Momen hangat Aruna dan Bima", tone: "rose", src: "/images/stock/larasati-3.jpg" },
+          { id: "aruna-04", alt: "Potret pasangan di sore hari", tone: "sky", src: "/images/stock/larasati-1.jpg" },
+          { id: "aruna-05", alt: "Aruna dan Bima tersenyum", tone: "night", src: "/images/stock/larasati-2.jpg" },
+          { id: "aruna-06", alt: "Detail bunga dan cincin pernikahan", tone: "sand", src: "/images/stock/larasati-4.jpg" },
         ],
       },
       story: {
@@ -105,12 +105,12 @@ export const templateOneV1: TemplateRuntimeManifest = {
           {
             title: "Pertama bertemu",
             text: "Kami dipertemukan oleh sore-sore panjang di kampus, lalu belajar bahwa pulang paling baik adalah berjalan beriringan.",
-            photo: { id: "aruna-story-01", alt: "Aruna dan Bima saat pertama bertemu", tone: "sand" },
+            photo: { id: "aruna-story-01", alt: "Aruna dan Bima saat pertama bertemu", tone: "sand", src: "/images/stock/larasati-3.jpg" },
           },
           {
             title: "Memilih bersama",
             text: "Dari percakapan sederhana, tumbuh keyakinan untuk saling menjaga dalam setiap musim.",
-            photo: { id: "aruna-story-02", alt: "Aruna dan Bima menikmati hari bersama", tone: "rose" },
+            photo: { id: "aruna-story-02", alt: "Aruna dan Bima menikmati hari bersama", tone: "rose", src: "/images/stock/larasati-2.jpg" },
           },
         ],
       },
@@ -124,7 +124,7 @@ export const templateOneV1: TemplateRuntimeManifest = {
         entries: [{ name: "Keluarga Prameswari", message: "Selamat menempuh hidup baru. Semoga selalu penuh kasih." }],
       },
       closing: "Merupakan kehormatan bagi kami apabila Anda berkenan hadir.",
-      branding: "Undangan oleh Undango",
+      branding: "Undangan oleh kamukamiundang",
     },
   },
   renderer: TemplateOneRenderer,

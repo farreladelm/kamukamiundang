@@ -23,6 +23,17 @@ export function TemplateDetail({
   const selectedPalette = template.palettes.find((palette) => palette.key === paletteKey)!;
 
   useEffect(() => {
+    if (!isPaletteOpen) return;
+
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") setIsPaletteOpen(false);
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isPaletteOpen]);
+
+  useEffect(() => {
     void fetch("/api/analytics/events", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -51,8 +62,8 @@ export function TemplateDetail({
   }
 
   return (
-    <main className="min-h-screen bg-stone-950 text-stone-900">
-      <div className="mx-auto flex min-h-screen max-w-[120rem] flex-col lg:h-screen lg:flex-row lg:overflow-hidden">
+    <main className="min-h-dvh bg-stone-950 text-stone-900">
+      <div className="mx-auto flex min-h-dvh max-w-[120rem] flex-col lg:h-screen lg:flex-row lg:overflow-hidden">
         <section
           data-testid="preview-cover"
           className="relative hidden min-h-[35rem] flex-1 flex-col justify-between overflow-hidden p-6 sm:p-10 lg:sticky lg:top-0 lg:flex lg:h-screen lg:min-h-0 lg:p-16"
@@ -123,9 +134,17 @@ export function TemplateDetail({
             aria-label="Pilihan palet"
             className="absolute right-0 bottom-16 w-56 border border-stone-200 bg-white p-3 text-stone-900 shadow-2xl"
           >
-            <p className="px-2 pb-2 text-xs font-semibold tracking-[0.16em] text-stone-500 uppercase">
-              Pilih palet
-            </p>
+            <div className="flex items-center justify-between px-2 pb-2">
+              <p className="text-xs font-semibold tracking-[0.16em] text-stone-500 uppercase">Pilih palet</p>
+              <button
+                type="button"
+                aria-label="Tutup pilihan palet"
+                className="flex size-6 items-center justify-center rounded-full text-stone-500 transition-colors hover:bg-stone-100 hover:text-stone-900 focus-visible:outline-2 focus-visible:outline-offset-1 focus-visible:outline-stone-900"
+                onClick={() => setIsPaletteOpen(false)}
+              >
+                <span aria-hidden="true" className="text-base leading-none">×</span>
+              </button>
+            </div>
             <div className="grid gap-1">
               {template.palettes.map((palette) => (
                 <button
