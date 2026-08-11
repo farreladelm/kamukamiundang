@@ -7,9 +7,9 @@ import type { TemplateCatalogItem } from "@/features/templates/types";
 const templates: TemplateCatalogItem[] = templateRegistry.map((template, index) => ({
   templateKey: template.templateKey,
   templateVersion: template.templateVersion,
-  slug: ["larasati", "pesisir-senja", "taman-aksara"][index],
-  name: ["Larasati", "Pesisir Senja", "Taman Aksara"][index],
-  category: ["Klasik", "Modern", "Botanical"][index],
+  slug: ["larasati", "pesisir-senja", "taman-aksara", "cahaya-hati", "ratri-kirana", "alinea-baru"][index],
+  name: ["Larasati", "Pesisir Senja", "Taman Aksara", "Cahaya Hati", "Ratri Kirana", "Alinea Baru"][index],
+  category: ["Klasik", "Modern", "Botanical", "Islami", "Elegant", "Minimalis"][index],
   description: "Deskripsi katalog",
   priceInRupiah: 650000,
   marketingThumbnail: null,
