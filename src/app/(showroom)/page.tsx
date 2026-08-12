@@ -31,9 +31,9 @@ export default async function ShowroomPage() {
             <h1 className="mt-7 max-w-xl text-5xl leading-[1.02] font-serif text-stone-900 sm:text-6xl lg:text-7xl">
               <span className="text-amber-800 italic">Kami mengundang kamu.</span> Bukan basa-basi.
             </h1>
-            <p className="mt-8 max-w-xl text-lg leading-8 text-stone-700">
-              kamukamiundang bantu kalian bikin undangan digital yang personal — mulai dari cerita,
-              galeri, sampai RSVP — biar tamu yang buka linknya beneran ngerasa diundang, bukan
+            <p className="mt-8 max-w-xl text-lg leading-8 text-stone-700 first-letter:mr-1 first-letter:float-left first-letter:font-serif first-letter:text-6xl first-letter:leading-[0.85] first-letter:text-amber-800">
+              kamukamiundang bantu kalian bikin undangan digital yang personal, mulai dari cerita,
+              galeri, sampai RSVP. Biar tamu yang buka linknya beneran ngerasa diundang, bukan
               cuma di-forward.
             </p>
             <div className="mt-9 flex flex-wrap items-center gap-6">
