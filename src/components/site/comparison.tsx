@@ -20,19 +20,27 @@ export function Comparison() {
         </Reveal>
 
         <Reveal delay={0.1} className="mt-10 overflow-hidden rounded-3xl bg-white shadow-[0_2px_10px_-4px_rgba(41,37,36,0.1)]">
-          <div className="grid grid-cols-[1fr_1fr_1fr] border-b border-stone-900/10 text-xs font-semibold tracking-[0.12em] uppercase sm:grid-cols-[1.1fr_1fr_1fr]">
-            <div className="px-5 py-4 text-stone-500 sm:px-7">&nbsp;</div>
-            <div className="px-5 py-4 text-stone-500 sm:px-7">Cara lama</div>
-            <div className="bg-stone-900 px-5 py-4 text-amber-400 sm:px-7">kamukamiundang</div>
+          <div className="hidden border-b border-stone-900/10 text-xs font-semibold tracking-[0.12em] uppercase sm:grid sm:grid-cols-[1.1fr_1fr_1fr]">
+            <div className="px-7 py-4 text-stone-500">&nbsp;</div>
+            <div className="px-7 py-4 text-stone-500">Cara lama</div>
+            <div className="bg-stone-900 px-7 py-4 text-amber-400">kamukamiundang</div>
           </div>
           {rows.map((row) => (
             <div
               key={row.label}
-              className="grid grid-cols-[1fr_1fr_1fr] border-b border-stone-900/10 text-sm last:border-b-0 sm:grid-cols-[1.1fr_1fr_1fr]"
+              className="grid grid-cols-1 gap-3 border-b border-stone-900/10 px-5 py-5 text-sm last:border-b-0 sm:grid-cols-[1.1fr_1fr_1fr] sm:items-center sm:gap-0 sm:px-0 sm:py-0"
             >
-              <div className="px-5 py-5 font-semibold text-stone-900 sm:px-7">{row.label}</div>
-              <div className="px-5 py-5 leading-6 text-stone-500 sm:px-7">{row.old}</div>
-              <div className="bg-stone-900/[0.03] px-5 py-5 leading-6 font-medium text-stone-800 sm:px-7">
+              <div className="font-semibold text-stone-900 sm:px-7 sm:py-5">{row.label}</div>
+              <div className="leading-6 text-stone-500 sm:px-7 sm:py-5">
+                <span className="mr-2 text-xs font-semibold tracking-[0.1em] text-stone-400 uppercase sm:hidden">
+                  Cara lama:
+                </span>
+                {row.old}
+              </div>
+              <div className="leading-6 font-medium text-stone-800 sm:bg-stone-900/[0.03] sm:px-7 sm:py-5">
+                <span className="mr-2 text-xs font-semibold tracking-[0.1em] text-amber-800 uppercase sm:hidden">
+                  kamukamiundang:
+                </span>
                 {row.ours}
               </div>
             </div>
