@@ -24,7 +24,7 @@ export function ShowroomExperience({
           <AiMatchBox onMatched={setMatch} />
           {match?.source === "fallback" && (
             <p role="status" className="mt-2 text-xs leading-relaxed text-amber-900">
-              Pakai mode sederhana — hasilnya mungkin kurang presisi.
+              Pakai mode sederhana, hasilnya mungkin kurang presisi.
             </p>
           )}
         </>

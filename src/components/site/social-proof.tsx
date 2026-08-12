@@ -38,7 +38,7 @@ export function SocialProof() {
         <div className="mt-14 grid gap-6 sm:grid-cols-3">
           {stories.map((story, index) => (
             <Reveal key={story.name} delay={index * 0.1} className={story.offset}>
-              <figure className="flex h-full flex-col rounded-3xl bg-white/80 p-7 shadow-[0_25px_50px_-30px_rgba(41,37,36,0.25)]">
+              <figure className="flex h-full flex-col rounded-3xl bg-white/80 p-7 shadow-[0_25px_50px_-30px_rgba(41,37,36,0.25)] transition-transform duration-300 hover:-translate-y-1">
                 <blockquote className="flex-1 font-serif text-lg leading-relaxed text-stone-800 italic">
                   “{story.quote}”
                 </blockquote>
