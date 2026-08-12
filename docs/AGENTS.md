@@ -40,6 +40,26 @@ truth.
 - Preserve existing design language and responsive behavior. Main flows must
   work from 360px mobile widths through modern desktop.
 
+## Design/UI Direction
+
+This is a customer-facing wedding-invitation SaaS — the showroom, template
+previews, and published invitations are the product. "Look modern and
+premium" is a standing requirement on that surface, not optional flair to
+skip under Scope Discipline below.
+
+- Before touching CSS or markup for looks on `(showroom)`, `templates/[slug]`,
+  or `i/[slug]` routes, load `ui-ux-pro-max:ui-ux-pro-max` first (styles,
+  palettes, font pairings, motion presets) to pick a deliberate direction,
+  then `impeccable` or `design-taste-frontend` for the critique/polish pass —
+  don't freehand style choices.
+- Use Framer Motion deliberately for entrance/scroll/hover motion on
+  public-facing pages — it's an installed dependency for exactly this, not
+  dead weight.
+- Admin/dashboard screens (`/admin/*`, `/workspace/*`) can stay plainer and
+  utilitarian; the design bar above applies to what a customer or guest sees.
+- Preserve one coherent design system per surface — consolidate/refactor
+  styles you touch instead of only appending one-off tweaks.
+
 ## Routing Map
 
 Routes use Next.js App Router under `src/app/`. Folders in parentheses are
