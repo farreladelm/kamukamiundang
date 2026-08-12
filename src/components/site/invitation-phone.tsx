@@ -42,7 +42,7 @@ export function InvitationPhone() {
             <p className="text-[0.65rem] leading-5 text-stone-600">
               Sabtu, 14 Februari 2027
               <br />
-              Yogyakarta
+              Indonesia
             </p>
             <div className="h-px w-10 bg-amber-800/60" />
             <div className="w-full space-y-2 rounded-2xl bg-white/70 p-3 text-left">
