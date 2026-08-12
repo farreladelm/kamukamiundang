@@ -1,7 +1,7 @@
 import {
   findTemplateRuntimeReferenceDrift,
   getRuntimeReferenceContracts,
-} from "./catalog";
+} from "./runtime-reference-contracts";
 import { templateRegistry } from "./registry";
 import {
   getCatalogBootstrap,
