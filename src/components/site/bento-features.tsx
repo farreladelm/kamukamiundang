@@ -41,7 +41,7 @@ export function BentoFeatures() {
       </Reveal>
 
       <div className="mt-10 grid gap-4 sm:grid-cols-3 sm:grid-rows-2">
-        <Reveal className="rounded-3xl bg-white p-8 shadow-[0_2px_10px_-4px_rgba(41,37,36,0.1)] sm:col-span-2 sm:row-span-2">
+        <Reveal className="rounded-3xl bg-white p-8 shadow-[0_2px_10px_-4px_rgba(41,37,36,0.1)] transition-transform duration-300 hover:-translate-y-1 sm:col-span-2 sm:row-span-2">
           <MarkRing />
           <h3 className="mt-6 font-serif text-2xl text-stone-900">RSVP yang beneran kepakai</h3>
           <p className="mt-3 max-w-sm text-sm leading-6 text-stone-600">
@@ -59,7 +59,7 @@ export function BentoFeatures() {
           </div>
         </Reveal>
 
-        <Reveal delay={0.05} className="rounded-3xl bg-white p-7 shadow-[0_2px_10px_-4px_rgba(41,37,36,0.1)]">
+        <Reveal delay={0.05} className="rounded-3xl bg-white p-7 shadow-[0_2px_10px_-4px_rgba(41,37,36,0.1)] transition-transform duration-300 hover:-translate-y-1">
           <MarkDot />
           <h3 className="mt-5 font-serif text-xl text-stone-900">Galeri &amp; cerita</h3>
           <p className="mt-2 text-sm leading-6 text-stone-600">
@@ -67,7 +67,7 @@ export function BentoFeatures() {
           </p>
         </Reveal>
 
-        <Reveal delay={0.1} className="rounded-3xl bg-white p-7 shadow-[0_2px_10px_-4px_rgba(41,37,36,0.1)]">
+        <Reveal delay={0.1} className="rounded-3xl bg-white p-7 shadow-[0_2px_10px_-4px_rgba(41,37,36,0.1)] transition-transform duration-300 hover:-translate-y-1">
           <MarkLines />
           <h3 className="mt-5 font-serif text-xl text-stone-900">Ucapan &amp; doa</h3>
           <p className="mt-2 text-sm leading-6 text-stone-600">
@@ -75,7 +75,7 @@ export function BentoFeatures() {
           </p>
         </Reveal>
 
-        <Reveal delay={0.15} className="rounded-3xl bg-stone-900 p-7 text-stone-50 shadow-[0_2px_10px_-4px_rgba(41,37,36,0.25)]">
+        <Reveal delay={0.15} className="rounded-3xl bg-stone-900 p-7 text-stone-50 shadow-[0_2px_10px_-4px_rgba(41,37,36,0.25)] transition-transform duration-300 hover:-translate-y-1">
           <span aria-hidden="true" className="block text-lg font-serif text-amber-400">Rp</span>
           <h3 className="mt-5 font-serif text-xl">Amplop digital</h3>
           <p className="mt-2 text-sm leading-6 text-stone-300">
@@ -83,7 +83,7 @@ export function BentoFeatures() {
           </p>
         </Reveal>
 
-        <Reveal delay={0.2} className="rounded-3xl bg-white p-7 shadow-[0_2px_10px_-4px_rgba(41,37,36,0.1)]">
+        <Reveal delay={0.2} className="rounded-3xl bg-white p-7 shadow-[0_2px_10px_-4px_rgba(41,37,36,0.1)] transition-transform duration-300 hover:-translate-y-1">
           <MarkPin />
           <h3 className="mt-5 font-serif text-xl text-stone-900">Peta &amp; musik latar</h3>
           <p className="mt-2 text-sm leading-6 text-stone-600">

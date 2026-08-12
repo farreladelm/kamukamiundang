@@ -28,7 +28,7 @@ export function Comparison() {
           {rows.map((row) => (
             <div
               key={row.label}
-              className="grid grid-cols-[1fr_1fr_1fr] border-b border-stone-900/10 text-sm last:border-b-0 sm:grid-cols-[1.1fr_1fr_1fr]"
+              className="grid grid-cols-[1fr_1fr_1fr] border-b border-stone-900/10 text-sm transition-colors duration-200 last:border-b-0 hover:bg-stone-900/[0.02] sm:grid-cols-[1.1fr_1fr_1fr]"
             >
               <div className="px-5 py-5 font-semibold text-stone-900 sm:px-7">{row.label}</div>
               <div className="px-5 py-5 leading-6 text-stone-500 sm:px-7">{row.old}</div>
