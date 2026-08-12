@@ -26,7 +26,7 @@ export default async function ShowroomPage() {
         <section className="mx-auto grid max-w-6xl gap-16 px-5 pt-14 pb-20 sm:px-8 sm:pt-20 sm:pb-28 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
           <Reveal>
             <p className="text-sm font-semibold tracking-[0.18em] text-stone-600 uppercase">
-              kamukamiundang / Undangan digital
+              kamukamiundang
             </p>
             <h1 className="mt-7 max-w-xl text-5xl leading-[1.02] font-serif text-stone-900 sm:text-6xl lg:text-7xl">
               <span className="text-amber-800 italic">Kami mengundang kamu.</span> Bukan basa-basi.
@@ -51,7 +51,7 @@ export default async function ShowroomPage() {
               </a>
             </div>
             <p className="mt-12 text-xs font-medium tracking-[0.14em] text-stone-500 uppercase">
-              Dipakai pasangan di Yogyakarta &middot; Bandung &middot; Solo &middot; Purwokerto
+              Dipakai pasangan di seluruh Indonesia
             </p>
           </Reveal>
           <Reveal delay={0.15}>
