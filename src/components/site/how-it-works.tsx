@@ -9,12 +9,12 @@ const steps = [
   {
     number: "02",
     title: "Ceritakan detailnya",
-    body: "Isi nama, tanggal, lokasi acara, sama galeri foto lewat formulir yang simpel — nggak perlu sentuh kode atau desain.",
+    body: "Isi nama, tanggal, lokasi acara, sama galeri foto lewat formulir yang simpel. Nggak perlu sentuh kode atau desain.",
   },
   {
     number: "03",
     title: "Terima link siap dibagikan",
-    body: "Kami susun undangannya dengan hati-hati, link finalnya kelar dalam 1x24 jam kerja — tinggal kalian share ke grup keluarga.",
+    body: "Kami susun undangannya dengan hati-hati, link finalnya kelar dalam 1x24 jam kerja. Tinggal kalian share ke grup keluarga.",
   },
 ];
 

@@ -9,12 +9,12 @@ const faqs = [
   {
     question: "Tamu harus install aplikasi dulu, nggak?",
     answer:
-      "Nggak perlu. Undangannya berupa link — tinggal dibuka dari WhatsApp atau browser, langsung jalan di HP tamu.",
+      "Nggak perlu. Undangannya berupa link yang tinggal dibuka dari WhatsApp atau browser, langsung jalan di HP tamu.",
   },
   {
     question: "Boleh ganti desain setelah pesan?",
     answer:
-      "Sebelum kami mulai kerjakan, boleh. Kalau sudah masuk proses susun, ganti desain berarti mulai dari pesanan baru — jadi pastikan dulu ya sebelum checkout.",
+      "Sebelum kami mulai kerjakan, boleh. Kalau sudah masuk proses susun, ganti desain berarti mulai dari pesanan baru, jadi pastikan dulu ya sebelum checkout.",
   },
   {
     question: "RSVP dari tamu itu kelihatan di mana?",

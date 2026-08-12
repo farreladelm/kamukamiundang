@@ -71,7 +71,7 @@ export function Catalog({
           </h2>
         </div>
         <p className="mt-4 max-w-sm text-sm leading-6 text-stone-600 sm:text-right">
-          Kami udah kurasi tiga desain, tinggal kalian sesuaikan ceritanya — biar tamu yang buka
+          Kami udah kurasi tiga desain, tinggal kalian sesuaikan ceritanya biar tamu yang buka
           langsung kerasa bedanya.
         </p>
       </div>

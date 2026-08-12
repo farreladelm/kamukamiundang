@@ -45,7 +45,7 @@ export function BentoFeatures() {
           <MarkRing />
           <h3 className="mt-6 font-serif text-2xl text-stone-900">RSVP yang beneran kepakai</h3>
           <p className="mt-3 max-w-sm text-sm leading-6 text-stone-600">
-            Tamu konfirmasi hadir langsung dari undangan, kalian tinggal buka rekap-nya — nggak perlu
+            Tamu konfirmasi hadir langsung dari undangan, kalian tinggal buka rekap-nya. Nggak perlu
             hitung manual dari chat yang bertebaran di banyak grup.
           </p>
           <div className="mt-8 rounded-2xl border border-stone-900/10 bg-[#f8f4ea] p-5">
@@ -63,7 +63,7 @@ export function BentoFeatures() {
           <MarkDot />
           <h3 className="mt-5 font-serif text-xl text-stone-900">Galeri &amp; cerita</h3>
           <p className="mt-2 text-sm leading-6 text-stone-600">
-            Pajang lebih dari satu foto sampul — sisipkan cerita perjalanan kalian berdua.
+            Pajang lebih dari satu foto sampul, sisipkan juga cerita perjalanan kalian berdua.
           </p>
         </Reveal>
 
