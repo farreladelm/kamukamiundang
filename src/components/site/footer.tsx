@@ -1,3 +1,5 @@
+import { HeartbeatCredit } from "@/components/site/heartbeat-credit";
+
 export function Footer() {
   return (
     <footer className="border-t border-stone-900/10 bg-[#f1ebdd]">
@@ -23,12 +25,9 @@ export function Footer() {
         <div className="flex flex-col gap-10 sm:flex-row sm:justify-between">
           <div className="max-w-sm">
             <p className="font-serif text-2xl italic text-stone-900">kamukamiundang</p>
-            <p className="mt-3 font-serif text-lg leading-snug text-amber-800 italic">
-              Dibuat oleh hati, dengan hati-hati, untuk orang yang selalu ada di hati.
-            </p>
+            <HeartbeatCredit />
             <p className="mt-4 text-sm leading-6 text-stone-600">
-              Undangan pernikahan digital yang dirancang dari Yogyakarta, dipakai pasangan di seluruh
-              Indonesia.
+              Undangan pernikahan digital yang dipakai pasangan di seluruh Indonesia.
             </p>
           </div>
           <div className="flex flex-wrap gap-10 sm:gap-16">
@@ -81,7 +80,7 @@ export function Footer() {
         </div>
         <div className="mt-12 flex flex-col gap-2 border-t border-stone-900/10 pt-6 text-xs text-stone-500 sm:flex-row sm:items-center sm:justify-between">
           <p>© {new Date().getFullYear()} kamukamiundang. Untuk hari yang tidak akan pernah terulang.</p>
-          <p>Yogyakarta, Indonesia</p>
+          <p>Indonesia</p>
         </div>
       </div>
     </footer>

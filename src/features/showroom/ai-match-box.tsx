@@ -76,7 +76,7 @@ export function AiMatchBox({ onMatched }: { onMatched: (response: AiMatchRespons
             id="ai-match-cerita"
             value={cerita}
             onChange={(event) => setCerita(event.target.value)}
-            placeholder="Contoh: pernikahan adat Jawa yang hangat, di Yogyakarta"
+            placeholder="Contoh: pernikahan adat Jawa yang hangat, outdoor di taman"
             rows={2}
             className="w-full rounded-2xl border border-stone-300 bg-white p-4 text-sm text-stone-900 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-stone-900"
           />

@@ -30,6 +30,22 @@ function MarkPin() {
   );
 }
 
+/** Top-down table illustration: a round table ringed by seats, drawn in the same thin-stroke amber language as the other marks. */
+function TableIllustration() {
+  const seatAngles = [0, 45, 90, 135, 180, 225, 270, 315];
+  return (
+    <svg viewBox="0 0 64 64" className="size-14 shrink-0 text-amber-800" aria-hidden="true">
+      <circle cx="32" cy="32" r="15" fill="none" stroke="currentColor" strokeOpacity="0.55" strokeWidth="1.5" />
+      {seatAngles.map((angle) => {
+        const rad = (angle * Math.PI) / 180;
+        const x = 32 + 24 * Math.cos(rad);
+        const y = 32 + 24 * Math.sin(rad);
+        return <circle key={angle} cx={x} cy={y} r="3" fill="currentColor" fillOpacity="0.45" />;
+      })}
+    </svg>
+  );
+}
+
 export function BentoFeatures() {
   return (
     <section id="fitur" className="mx-auto max-w-6xl px-5 py-20 sm:px-8 sm:py-28">
@@ -48,14 +64,12 @@ export function BentoFeatures() {
             Tamu konfirmasi hadir langsung dari undangan, kalian tinggal buka rekap-nya. Nggak perlu
             hitung manual dari chat yang bertebaran di banyak grup.
           </p>
-          <div className="mt-8 rounded-2xl border border-stone-900/10 bg-[#f8f4ea] p-5">
-            <div className="flex items-center justify-between text-xs font-semibold tracking-[0.1em] text-stone-500 uppercase">
-              <span>Konfirmasi hadir</span>
-              <span>142 tamu</span>
-            </div>
-            <div className="mt-3 h-2 overflow-hidden rounded-full bg-stone-900/10">
-              <div className="h-full w-[78%] rounded-full bg-amber-800" />
-            </div>
+          <div className="mt-8 flex items-center gap-4 rounded-2xl border border-stone-900/10 bg-[#f8f4ea] p-5">
+            <TableIllustration />
+            <p className="text-sm text-stone-700">
+              <span className="mr-1 font-serif text-2xl text-stone-900">142</span>
+              tamu konfirmasi hadir
+            </p>
           </div>
         </Reveal>
 
