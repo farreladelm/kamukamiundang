@@ -7,9 +7,9 @@ import type { TemplateCatalogItem } from "@/features/templates/types";
 const catalogTemplates: TemplateCatalogItem[] = templateRegistry.map((template, index) => ({
   templateKey: template.templateKey,
   templateVersion: template.templateVersion,
-  slug: ["larasati", "pesisir-senja", "taman-aksara", "cahaya-hati", "ratri-kirana", "alinea-baru"][index],
-  name: ["Larasati", "Pesisir Senja", "Taman Aksara", "Cahaya Hati", "Ratri Kirana", "Alinea Baru"][index],
-  category: ["Klasik", "Modern", "Botanical", "Islami", "Elegant", "Minimalis"][index],
+  slug: ["larasati", "pesisir-senja", "taman-aksara", "cahaya-hati", "ratri-kirana", "alinea-baru", "neon-vow"][index],
+  name: ["Larasati", "Pesisir Senja", "Taman Aksara", "Cahaya Hati", "Ratri Kirana", "Alinea Baru", "Neon Vow"][index],
+  category: ["Klasik", "Modern", "Botanical", "Islami", "Elegant", "Minimalis", "Modern"][index],
   description: "Deskripsi katalog",
   priceInRupiah: 650000 + index * 50000,
   marketingThumbnail: null,
@@ -60,12 +60,12 @@ describe("Catalog", () => {
   it("offers preview and contact actions for each visible template", () => {
     render(<Catalog templates={catalogTemplates} canonicalOrigin="https://undango.test" />);
 
-    expect(screen.getAllByRole("link", { name: "Preview" })).toHaveLength(6);
+    expect(screen.getAllByRole("link", { name: "Preview" })).toHaveLength(7);
     expect(screen.getAllByRole("link", { name: "Preview" })[0]).toHaveAttribute(
       "href",
       "/templates/larasati",
     );
-    expect(screen.getAllByRole("link", { name: "Pesan" })).toHaveLength(6);
+    expect(screen.getAllByRole("link", { name: "Pesan" })).toHaveLength(7);
     expect(screen.getAllByRole("link", { name: "Pesan" })[0]).toHaveAttribute(
       "href",
       expect.stringContaining("undango.test%2Ftemplates%2Flarasati"),
