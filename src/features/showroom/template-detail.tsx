@@ -18,6 +18,8 @@ export function TemplateDetail({
     throw new Error(`Unknown template ${template.templateKey} v${template.templateVersion}`);
   }
 
+  const isEditorialPreview = template.templateKey === "template-7";
+
   const [paletteKey, setPaletteKey] = useState(template.demo.paletteKey);
   const [isPaletteOpen, setIsPaletteOpen] = useState(false);
   const selectedPalette = template.palettes.find((palette) => palette.key === paletteKey)!;
@@ -63,7 +65,10 @@ export function TemplateDetail({
 
   return (
     <main className="min-h-dvh bg-stone-950 text-stone-900">
-      <div className="mx-auto flex min-h-dvh max-w-[120rem] flex-col lg:h-screen lg:flex-row lg:overflow-hidden">
+      <div
+        data-testid="template-detail-shell"
+        className={`mx-auto flex min-h-dvh max-w-[120rem] flex-col lg:flex-row${isEditorialPreview ? "" : " lg:h-screen lg:overflow-hidden"}`}
+      >
         <section
           data-testid="preview-cover"
           className="relative hidden min-h-[35rem] flex-1 flex-col justify-between overflow-hidden p-6 sm:p-10 lg:sticky lg:top-0 lg:flex lg:h-screen lg:min-h-0 lg:p-16"
@@ -109,12 +114,12 @@ export function TemplateDetail({
 
         <section
           data-testid="invitation-scroll"
-          className="flex w-full justify-center overflow-y-visible lg:h-screen lg:w-[30rem] lg:shrink-0 lg:overflow-y-auto"
+          className={`flex w-full justify-center overflow-y-visible lg:w-[30rem] lg:shrink-0${isEditorialPreview ? "" : " lg:h-screen lg:overflow-y-auto"}`}
           style={{ backgroundColor: selectedPalette.tokens.canvas }}
         >
           <div
             data-testid="invitation-frame"
-            className="h-fit w-full overflow-hidden bg-white"
+            className={`h-fit w-full bg-white${isEditorialPreview ? "" : " overflow-hidden"}`}
           >
             <div data-testid="template-demo">
       {renderTemplate(runtime, paletteKey, {

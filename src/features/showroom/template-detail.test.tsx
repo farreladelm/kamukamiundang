@@ -88,4 +88,32 @@ describe("TemplateDetail", () => {
       "false",
     );
   });
+
+  it("gives the gate-less template-7 preview a real scrolling page instead of an independent rail", () => {
+    const editorialTemplate = templateRegistry.find((entry) => entry.templateKey === "template-7")!;
+    const editorialCatalogTemplate: TemplateCatalogItem = {
+      templateKey: editorialTemplate.templateKey,
+      templateVersion: editorialTemplate.templateVersion,
+      slug: "neon-vow",
+      name: "Neon Vow",
+      category: "Modern",
+      description: "Editorial neon",
+      priceInRupiah: 850000,
+      marketingThumbnail: null,
+      displayOrder: 70,
+      status: "VISIBLE",
+      isVisible: true,
+      contentSchemaVersion: editorialTemplate.contentSchemaVersion,
+      previewStyle: editorialTemplate.previewStyle,
+      capabilities: editorialTemplate.capabilities,
+      palettes: editorialTemplate.palettes,
+      demo: editorialTemplate.demo,
+    };
+
+    render(<TemplateDetail template={editorialCatalogTemplate} />);
+
+    expect(screen.getByTestId("template-detail-shell").className).not.toContain("lg:overflow-hidden");
+    expect(screen.getByTestId("invitation-scroll").className).not.toContain("lg:overflow-y-auto");
+    expect(screen.getByTestId("invitation-frame").className).not.toContain("overflow-hidden");
+  });
 });
