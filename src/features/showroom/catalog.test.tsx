@@ -86,6 +86,7 @@ describe("Catalog", () => {
       "src",
       "https://cdn.example/larasati.webp",
     );
+    expect(screen.getByRole("img", { name: "Larasati" })).toHaveAttribute("loading", "lazy");
     expect(document.querySelector(".template-thumbnail-coast")).toBeInTheDocument();
   });
 

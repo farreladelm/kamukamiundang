@@ -137,6 +137,7 @@ export function Catalog({
                 <img
                   src={template.marketingThumbnail}
                   alt={template.name}
+                  loading="lazy"
                   className="aspect-[4/5] w-full rounded-2xl object-cover transition-transform duration-500 group-hover:scale-[1.02]"
                 />
               ) : (
