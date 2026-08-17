@@ -72,6 +72,24 @@ describe("Catalog", () => {
     );
   });
 
+  it("uses the database marketing thumbnail and preserves runtime preview for null thumbnails", () => {
+    render(
+      <Catalog
+        templates={[
+          { ...catalogTemplates[0], marketingThumbnail: "https://cdn.example/larasati.webp" },
+          catalogTemplates[1],
+        ]}
+      />,
+    );
+
+    expect(screen.getByRole("img", { name: "Larasati" })).toHaveAttribute(
+      "src",
+      "https://cdn.example/larasati.webp",
+    );
+    expect(screen.getByRole("img", { name: "Larasati" })).toHaveAttribute("loading", "lazy");
+    expect(document.querySelector(".template-thumbnail-coast")).toBeInTheDocument();
+  });
+
   it("promotes the top match to the front, badges it, and applies its recommended palette", () => {
     render(
       <Catalog

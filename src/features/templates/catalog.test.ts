@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import {
+  listVisibleTemplateCatalogWithClient,
   resolveTemplateCatalogRecord,
+  resolveTemplateCatalogBySlugWithClient,
   type TemplateCatalogDatabaseRecord,
 } from "@/features/templates/catalog";
 import { templateRegistry } from "@/features/templates/registry";
@@ -77,5 +79,50 @@ describe("template catalog resolver", () => {
         paletteKey: "missing-palette",
       }),
     ).toMatchObject({ ok: false, reason: "INCOMPATIBLE_RUNTIME" });
+  });
+
+  it("excludes visible metadata without an exact runtime from public lists", async () => {
+    const templates = await listVisibleTemplateCatalogWithClient(
+      {
+        templateCatalog: {
+          findMany: async () => [
+            { ...catalogRecord, templateKey: "missing-runtime" },
+            catalogRecord,
+            { ...catalogRecord, templateKey: "template-2", slug: "pesisir-senja" },
+          ],
+          findFirst: async () => null,
+          findUnique: async () => null,
+        },
+      },
+      [templateRegistry[0]],
+    );
+
+    expect(templates).toEqual([
+      expect.objectContaining({
+        templateKey: "template-1",
+        name: "Larasati dari Database",
+        priceInRupiah: 825000,
+      }),
+    ]);
+  });
+
+  it("resolves a visible alias to its database canonical slug", async () => {
+    const resolved = await resolveTemplateCatalogBySlugWithClient(
+      {
+        templateCatalog: {
+          findMany: async () => [],
+          findFirst: async () => catalogRecord,
+          findUnique: async () => null,
+        },
+      },
+      "larasati-lama",
+      [templateRegistry[0]],
+    );
+
+    expect(resolved).toMatchObject({
+      slug: "larasati",
+      name: "Larasati dari Database",
+      isVisible: true,
+    });
   });
 });

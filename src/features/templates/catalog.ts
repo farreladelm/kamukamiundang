@@ -149,6 +149,7 @@ const catalogSelect = {
 
 export async function listVisibleTemplateCatalogWithClient(
   client: CatalogClient,
+  registry: RuntimeRegistry = templateRegistry,
 ): Promise<ResolvedTemplateCatalog[]> {
   const records = await client.templateCatalog.findMany({
     where: { status: "VISIBLE" },
@@ -157,7 +158,7 @@ export async function listVisibleTemplateCatalogWithClient(
   });
 
   return records.flatMap((record) => {
-    const resolved = resolveTemplateCatalogRecord(record, templateRegistry, {
+    const resolved = resolveTemplateCatalogRecord(record, registry, {
       requireVisible: true,
     });
     return "ok" in resolved ? [] : [resolved];
@@ -167,6 +168,7 @@ export async function listVisibleTemplateCatalogWithClient(
 export async function resolveTemplateCatalogBySlugWithClient(
   client: CatalogClient,
   slug: string,
+  registry: RuntimeRegistry = templateRegistry,
 ): Promise<ResolvedTemplateCatalog | UnavailableCatalog> {
   const record = await client.templateCatalog.findFirst({
     where: {
@@ -179,7 +181,7 @@ export async function resolveTemplateCatalogBySlugWithClient(
     return unavailable("MISSING_METADATA", "unknown", 0);
   }
 
-  return resolveTemplateCatalogRecord(record, templateRegistry, { requireVisible: true });
+  return resolveTemplateCatalogRecord(record, registry, { requireVisible: true });
 }
 
 export async function resolveTemplateCatalogByIdentityWithClient(
