@@ -17,8 +17,8 @@ const DUMMY_PASSWORD_HASH =
 type LoginAttempt = { failures: number; firstFailureAt: number };
 const loginAttempts = new Map<string, LoginAttempt>();
 
-function loginKey(email: string, ipAddress: string): string {
-  return `${email}:${ipAddress || "unknown"}`;
+function loginKey(email: string): string {
+  return email;
 }
 
 function isRateLimited(key: string, now: number): boolean {
@@ -44,6 +44,12 @@ function recordFailure(key: string, now: number): void {
   current.failures += 1;
 }
 
+function pruneExpiredAttempts(now: number): void {
+  for (const [key, attempt] of loginAttempts) {
+    if (now - attempt.firstFailureAt >= LOGIN_WINDOW_MS) loginAttempts.delete(key);
+  }
+}
+
 export function resetAdminLoginRateLimit(): void {
   loginAttempts.clear();
 }
@@ -51,12 +57,10 @@ export function resetAdminLoginRateLimit(): void {
 export async function loginAdmin({
   email,
   password,
-  ipAddress = "unknown",
   now = new Date(),
 }: {
   email: string;
   password: string;
-  ipAddress?: string;
   now?: Date;
 }): Promise<{ ok: true; adminId: string; sessionToken: string } | { ok: false; error: string }> {
   let normalizedEmail: string;
@@ -67,12 +71,16 @@ export async function loginAdmin({
     normalizedEmail = email.trim().toLowerCase();
   }
 
-  const key = loginKey(normalizedEmail, ipAddress);
+  const key = loginKey(normalizedEmail);
   const currentTime = now.getTime();
 
+  pruneExpiredAttempts(currentTime);
   if (isRateLimited(key, currentTime)) {
     return { ok: false, error: ADMIN_LOGIN_ERROR };
   }
+
+  // Reserve failure slot before expensive password verification so concurrent attempts cannot bypass the limit.
+  recordFailure(key, currentTime);
 
   const admin = await db.admin.findUnique({ where: { email: normalizedEmail } });
   const passwordMatches = await verifyAdminPassword(
@@ -81,7 +89,6 @@ export async function loginAdmin({
   );
 
   if (!admin || !admin.isActive || !passwordMatches) {
-    recordFailure(key, currentTime);
     return { ok: false, error: ADMIN_LOGIN_ERROR };
   }
 

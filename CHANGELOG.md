@@ -7,3 +7,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Changed
 - Catalog cards now display administrator-configured marketing thumbnails while preserving runtime previews when no thumbnail is set.
+- Admin logout now revokes its database session before clearing the browser cookie.
+
+### Security
+- Admin login failures are throttled per normalized account for the MVP, with the long-term account/network policy documented for a later deployment upgrade.
