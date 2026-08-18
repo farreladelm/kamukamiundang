@@ -11,6 +11,7 @@ import { createAdminSession } from "./session";
 
 const LOGIN_WINDOW_MS = 15 * 60 * 1000;
 const MAX_LOGIN_FAILURES = 5;
+const MAX_TRACKED_LOGIN_KEYS = 10_000;
 const DUMMY_PASSWORD_HASH =
   "$argon2id$v=19$m=19456,t=2,p=1$xjJODDiMWpoZDUU2cXvpIQ$YiCm/TGEDTK0DzDAatM7Jfwv/eZZa7z/r2WfWlWKqKA";
 
@@ -37,17 +38,15 @@ function recordFailure(key: string, now: number): void {
   const current = loginAttempts.get(key);
 
   if (!current || now - current.firstFailureAt >= LOGIN_WINDOW_MS) {
+    if (!current && loginAttempts.size >= MAX_TRACKED_LOGIN_KEYS) {
+      const oldestKey = loginAttempts.keys().next().value;
+      if (oldestKey !== undefined) loginAttempts.delete(oldestKey);
+    }
     loginAttempts.set(key, { failures: 1, firstFailureAt: now });
     return;
   }
 
   current.failures += 1;
-}
-
-function pruneExpiredAttempts(now: number): void {
-  for (const [key, attempt] of loginAttempts) {
-    if (now - attempt.firstFailureAt >= LOGIN_WINDOW_MS) loginAttempts.delete(key);
-  }
 }
 
 export function resetAdminLoginRateLimit(): void {
@@ -74,7 +73,6 @@ export async function loginAdmin({
   const key = loginKey(normalizedEmail);
   const currentTime = now.getTime();
 
-  pruneExpiredAttempts(currentTime);
   if (isRateLimited(key, currentTime)) {
     return { ok: false, error: ADMIN_LOGIN_ERROR };
   }
