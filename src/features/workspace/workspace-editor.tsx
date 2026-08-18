@@ -4,6 +4,11 @@ import { useActionState, useState } from "react";
 import { getTemplateRuntimeManifest } from "@/features/templates/registry";
 import { renderTemplate } from "@/features/templates/render-template";
 import {
+  toTemplateContentViewModel,
+  type WorkspaceDraft,
+  workspaceDraftSchema,
+} from "@/features/invitations/content-schema";
+import {
   initialWorkspaceSaveState,
   type WorkspaceSaveState,
 } from "./action-state";
@@ -11,13 +16,15 @@ import {
   saveWorkspaceDraftAction,
 } from "./actions";
 import type { WorkspaceInvitationDto } from "@/features/invitations/workspace-dto";
+import { CopySection } from "./copy-section";
+import { IdentitySection } from "./identity-section";
 
 export function WorkspaceEditor({ workspace }: { workspace: WorkspaceInvitationDto }) {
   const [saveState, formAction, pending] = useActionState<WorkspaceSaveState, FormData>(
     saveWorkspaceDraftAction,
     { ...initialWorkspaceSaveState, contentVersion: workspace.contentVersion },
   );
-  const [rawContent, setRawContent] = useState(() => JSON.stringify(workspace.draft, null, 2));
+  const [draft, setDraft] = useState<WorkspaceDraft>(() => workspace.draft);
   const runtime = getTemplateRuntimeManifest(workspace.templateKey, workspace.templateVersion);
 
   if (!runtime) {
@@ -25,6 +32,7 @@ export function WorkspaceEditor({ workspace }: { workspace: WorkspaceInvitationD
   }
 
   const selectedPalette = runtime.palettes.find((palette) => palette.key === workspace.paletteKey);
+  const previewDraft = workspaceDraftSchema.safeParse(draft);
 
   return (
     <div className="grid gap-8 xl:grid-cols-[minmax(18rem,0.7fr)_minmax(0,1.3fr)]">
@@ -33,31 +41,18 @@ export function WorkspaceEditor({ workspace }: { workspace: WorkspaceInvitationD
           <p className="text-xs font-semibold tracking-[0.18em] text-stone-500 uppercase">Draft workspace</p>
           <h2 className="mt-2 font-serif text-3xl">Simpan perubahan</h2>
           <p className="mt-3 text-sm leading-6 text-stone-600">
-            Draft tersimpan dengan kontrol versi. Field invitation lengkap hadir pada tahap workspace berikutnya.
+            Perubahan tersimpan dengan kontrol versi. Field lain hadir pada tahap workspace berikutnya.
           </p>
         </div>
 
-        <form action={formAction} className="mt-7 grid gap-4">
+        <form action={formAction} className="mt-7 grid gap-7">
           <input type="hidden" name="invitationId" value={workspace.invitationId} />
           <input type="hidden" name="expectedContentVersion" value={saveState.contentVersion} />
-          <div>
-            <label htmlFor="workspace-draft-content" className="text-sm font-semibold">
-              Draft JSON
-            </label>
-            <textarea
-              id="workspace-draft-content"
-              name="content"
-              value={rawContent}
-              onChange={(event) => setRawContent(event.target.value)}
-              rows={14}
-              spellCheck={false}
-              className="mt-2 w-full border border-stone-300 bg-stone-50 px-3 py-3 font-mono text-xs leading-5 focus-visible:outline-2"
-              aria-describedby="workspace-draft-help"
-            />
-            <p id="workspace-draft-help" className="mt-2 text-xs leading-5 text-stone-500">
-              Simpan object JSON valid. Input tetap dipertahankan jika validasi atau konflik versi gagal.
-            </p>
-          </div>
+          <IdentitySection draft={draft} onChange={setDraft} />
+          <CopySection draft={draft} onChange={setDraft} />
+          <p className="text-xs leading-5 text-stone-500">
+            Input tetap dipertahankan jika validasi atau konflik versi gagal.
+          </p>
           <button
             type="submit"
             disabled={pending}
@@ -89,7 +84,11 @@ export function WorkspaceEditor({ workspace }: { workspace: WorkspaceInvitationD
           </p>
         </div>
         <div className="overflow-hidden border border-stone-300 bg-white shadow-sm">
-          {renderTemplate(runtime, workspace.paletteKey, runtime.demo.content)}
+          {previewDraft.success ? (
+            renderTemplate(runtime, workspace.paletteKey, toTemplateContentViewModel(previewDraft.data))
+          ) : (
+            <p role="alert" className="p-5 text-sm text-red-700">Perbaiki isian sebelum melihat preview.</p>
+          )}
         </div>
       </section>
     </div>

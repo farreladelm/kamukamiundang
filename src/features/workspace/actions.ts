@@ -97,23 +97,28 @@ export async function saveWorkspaceDraftForCustomer(
 }
 
 function parseWorkspaceFormData(formData: FormData) {
-  const rawContent = formData.get("content");
-  let content: unknown;
-
-  if (typeof rawContent !== "string") {
-    content = undefined;
-  } else {
-    try {
-      content = JSON.parse(rawContent) as unknown;
-    } catch {
-      content = undefined;
-    }
-  }
-
   return workspaceSaveInputSchema.safeParse({
     invitationId: formData.get("invitationId"),
     expectedContentVersion: formData.get("expectedContentVersion"),
-    content,
+    content: {
+      couple: {
+        firstName: formData.get("firstName"),
+        secondName: formData.get("secondName"),
+      },
+      profiles: [
+        {
+          name: formData.get("profile1Name"),
+          parents: formData.get("profile1Parents"),
+        },
+        {
+          name: formData.get("profile2Name"),
+          parents: formData.get("profile2Parents"),
+        },
+      ],
+      opening: formData.get("opening"),
+      quote: formData.get("quote"),
+      closing: formData.get("closing"),
+    },
   });
 }
 

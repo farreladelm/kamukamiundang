@@ -5,6 +5,10 @@ import {
   WorkspaceUnavailableError,
 } from "@/features/invitations/workspace-dto";
 import { saveWorkspaceDraftForCustomer } from "@/features/workspace/actions";
+import {
+  emptyWorkspaceDraft,
+  type WorkspaceDraft,
+} from "@/features/invitations/content-schema";
 
 beforeEach(async () => {
   await db.$executeRawUnsafe(
@@ -51,6 +55,19 @@ async function setupWorkspace(contentSchemaVersion = 2) {
   return { customer, invitation };
 }
 
+function workspaceDraft(opening = "Kami mengundang Anda."): WorkspaceDraft {
+  return {
+    couple: { firstName: "Rani", secondName: "Dimas" },
+    profiles: [
+      { name: "Rani Prameswari", parents: "Putri Bapak Hadi dan Ibu Rani" },
+      { name: "Dimas Adinata", parents: "Putra Bapak Surya dan Ibu Ratih" },
+    ],
+    opening,
+    quote: "Doa terbaik untuk kami.",
+    closing: "Sampai jumpa di hari bahagia kami.",
+  };
+}
+
 describe("versioned customer workspace drafts", () => {
   it("loads pinned draft DTO and saves the next content version", async () => {
     const { customer, invitation } = await setupWorkspace();
@@ -62,7 +79,7 @@ describe("versioned customer workspace drafts", () => {
       contentSchemaVersion: 2,
       paletteKey: "gading",
       contentVersion: 0,
-      draft: {},
+       draft: emptyWorkspaceDraft,
     });
 
     await expect(
@@ -70,13 +87,16 @@ describe("versioned customer workspace drafts", () => {
         customerId: customer.id,
         invitationId: invitation.id,
         expectedContentVersion: 0,
-        content: { draftNote: "first save" },
+        content: workspaceDraft("Kami mengundang Anda ke perayaan kami."),
       }),
     ).resolves.toEqual({ status: "success", contentVersion: 1 });
 
     await expect(
       db.invitationContent.findUniqueOrThrow({ where: { invitationId: invitation.id } }),
-    ).resolves.toMatchObject({ content: { draftNote: "first save" }, contentVersion: 1 });
+    ).resolves.toMatchObject({
+      content: workspaceDraft("Kami mengundang Anda ke perayaan kami."),
+      contentVersion: 1,
+    });
   });
 
   it("allows only one concurrent save from the same version", async () => {
@@ -86,13 +106,13 @@ describe("versioned customer workspace drafts", () => {
         customerId: customer.id,
         invitationId: invitation.id,
         expectedContentVersion: 0,
-        content: { draftNote: "first writer" },
+        content: workspaceDraft("Penulis pertama"),
       }),
       saveWorkspaceDraftForCustomer({
         customerId: customer.id,
         invitationId: invitation.id,
         expectedContentVersion: 0,
-        content: { draftNote: "second writer" },
+        content: workspaceDraft("Penulis kedua"),
       }),
     ]);
 
@@ -110,7 +130,7 @@ describe("versioned customer workspace drafts", () => {
         customerId: customer.id,
         invitationId: invitation.id,
         expectedContentVersion: 0,
-        content: { draftNote: "locked" },
+        content: workspaceDraft("Terkunci"),
       }),
     ).resolves.toEqual({ status: "locked" });
 
@@ -119,7 +139,7 @@ describe("versioned customer workspace drafts", () => {
         customerId: "00000000-0000-0000-0000-000000000099",
         invitationId: invitation.id,
         expectedContentVersion: 0,
-        content: { draftNote: "other customer" },
+        content: workspaceDraft("Customer lain"),
       }),
     ).resolves.toEqual({ status: "unavailable" });
 
@@ -132,7 +152,7 @@ describe("versioned customer workspace drafts", () => {
         customerId: customer.id,
         invitationId: invitation.id,
         expectedContentVersion: 0,
-        content: { draftNote: "missing runtime" },
+        content: workspaceDraft("Runtime tidak tersedia"),
       }),
     ).resolves.toEqual({ status: "unavailable" });
   });
