@@ -43,4 +43,59 @@ describe("order intake and activation", () => {
       photoLimit: 20,
     })).rejects.toThrow("Unknown template version or palette");
   });
+
+  it("preserves old order snapshot price when database catalog price is updated later", async () => {
+    const catalogBefore = await db.templateCatalog.findUniqueOrThrow({
+      where: { templateKey_templateVersion: { templateKey: "template-1", templateVersion: 1 } },
+    });
+    const order = await createPendingOrder({
+      customer: { name: "Historical Price Customer", whatsapp: "628999" },
+      templateKey: "template-1",
+      templateVersion: 1,
+      paletteKey: "gading",
+      photoLimit: 15,
+    });
+
+    expect(order.priceInRupiah).toBe(catalogBefore.priceInRupiah);
+
+    // Update price in catalog database after order is placed
+    await db.templateCatalog.update({
+      where: { templateKey_templateVersion: { templateKey: "template-1", templateVersion: 1 } },
+      data: { priceInRupiah: catalogBefore.priceInRupiah + 250000 },
+    });
+
+    const orderAfter = await db.order.findUniqueOrThrow({ where: { id: order.id } });
+    expect(orderAfter.priceInRupiah).toBe(catalogBefore.priceInRupiah);
+  });
+
+  it("rejects order intake for HIDDEN, RETIRED, or DRAFT template status", async () => {
+    for (const status of ["HIDDEN", "RETIRED", "DRAFT"] as const) {
+      await db.templateCatalog.update({
+        where: { templateKey_templateVersion: { templateKey: "template-1", templateVersion: 1 } },
+        data: { status },
+      });
+
+      await expect(
+        createPendingOrder({
+          customer: { name: "Boundary Test Customer" },
+          templateKey: "template-1",
+          templateVersion: 1,
+          paletteKey: "gading",
+          photoLimit: 20,
+        }),
+      ).rejects.toThrow("Template status is not visible for order creation");
+    }
+  });
+
+  it("rejects order intake when palette key is invalid for template", async () => {
+    await expect(
+      createPendingOrder({
+        customer: { name: "Invalid Palette Customer" },
+        templateKey: "template-1",
+        templateVersion: 1,
+        paletteKey: "nonexistent-palette",
+        photoLimit: 20,
+      }),
+    ).rejects.toThrow("Unknown template version or palette");
+  });
 });
