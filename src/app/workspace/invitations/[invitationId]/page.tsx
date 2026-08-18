@@ -1,5 +1,8 @@
 import { notFound } from "next/navigation";
-import { requireOwnedEditableInvitation } from "@/features/auth/customer-policy";
+import {
+  getWorkspaceInvitationDto,
+} from "@/features/invitations/workspace-dto";
+import { WorkspaceEditor } from "@/features/workspace/workspace-editor";
 
 export default async function CustomerInvitationWorkspacePage({
   params,
@@ -7,20 +10,22 @@ export default async function CustomerInvitationWorkspacePage({
   params: Promise<{ invitationId: string }>;
 }) {
   const { invitationId } = await params;
-  let invitation;
+  let workspace;
 
   try {
-    invitation = await requireOwnedEditableInvitation(invitationId);
+    workspace = await getWorkspaceInvitationDto(invitationId);
   } catch {
     notFound();
   }
 
   return (
-    <main className="mx-auto min-h-dvh max-w-4xl px-5 py-10 sm:px-8">
+    <main className="mx-auto min-h-dvh max-w-7xl px-5 py-10 sm:px-8">
       <p className="text-xs font-semibold tracking-[0.18em] text-stone-500 uppercase">Workspace customer</p>
       <h1 className="mt-3 font-serif text-5xl">Isi invitation</h1>
-      <p className="mt-4 text-sm text-stone-600">{invitation.templateKey} v{invitation.templateVersion} · akses editing aktif.</p>
-      <div className="mt-8 border border-stone-300 bg-white p-6 text-sm text-stone-600">Form konten tersedia pada slice workspace berikutnya.</div>
+      <p className="mt-4 text-sm text-stone-600">{workspace.templateKey} v{workspace.templateVersion} · akses editing aktif.</p>
+      <div className="mt-8">
+        <WorkspaceEditor workspace={workspace} />
+      </div>
     </main>
   );
 }
