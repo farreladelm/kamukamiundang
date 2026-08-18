@@ -286,6 +286,8 @@ Task lama tetap selesai. Tabel ini mencatat bagian yang memerlukan remediation k
 
 ### MVP-19: Build versioned draft workspace core
 
+**Status:** Implemented; focused workspace tests pass. 
+
 **Acceptance:** Workspace reads/writes mutable draft pinned to template/schema version; compare-and-swap rejects stale saves and preserves local input; locked editing rejects customer writes server-side.  
 **Verify:** Workspace-save integration and editor component tests.  
 **Dependencies:** `MVP-06`, `MVP-18`, Checkpoint `MVP-Catalog`  
