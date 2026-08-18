@@ -105,6 +105,17 @@ export const templateCatalogBootstrap: readonly TemplateCatalogBootstrap[] = [
     marketingThumbnail: null,
     displayOrder: 60,
   },
+  {
+    templateKey: "template-7",
+    templateVersion: 1,
+    slug: "neon-vow",
+    name: "Neon Vow",
+    categoryKey: "modern",
+    description: "Editorial berani dengan warna neon lime dan tipografi besar, terinspirasi dari undangan digital Jepang.",
+    priceInRupiah: 850000,
+    marketingThumbnail: null,
+    displayOrder: 70,
+  },
 ];
 
 for (const category of templateCategoryBootstrap) {

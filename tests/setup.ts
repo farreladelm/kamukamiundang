@@ -15,3 +15,18 @@ process.env.DATABASE_URL = testDatabaseUrl;
 
 // Vitest lacks Next.js's react-server module condition; Next build enforces this marker.
 vi.mock("server-only", () => ({}));
+
+// Mock IntersectionObserver for framer-motion's whileInView animations
+Object.defineProperty(global, "IntersectionObserver", {
+  writable: true,
+  configurable: true,
+  value: class IntersectionObserver {
+    constructor() {}
+    disconnect() {}
+    observe() {}
+    takeRecords() {
+      return [];
+    }
+    unobserve() {}
+  },
+});

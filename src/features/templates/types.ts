@@ -116,7 +116,7 @@ export type TemplateRuntimeManifest = {
   templateKey: string;
   templateVersion: number;
   contentSchemaVersion: number;
-  previewStyle: "arch" | "coast" | "garden" | "crescent" | "noir" | "line";
+  previewStyle: "arch" | "coast" | "garden" | "crescent" | "noir" | "line" | "editorial";
   capabilities: readonly TemplateCapability[];
   palettes: readonly TemplatePalette[];
   demo: {
