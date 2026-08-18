@@ -1,6 +1,6 @@
 # Task List: Undango
 
-**Status:** MVP-01 - MVP-18 and MVP-CAT-02 complete and approved; remaining hybrid template catalog amendment tasks pending  
+**Status:** MVP-01 - MVP-18 and MVP-CAT-01 - MVP-CAT-06 complete and approved; Checkpoint MVP-Catalog complete.  
 **Specification:** [`docs/PRD.md`](../docs/PRD.md) v0.5 Approved  
 **Plan:** [`tasks/plan.md`](./plan.md) v0.4 Approved  
 **Template catalog plan:** [`tasks/template-catalog-plan.md`](./template-catalog-plan.md)  
@@ -264,6 +264,7 @@ Task lama tetap selesai. Tabel ini mencatat bagian yang memerlukan remediation k
 
 ### MVP-CAT-06: Integrate order snapshots and deployment drift gate
 
+**Status:** Completed and verified 18 August 2026.  
 **Acceptance:** New-order selection includes only orderable resolved templates; server re-resolves selection and copies current database price plus immutable runtime/schema/palette identity into Order; later metadata edits do not alter old orders; reconciliation/reference scan blocks visible metadata without runtime and active references without runtime.  
 **Verify:** Order price-change snapshot, invalid/retired selection, concurrent metadata change, reconciliation drift, rollback compatibility, and full core-flow regression tests.  
 **Dependencies:** `MVP-CAT-03`, `MVP-CAT-04`, `MVP-15`  
@@ -274,12 +275,12 @@ Task lama tetap selesai. Tabel ini mencatat bagian yang memerlukan remediation k
 
 - [x] `MVP-01` - `MVP-18` historical completion remains recorded.
 - [x] `MVP-CAT-01` decision/specification approved.
-- [x] `MVP-CAT-02` and `MVP-CAT-03` implemented and reviewed; `MVP-CAT-04` - `MVP-CAT-06` remain pending.
+- [x] `MVP-CAT-01` - `MVP-CAT-06` implemented, reviewed, and merged.
 - [x] Runtime manifests, exact resolver, compatibility checks, and order/invitation/snapshot reference scan pass.
-- [ ] Empty and existing databases migrate without losing visibility or catalog metadata.
-- [ ] Showroom, WhatsApp, and new orders use database metadata plus exact source runtime.
-- [ ] Old order prices remain unchanged after catalog price edits.
-- [ ] Slug aliases, fail-closed missing pairs, reference scans, and rollback compatibility pass.
+- [x] Empty and existing databases migrate without losing visibility or catalog metadata.
+- [x] Showroom, WhatsApp, and new orders use database metadata plus exact source runtime.
+- [x] Old order prices remain unchanged after catalog price edits.
+- [x] Slug aliases, fail-closed missing pairs, reference scans, and rollback compatibility pass.
 
 ## MVP Workspace and Assets
 
