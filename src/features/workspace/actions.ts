@@ -113,7 +113,7 @@ function parseWorkspaceFormData(formData: FormData) {
         fatherName: formData.get("groomFatherName"),
         motherName: formData.get("groomMotherName"),
       },
-      quote: formData.get("quote"),
+      quoteKey: formData.get("quoteKey"),
     },
   });
 }

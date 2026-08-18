@@ -20,7 +20,7 @@ function workspaceFixture(): WorkspaceInvitationDto {
     draft: {
       bride: { nickname: "Rani", fullName: "Rani Prameswari", fatherName: "Hadi", motherName: "Rani" },
       groom: { nickname: "Dimas", fullName: "Dimas Adinata", fatherName: "Surya", motherName: "Ratih" },
-      quote: "Doa terbaik untuk kami.",
+      quoteKey: "matthew-19-6",
     },
     palettes: runtime.palettes,
   };
@@ -34,6 +34,7 @@ describe("WorkspaceEditor", () => {
     expect(firstNameInput).toHaveValue("Rani");
     expect(screen.getAllByRole("textbox", { name: "Nama lengkap" })[0]).toHaveValue("Rani Prameswari");
     expect(screen.getAllByRole("textbox", { name: "Nama ayah" })[0]).toHaveValue("Hadi");
+    expect(screen.getByRole("radio", { name: /Matthew 19:6/ })).toBeChecked();
     expect(screen.getByText("template-1 v1")).toBeInTheDocument();
     expect(screen.getAllByText(/Rani/).length).toBeGreaterThan(0);
 

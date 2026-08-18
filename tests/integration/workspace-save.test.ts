@@ -55,11 +55,11 @@ async function setupWorkspace(contentSchemaVersion = 2) {
   return { customer, invitation };
 }
 
-function workspaceDraft(quote = "Doa terbaik untuk kami."): WorkspaceDraft {
+function workspaceDraft(): WorkspaceDraft {
   return {
     bride: { nickname: "Rani", fullName: "Rani Prameswari", fatherName: "Hadi", motherName: "Rani" },
     groom: { nickname: "Dimas", fullName: "Dimas Adinata", fatherName: "Surya", motherName: "Ratih" },
-    quote,
+    quoteKey: "matthew-19-6",
   };
 }
 
@@ -82,14 +82,14 @@ describe("versioned customer workspace drafts", () => {
         customerId: customer.id,
         invitationId: invitation.id,
         expectedContentVersion: 0,
-        content: workspaceDraft("Kami mengundang Anda ke perayaan kami."),
+        content: workspaceDraft(),
       }),
     ).resolves.toEqual({ status: "success", contentVersion: 1 });
 
     await expect(
       db.invitationContent.findUniqueOrThrow({ where: { invitationId: invitation.id } }),
     ).resolves.toMatchObject({
-      content: workspaceDraft("Kami mengundang Anda ke perayaan kami."),
+      content: workspaceDraft(),
       contentVersion: 1,
     });
   });
@@ -101,13 +101,13 @@ describe("versioned customer workspace drafts", () => {
         customerId: customer.id,
         invitationId: invitation.id,
         expectedContentVersion: 0,
-        content: workspaceDraft("Penulis pertama"),
+        content: workspaceDraft(),
       }),
       saveWorkspaceDraftForCustomer({
         customerId: customer.id,
         invitationId: invitation.id,
         expectedContentVersion: 0,
-        content: workspaceDraft("Penulis kedua"),
+        content: workspaceDraft(),
       }),
     ]);
 
@@ -125,7 +125,7 @@ describe("versioned customer workspace drafts", () => {
         customerId: customer.id,
         invitationId: invitation.id,
         expectedContentVersion: 0,
-        content: workspaceDraft("Terkunci"),
+        content: workspaceDraft(),
       }),
     ).resolves.toEqual({ status: "locked" });
 
@@ -134,7 +134,7 @@ describe("versioned customer workspace drafts", () => {
         customerId: "00000000-0000-0000-0000-000000000099",
         invitationId: invitation.id,
         expectedContentVersion: 0,
-        content: workspaceDraft("Customer lain"),
+        content: workspaceDraft(),
       }),
     ).resolves.toEqual({ status: "unavailable" });
 
@@ -147,7 +147,7 @@ describe("versioned customer workspace drafts", () => {
         customerId: customer.id,
         invitationId: invitation.id,
         expectedContentVersion: 0,
-        content: workspaceDraft("Runtime tidak tersedia"),
+        content: workspaceDraft(),
       }),
     ).resolves.toEqual({ status: "unavailable" });
   });

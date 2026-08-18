@@ -3,7 +3,27 @@ import { z } from "zod";
 
 const shortText = z.string().trim().max(100, "Maksimal 100 karakter.").default("");
 const parentText = z.string().trim().max(300, "Maksimal 300 karakter.").default("");
-const copyText = z.string().trim().max(2000, "Maksimal 2.000 karakter.").default("");
+
+const workspaceQuoteKeySchema = z.enum(["matthew-19-6", "ar-rum-21"]);
+
+export type WorkspaceQuoteKey = z.infer<typeof workspaceQuoteKeySchema>;
+
+export const workspaceQuoteOptions: ReadonlyArray<{
+  key: WorkspaceQuoteKey;
+  text: string;
+  source: string;
+}> = [
+  {
+    key: "matthew-19-6",
+    text: "So they are no longer two, but one flesh. Therefore what God has joined together, let no one separate.",
+    source: "Matthew 19:6",
+  },
+  {
+    key: "ar-rum-21",
+    text: "Dan di antara tanda-tanda (kebesaran)-Nya ialah Dia menciptakan pasangan-pasangan untukmu dari jenismu sendiri, agar kamu cenderung dan merasa tenteram kepadanya, dan Dia menjadikan di antaramu rasa kasih dan sayang. Sungguh, pada yang demikian itu benar-benar terdapat tanda-tanda (kebesaran Allah) bagi kaum yang berpikir.",
+    source: "QS. Ar-Rum 21",
+  },
+];
 
 const partnerSchema = z.object({
   nickname: shortText,
@@ -25,7 +45,7 @@ export const workspaceDraftSchema = z.object({
     fatherName: "",
     motherName: "",
   })),
-  quote: copyText,
+  quoteKey: workspaceQuoteKeySchema.nullable().default(null),
 });
 
 export type WorkspaceDraft = z.infer<typeof workspaceDraftSchema>;
@@ -47,6 +67,11 @@ function formatParents(
 
   if (!parents) return "";
   return `${role === "putri" ? "Putri" : "Putra"} dari ${parents}`;
+}
+
+function getQuote(key: WorkspaceQuoteKey | null) {
+  const quote = workspaceQuoteOptions.find((option) => option.key === key);
+  return quote ? `${quote.text} — ${quote.source}` : "Pilih kutipan untuk preview.";
 }
 
 /** Maps editable draft fields to preview while retaining source-controlled template copy. */
@@ -78,7 +103,7 @@ export function toTemplateContentViewModel(
       },
     ],
     opening: templateCopy.opening,
-    quote: draft.quote,
+    quote: getQuote(draft.quoteKey),
     eventDate: "Tanggal acara akan ditambahkan",
     eventDateIso: "2099-01-01T00:00:00+00:00",
     events: [],
