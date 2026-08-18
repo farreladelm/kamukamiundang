@@ -85,7 +85,11 @@ export function WorkspaceEditor({ workspace }: { workspace: WorkspaceInvitationD
         </div>
         <div className="overflow-hidden border border-stone-300 bg-white shadow-sm">
           {previewDraft.success ? (
-            renderTemplate(runtime, workspace.paletteKey, toTemplateContentViewModel(previewDraft.data))
+            renderTemplate(
+              runtime,
+              workspace.paletteKey,
+              toTemplateContentViewModel(previewDraft.data, runtime.demo.content),
+            )
           ) : (
             <p role="alert" className="p-5 text-sm text-red-700">Perbaiki isian sebelum melihat preview.</p>
           )}

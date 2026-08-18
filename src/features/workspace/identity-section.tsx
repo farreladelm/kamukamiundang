@@ -8,15 +8,18 @@ type IdentitySectionProps = {
 };
 
 const inputClassName = "mt-2 min-h-11 w-full border border-stone-300 bg-stone-50 px-3 text-sm focus-visible:outline-2";
+const partners = [
+  { key: "bride", label: "Mempelai perempuan" },
+  { key: "groom", label: "Mempelai laki-laki" },
+] as const;
 
 export function IdentitySection({ draft, onChange }: IdentitySectionProps) {
-  function updatePartner(index: 0 | 1, field: "name" | "parents", value: string) {
-    const profiles: WorkspaceDraft["profiles"] = [
-      { ...draft.profiles[0] },
-      { ...draft.profiles[1] },
-    ];
-    profiles[index] = { ...profiles[index], [field]: value };
-    onChange({ ...draft, profiles });
+  function updatePartner(
+    partner: "bride" | "groom",
+    field: "nickname" | "fullName" | "fatherName" | "motherName",
+    value: string,
+  ) {
+    onChange({ ...draft, [partner]: { ...draft[partner], [field]: value } });
   }
 
   return (
@@ -25,60 +28,53 @@ export function IdentitySection({ draft, onChange }: IdentitySectionProps) {
         <p className="text-xs font-semibold tracking-[0.18em] text-stone-500 uppercase">Identitas</p>
         <h3 id="workspace-identity-heading" className="mt-2 font-serif text-2xl">Kedua mempelai</h3>
       </div>
-      <div className="grid gap-4 sm:grid-cols-2">
-        <label className="text-sm font-semibold" htmlFor="workspace-first-name">
-          Nama mempelai pertama
-          <input
-            id="workspace-first-name"
-            name="firstName"
-            value={draft.couple.firstName}
-            onChange={(event) => onChange({
-              ...draft,
-              couple: { ...draft.couple, firstName: event.target.value },
-            })}
-            className={inputClassName}
-          />
-        </label>
-        <label className="text-sm font-semibold" htmlFor="workspace-second-name">
-          Nama mempelai kedua
-          <input
-            id="workspace-second-name"
-            name="secondName"
-            value={draft.couple.secondName}
-            onChange={(event) => onChange({
-              ...draft,
-              couple: { ...draft.couple, secondName: event.target.value },
-            })}
-            className={inputClassName}
-          />
-        </label>
-      </div>
-      {[0, 1].map((index) => (
-        <fieldset key={index} className="grid gap-4 border border-stone-200 p-4">
+      {partners.map(({ key, label }) => (
+        <fieldset key={key} className="grid gap-4 border border-stone-200 p-4">
           <legend className="px-1 text-xs font-semibold tracking-[0.14em] text-stone-500 uppercase">
-            Mempelai {index + 1}
+            {label}
           </legend>
-          <label className="text-sm font-semibold" htmlFor={`workspace-profile-name-${index}`}>
-            Nama lengkap
+          <label className="text-sm font-semibold" htmlFor={`workspace-${key}-nickname`}>
+            Nama panggilan
             <input
-              id={`workspace-profile-name-${index}`}
-              name={`profile${index + 1}Name`}
-              value={draft.profiles[index].name}
-              onChange={(event) => updatePartner(index as 0 | 1, "name", event.target.value)}
+              id={`workspace-${key}-nickname`}
+              name={`${key}Nickname`}
+              value={draft[key].nickname}
+              onChange={(event) => updatePartner(key, "nickname", event.target.value)}
               className={inputClassName}
             />
           </label>
-          <label className="text-sm font-semibold" htmlFor={`workspace-profile-parents-${index}`}>
-            Nama orang tua
-            <textarea
-              id={`workspace-profile-parents-${index}`}
-              name={`profile${index + 1}Parents`}
-              value={draft.profiles[index].parents}
-              onChange={(event) => updatePartner(index as 0 | 1, "parents", event.target.value)}
-              rows={3}
-              className="mt-2 w-full border border-stone-300 bg-stone-50 px-3 py-3 text-sm focus-visible:outline-2"
+          <label className="text-sm font-semibold" htmlFor={`workspace-${key}-full-name`}>
+            Nama lengkap
+            <input
+              id={`workspace-${key}-full-name`}
+              name={`${key}FullName`}
+              value={draft[key].fullName}
+              onChange={(event) => updatePartner(key, "fullName", event.target.value)}
+              className={inputClassName}
             />
           </label>
+          <div className="grid gap-4 sm:grid-cols-2">
+            <label className="text-sm font-semibold" htmlFor={`workspace-${key}-father`}>
+              Nama ayah
+              <input
+                id={`workspace-${key}-father`}
+                name={`${key}FatherName`}
+                value={draft[key].fatherName}
+                onChange={(event) => updatePartner(key, "fatherName", event.target.value)}
+                className={inputClassName}
+              />
+            </label>
+            <label className="text-sm font-semibold" htmlFor={`workspace-${key}-mother`}>
+              Nama ibu
+              <input
+                id={`workspace-${key}-mother`}
+                name={`${key}MotherName`}
+                value={draft[key].motherName}
+                onChange={(event) => updatePartner(key, "motherName", event.target.value)}
+                className={inputClassName}
+              />
+            </label>
+          </div>
         </fieldset>
       ))}
     </section>

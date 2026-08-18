@@ -101,23 +101,19 @@ function parseWorkspaceFormData(formData: FormData) {
     invitationId: formData.get("invitationId"),
     expectedContentVersion: formData.get("expectedContentVersion"),
     content: {
-      couple: {
-        firstName: formData.get("firstName"),
-        secondName: formData.get("secondName"),
+      bride: {
+        nickname: formData.get("brideNickname"),
+        fullName: formData.get("brideFullName"),
+        fatherName: formData.get("brideFatherName"),
+        motherName: formData.get("brideMotherName"),
       },
-      profiles: [
-        {
-          name: formData.get("profile1Name"),
-          parents: formData.get("profile1Parents"),
-        },
-        {
-          name: formData.get("profile2Name"),
-          parents: formData.get("profile2Parents"),
-        },
-      ],
-      opening: formData.get("opening"),
+      groom: {
+        nickname: formData.get("groomNickname"),
+        fullName: formData.get("groomFullName"),
+        fatherName: formData.get("groomFatherName"),
+        motherName: formData.get("groomMotherName"),
+      },
       quote: formData.get("quote"),
-      closing: formData.get("closing"),
     },
   });
 }

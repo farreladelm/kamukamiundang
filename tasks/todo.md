@@ -296,7 +296,7 @@ Task lama tetap selesai. Tabel ini mencatat bagian yang memerlukan remediation k
 
 ### MVP-20: Add identity and copy fields
 
-**Acceptance:** Couple/parent names, quote, opening, and closing use shared server/client schema; errors retain draft; optional omissions render without broken layout.  
+**Acceptance:** Bride/groom names plus separate father/mother names and quote use shared server/client schema; opening and closing remain source-controlled template copy; errors retain draft; optional omissions render without broken layout.  
 **Verify:** Section tests and manual mobile focus/keyboard check.  
 **Dependencies:** `MVP-19`  
 **Likely files:** `src/features/invitations/content-schema.ts`, `src/features/workspace/identity-section.tsx`, `src/features/workspace/copy-section.tsx`, `src/features/workspace/identity-section.test.tsx`  

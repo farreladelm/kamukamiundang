@@ -6,25 +6,26 @@ const parentText = z.string().trim().max(300, "Maksimal 300 karakter.").default(
 const copyText = z.string().trim().max(2000, "Maksimal 2.000 karakter.").default("");
 
 const partnerSchema = z.object({
-  name: shortText,
-  parents: parentText,
+  nickname: shortText,
+  fullName: shortText,
+  fatherName: parentText,
+  motherName: parentText,
 });
 
 export const workspaceDraftSchema = z.object({
-  couple: z.object({
-    firstName: shortText,
-    secondName: shortText,
-  }).default(() => ({ firstName: "", secondName: "" })),
-  profiles: z.tuple([partnerSchema, partnerSchema]).default((): [
-    { name: string; parents: string },
-    { name: string; parents: string },
-  ] => [
-    { name: "", parents: "" },
-    { name: "", parents: "" },
-  ]),
-  opening: copyText,
+  bride: partnerSchema.default(() => ({
+    nickname: "",
+    fullName: "",
+    fatherName: "",
+    motherName: "",
+  })),
+  groom: partnerSchema.default(() => ({
+    nickname: "",
+    fullName: "",
+    fatherName: "",
+    motherName: "",
+  })),
   quote: copyText,
-  closing: copyText,
 });
 
 export type WorkspaceDraft = z.infer<typeof workspaceDraftSchema>;
@@ -35,8 +36,24 @@ function displayText(value: string, placeholder: string) {
   return value || placeholder;
 }
 
-/** Maps editable draft fields to safe preview placeholders until later workspace sections are configured. */
-export function toTemplateContentViewModel(draft: WorkspaceDraft): TemplateContentViewModel {
+function formatParents(
+  role: "putra" | "putri",
+  partner: WorkspaceDraft["bride"],
+) {
+  const parents = [
+    partner.fatherName && `Bapak ${partner.fatherName}`,
+    partner.motherName && `Ibu ${partner.motherName}`,
+  ].filter(Boolean).join(" dan ");
+
+  if (!parents) return "";
+  return `${role === "putri" ? "Putri" : "Putra"} dari ${parents}`;
+}
+
+/** Maps editable draft fields to preview while retaining source-controlled template copy. */
+export function toTemplateContentViewModel(
+  draft: WorkspaceDraft,
+  templateCopy: Pick<TemplateContentViewModel, "opening" | "closing">,
+): TemplateContentViewModel {
   return {
     eyebrow: "Undangan pernikahan",
     cover: {
@@ -45,27 +62,27 @@ export function toTemplateContentViewModel(draft: WorkspaceDraft): TemplateConte
       recipientName: "Tamu undangan",
     },
     couple: {
-      firstName: displayText(draft.couple.firstName, "Mempelai pertama"),
-      secondName: displayText(draft.couple.secondName, "Mempelai kedua"),
+      firstName: displayText(draft.bride.nickname, "Mempelai perempuan"),
+      secondName: displayText(draft.groom.nickname, "Mempelai laki-laki"),
     },
     profiles: [
       {
-        name: displayText(draft.profiles[0].name, "Mempelai pertama"),
+        name: displayText(draft.bride.fullName || draft.bride.nickname, "Mempelai perempuan"),
         role: "putri",
-        parents: draft.profiles[0].parents,
+        parents: formatParents("putri", draft.bride),
       },
       {
-        name: displayText(draft.profiles[1].name, "Mempelai kedua"),
+        name: displayText(draft.groom.fullName || draft.groom.nickname, "Mempelai laki-laki"),
         role: "putra",
-        parents: draft.profiles[1].parents,
+        parents: formatParents("putra", draft.groom),
       },
     ],
-    opening: draft.opening,
+    opening: templateCopy.opening,
     quote: draft.quote,
     eventDate: "Tanggal acara akan ditambahkan",
     eventDateIso: "2099-01-01T00:00:00+00:00",
     events: [],
-    closing: draft.closing,
+    closing: templateCopy.closing,
     branding: "Undangan oleh Undango",
   };
 }

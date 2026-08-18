@@ -55,16 +55,11 @@ async function setupWorkspace(contentSchemaVersion = 2) {
   return { customer, invitation };
 }
 
-function workspaceDraft(opening = "Kami mengundang Anda."): WorkspaceDraft {
+function workspaceDraft(quote = "Doa terbaik untuk kami."): WorkspaceDraft {
   return {
-    couple: { firstName: "Rani", secondName: "Dimas" },
-    profiles: [
-      { name: "Rani Prameswari", parents: "Putri Bapak Hadi dan Ibu Rani" },
-      { name: "Dimas Adinata", parents: "Putra Bapak Surya dan Ibu Ratih" },
-    ],
-    opening,
-    quote: "Doa terbaik untuk kami.",
-    closing: "Sampai jumpa di hari bahagia kami.",
+    bride: { nickname: "Rani", fullName: "Rani Prameswari", fatherName: "Hadi", motherName: "Rani" },
+    groom: { nickname: "Dimas", fullName: "Dimas Adinata", fatherName: "Surya", motherName: "Ratih" },
+    quote,
   };
 }
 

@@ -18,14 +18,9 @@ function workspaceFixture(): WorkspaceInvitationDto {
     paletteKey: runtime.demo.paletteKey,
     contentVersion: 3,
     draft: {
-      couple: { firstName: "Rani", secondName: "Dimas" },
-      profiles: [
-        { name: "Rani Prameswari", parents: "Putri Bapak Hadi dan Ibu Rani" },
-        { name: "Dimas Adinata", parents: "Putra Bapak Surya dan Ibu Ratih" },
-      ],
-      opening: "Kami mengundang Anda.",
+      bride: { nickname: "Rani", fullName: "Rani Prameswari", fatherName: "Hadi", motherName: "Rani" },
+      groom: { nickname: "Dimas", fullName: "Dimas Adinata", fatherName: "Surya", motherName: "Ratih" },
       quote: "Doa terbaik untuk kami.",
-      closing: "Sampai jumpa di hari bahagia kami.",
     },
     palettes: runtime.palettes,
   };
@@ -35,14 +30,17 @@ describe("WorkspaceEditor", () => {
   it("renders typed fields and previews current local draft content", () => {
     render(<WorkspaceEditor workspace={workspaceFixture()} />);
 
-    const firstNameInput = screen.getByRole("textbox", { name: "Nama mempelai pertama" });
+    const [firstNameInput] = screen.getAllByRole("textbox", { name: "Nama panggilan" });
     expect(firstNameInput).toHaveValue("Rani");
+    expect(screen.getAllByRole("textbox", { name: "Nama lengkap" })[0]).toHaveValue("Rani Prameswari");
+    expect(screen.getAllByRole("textbox", { name: "Nama ayah" })[0]).toHaveValue("Hadi");
     expect(screen.getByText("template-1 v1")).toBeInTheDocument();
     expect(screen.getAllByText(/Rani/).length).toBeGreaterThan(0);
 
     fireEvent.change(firstNameInput, { target: { value: "Naya" } });
     expect(firstNameInput).toHaveValue("Naya");
     expect(screen.getAllByText(/Naya/).length).toBeGreaterThan(0);
-    expect(screen.queryByRole("textbox", { name: "Draft JSON" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("textbox", { name: "Pesan pembuka" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("textbox", { name: "Pesan penutup" })).not.toBeInTheDocument();
   });
 });
