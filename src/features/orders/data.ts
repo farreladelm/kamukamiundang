@@ -101,7 +101,12 @@ export async function createPendingOrder({
     requireVisible: true,
   });
 
-  if ("ok" in template) throw new Error("Unknown template version or palette");
+  if ("ok" in template) {
+    if (template.reason === "NOT_VISIBLE") {
+      throw new Error("Template status is not visible for order creation");
+    }
+    throw new Error("Unknown template version or palette");
+  }
   if (!Number.isInteger(photoLimit) || photoLimit < 0) throw new Error("Invalid photo limit");
   if (storageQuotaBytes < BigInt(0)) throw new Error("Invalid storage quota");
 
