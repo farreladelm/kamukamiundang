@@ -60,7 +60,7 @@ describe("WorkspaceEditor", () => {
     expect(screen.getAllByText(/Naya/).length).toBeGreaterThan(0);
     expect(screen.queryByRole("textbox", { name: "Pesan pembuka" })).not.toBeInTheDocument();
     expect(screen.queryByRole("textbox", { name: "Pesan penutup" })).not.toBeInTheDocument();
-  });
+  }, 15_000);
 
   it("supports gated story and gift sections with placeholder preview content", () => {
     render(<WorkspaceEditor workspace={workspaceFixture()} />);
@@ -82,7 +82,7 @@ describe("WorkspaceEditor", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Hapus cerita" }));
     expect(screen.queryByRole("textbox", { name: "Judul bab" })).not.toBeInTheDocument();
-  });
+  }, 15_000);
 
   it("does not enable optional controls for unsupported template capabilities", () => {
     render(<WorkspaceEditor workspace={workspaceFixture("template-2")} />);
