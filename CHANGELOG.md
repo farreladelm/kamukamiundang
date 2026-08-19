@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Formatted Rupiah price in admin order intake template selection dropdown options.
 - Customer workspace now loads and saves versioned drafts with pinned runtime checks and stale-save protection.
 - Customer workspace now provides bride/groom identity fields and curated invitation quote choices.
+- Customer workspace now supports Akad Nikah and Resepsi schedules with timezone-aware countdowns and Google Maps validation.
 
 ### Changed
 - Catalog cards now display administrator-configured marketing thumbnails while preserving runtime previews when no thumbnail is set.

@@ -114,6 +114,24 @@ function parseWorkspaceFormData(formData: FormData) {
         motherName: formData.get("groomMotherName"),
       },
       quoteKey: formData.get("quoteKey"),
+      mainEvent: formData.get("mainEventLabel") === null ? null : {
+        label: formData.get("mainEventLabel"),
+        date: formData.get("mainEventDate"),
+        time: formData.get("mainEventTime"),
+        timeZone: formData.get("mainEventTimeZone"),
+        venue: formData.get("mainEventVenue"),
+        address: formData.get("mainEventAddress"),
+        mapUrl: formData.get("mainEventMapUrl"),
+      },
+      secondaryEvent: formData.get("secondaryEventLabel") === null ? null : {
+        label: formData.get("secondaryEventLabel"),
+        date: formData.get("secondaryEventDate"),
+        time: formData.get("secondaryEventTime"),
+        timeZone: formData.get("secondaryEventTimeZone"),
+        venue: formData.get("secondaryEventVenue"),
+        address: formData.get("secondaryEventAddress"),
+        mapUrl: formData.get("secondaryEventMapUrl"),
+      },
     },
   });
 }

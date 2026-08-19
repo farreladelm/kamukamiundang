@@ -17,6 +17,7 @@ import {
 } from "./actions";
 import type { WorkspaceInvitationDto } from "@/features/invitations/workspace-dto";
 import { CopySection } from "./copy-section";
+import { EventSection } from "./event-section";
 import { IdentitySection } from "./identity-section";
 
 export function WorkspaceEditor({ workspace }: { workspace: WorkspaceInvitationDto }) {
@@ -32,7 +33,10 @@ export function WorkspaceEditor({ workspace }: { workspace: WorkspaceInvitationD
   }
 
   const selectedPalette = runtime.palettes.find((palette) => palette.key === workspace.paletteKey);
-  const previewDraft = workspaceDraftSchema.safeParse(draft);
+  const validation = workspaceDraftSchema.safeParse(draft);
+  const fieldErrors = validation.success
+    ? {}
+    : Object.fromEntries(validation.error.issues.map((issue) => [issue.path.join("."), issue.message]));
 
   return (
     <div className="grid gap-8 xl:grid-cols-[minmax(18rem,0.7fr)_minmax(0,1.3fr)]">
@@ -50,6 +54,7 @@ export function WorkspaceEditor({ workspace }: { workspace: WorkspaceInvitationD
           <input type="hidden" name="expectedContentVersion" value={saveState.contentVersion} />
           <IdentitySection draft={draft} onChange={setDraft} />
           <CopySection draft={draft} onChange={setDraft} />
+          <EventSection draft={draft} onChange={setDraft} errors={fieldErrors} />
           <p className="text-xs leading-5 text-stone-500">
             Input tetap dipertahankan jika validasi atau konflik versi gagal.
           </p>
@@ -84,14 +89,10 @@ export function WorkspaceEditor({ workspace }: { workspace: WorkspaceInvitationD
           </p>
         </div>
         <div className="overflow-hidden border border-stone-300 bg-white shadow-sm">
-          {previewDraft.success ? (
-            renderTemplate(
-              runtime,
-              workspace.paletteKey,
-              toTemplateContentViewModel(previewDraft.data, runtime.demo.content),
-            )
-          ) : (
-            <p role="alert" className="p-5 text-sm text-red-700">Perbaiki isian sebelum melihat preview.</p>
+          {renderTemplate(
+            runtime,
+            workspace.paletteKey,
+            toTemplateContentViewModel(draft, runtime.demo.content),
           )}
         </div>
       </section>

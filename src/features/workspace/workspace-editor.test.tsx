@@ -21,6 +21,16 @@ function workspaceFixture(): WorkspaceInvitationDto {
       bride: { nickname: "Rani", fullName: "Rani Prameswari", fatherName: "Hadi", motherName: "Rani" },
       groom: { nickname: "Dimas", fullName: "Dimas Adinata", fatherName: "Surya", motherName: "Ratih" },
       quoteKey: "matthew-19-6",
+      mainEvent: {
+        label: "Akad Nikah",
+        date: "2026-11-14",
+        time: "08:00",
+        timeZone: "Asia/Jakarta",
+        venue: "Pendopo Joglo Sari",
+        address: "Jl. Taman Sari No. 18, Yogyakarta",
+        mapUrl: "https://maps.google.com/?q=Pendopo+Joglo+Sari",
+      },
+      secondaryEvent: null,
     },
     palettes: runtime.palettes,
   };
@@ -37,6 +47,11 @@ describe("WorkspaceEditor", () => {
     expect(screen.getByRole("radio", { name: /Matthew 19:6/ })).toBeChecked();
     expect(screen.getByText("template-1 v1")).toBeInTheDocument();
     expect(screen.getAllByText(/Rani/).length).toBeGreaterThan(0);
+
+    const mapsUrlInput = screen.getByRole("textbox", { name: "Tautan Google Maps" });
+    fireEvent.change(mapsUrlInput, { target: { value: "https://example.com/maps" } });
+    expect(screen.getByText("Gunakan tautan Google Maps HTTPS yang valid.")).toBeInTheDocument();
+    expect(screen.getByTestId("invitation-experience")).toBeInTheDocument();
 
     fireEvent.change(firstNameInput, { target: { value: "Naya" } });
     expect(firstNameInput).toHaveValue("Naya");
