@@ -77,7 +77,6 @@ const giftAccountSchema = z.object({
 });
 
 const workspaceGiftSchema = z.object({
-  intro: z.string().trim().max(500, "Maksimal 500 karakter.").default(""),
   accounts: z.array(giftAccountSchema).max(MAX_GIFT_ACCOUNTS),
   physicalAddress: z.string().trim().max(500, "Maksimal 500 karakter.").default(""),
 });
@@ -166,7 +165,7 @@ function toTemplateEvent(event: NonNullable<WorkspaceDraft["mainEvent"]>) {
 /** Maps editable draft fields to preview while retaining source-controlled template copy. */
 export function toTemplateContentViewModel(
   draft: WorkspaceDraft,
-  templateCopy: Pick<TemplateContentViewModel, "opening" | "closing">,
+  templateCopy: Pick<TemplateContentViewModel, "opening" | "closing" | "gift">,
   capabilities: readonly TemplateCapability[] = [],
 ): TemplateContentViewModel {
   const mainEvent = draft.mainEvent ? toTemplateEvent(draft.mainEvent) : null;
@@ -189,11 +188,11 @@ export function toTemplateContentViewModel(
         })),
       }
     : undefined;
-  const gift = capabilities.includes("gift") && draft.gift && (
-    draft.gift.intro || giftAccounts.length > 0 || draft.gift.physicalAddress
+  const gift = capabilities.includes("gift") && templateCopy.gift && draft.gift && (
+    giftAccounts.length > 0 || draft.gift.physicalAddress
   )
     ? {
-        intro: draft.gift.intro,
+        intro: templateCopy.gift.intro,
         accounts: giftAccounts,
         physicalAddress: draft.gift.physicalAddress || undefined,
       }

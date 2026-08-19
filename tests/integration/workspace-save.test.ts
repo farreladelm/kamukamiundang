@@ -78,7 +78,6 @@ function workspaceDraft(): WorkspaceDraft {
       entries: [{ title: "Pertama bertemu", text: "Di kampus." }],
     },
     gift: {
-      intro: "Tanda kasih.",
       accounts: [{ bank: "Bank Nusantara", accountNumber: "123", accountName: "Rani" }],
       physicalAddress: "Jl. Taman Sari",
     },

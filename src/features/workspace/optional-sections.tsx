@@ -13,7 +13,7 @@ type OptionalSectionsProps = {
 };
 
 const emptyStory = () => ({ intro: "", entries: [] });
-const emptyGift = () => ({ intro: "", accounts: [], physicalAddress: "" });
+const emptyGift = () => ({ accounts: [], physicalAddress: "" });
 
 export function OptionalSections({ draft, onChange, canStory, canGift }: OptionalSectionsProps) {
   function updateStory(story: NonNullable<WorkspaceDraft["story"]>) {

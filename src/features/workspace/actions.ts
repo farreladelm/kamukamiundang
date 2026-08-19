@@ -152,7 +152,6 @@ function parseWorkspaceFormData(formData: FormData) {
         })),
       },
       gift: formData.get("giftEnabled") === null ? null : {
-        intro: "",
         accounts: Array.from({ length: parseFormCount(formData.get("giftAccountCount"), MAX_GIFT_ACCOUNTS) }, (_, index) => ({
           bank: formData.get(`giftAccountBank_${index}`),
           accountNumber: formData.get(`giftAccountAccountNumber_${index}`),
