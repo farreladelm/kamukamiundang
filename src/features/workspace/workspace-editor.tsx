@@ -19,6 +19,7 @@ import type { WorkspaceInvitationDto } from "@/features/invitations/workspace-dt
 import { CopySection } from "./copy-section";
 import { EventSection } from "./event-section";
 import { IdentitySection } from "./identity-section";
+import { OptionalSections } from "./optional-sections";
 
 export function WorkspaceEditor({ workspace }: { workspace: WorkspaceInvitationDto }) {
   const [saveState, formAction, pending] = useActionState<WorkspaceSaveState, FormData>(
@@ -55,6 +56,7 @@ export function WorkspaceEditor({ workspace }: { workspace: WorkspaceInvitationD
           <IdentitySection draft={draft} onChange={setDraft} />
           <CopySection draft={draft} onChange={setDraft} />
           <EventSection draft={draft} onChange={setDraft} errors={fieldErrors} />
+          <OptionalSections draft={draft} onChange={setDraft} canStory={runtime.capabilities.includes("story")} canGift={runtime.capabilities.includes("gift")} />
           <p className="text-xs leading-5 text-stone-500">
             Input tetap dipertahankan jika validasi atau konflik versi gagal.
           </p>
@@ -92,7 +94,7 @@ export function WorkspaceEditor({ workspace }: { workspace: WorkspaceInvitationD
           {renderTemplate(
             runtime,
             workspace.paletteKey,
-            toTemplateContentViewModel(draft, runtime.demo.content),
+             toTemplateContentViewModel(draft, runtime.demo.content, runtime.capabilities),
           )}
         </div>
       </section>

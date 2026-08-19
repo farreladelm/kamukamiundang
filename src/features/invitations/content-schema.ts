@@ -1,4 +1,4 @@
-import type { TemplateContentViewModel } from "@/features/templates/types";
+import type { TemplateCapability, TemplateContentViewModel } from "@/features/templates/types";
 import {
   defaultWeddingEvents,
   isAllowedMapsUrl,
@@ -13,6 +13,9 @@ const shortText = z.string().trim().max(100, "Maksimal 100 karakter.").default("
 const parentText = z.string().trim().max(300, "Maksimal 300 karakter.").default("");
 
 const workspaceQuoteKeySchema = z.enum(["matthew-19-6", "ar-rum-21"]);
+
+export const MAX_STORY_ENTRIES = 4;
+export const MAX_GIFT_ACCOUNTS = 2;
 
 export type WorkspaceQuoteKey = z.infer<typeof workspaceQuoteKeySchema>;
 
@@ -57,6 +60,28 @@ const workspaceEventSchema = z.object({
   mapUrl: mapsUrlSchema,
 });
 
+const storyEntrySchema = z.object({
+  title: eventText,
+  text: z.string().trim().max(1000, "Maksimal 1000 karakter.").default(""),
+});
+
+const workspaceStorySchema = z.object({
+  intro: z.string().trim().max(500, "Maksimal 500 karakter.").default(""),
+  entries: z.array(storyEntrySchema).max(MAX_STORY_ENTRIES),
+});
+
+const giftAccountSchema = z.object({
+  bank: shortText,
+  accountNumber: shortText,
+  accountName: shortText,
+});
+
+const workspaceGiftSchema = z.object({
+  intro: z.string().trim().max(500, "Maksimal 500 karakter.").default(""),
+  accounts: z.array(giftAccountSchema).max(MAX_GIFT_ACCOUNTS),
+  physicalAddress: z.string().trim().max(500, "Maksimal 500 karakter.").default(""),
+});
+
 export const workspaceDraftSchema = z.object({
   bride: partnerSchema.default(() => ({
     nickname: "",
@@ -73,6 +98,8 @@ export const workspaceDraftSchema = z.object({
   quoteKey: workspaceQuoteKeySchema.nullable().default(null),
   mainEvent: workspaceEventSchema.nullable().default(() => ({ ...defaultWeddingEvents.main })),
   secondaryEvent: workspaceEventSchema.nullable().default(() => ({ ...defaultWeddingEvents.secondary })),
+  story: workspaceStorySchema.nullable().default(null),
+  gift: workspaceGiftSchema.nullable().default(null),
 });
 
 export type WorkspaceDraft = z.infer<typeof workspaceDraftSchema>;
@@ -140,11 +167,37 @@ function toTemplateEvent(event: NonNullable<WorkspaceDraft["mainEvent"]>) {
 export function toTemplateContentViewModel(
   draft: WorkspaceDraft,
   templateCopy: Pick<TemplateContentViewModel, "opening" | "closing">,
+  capabilities: readonly TemplateCapability[] = [],
 ): TemplateContentViewModel {
   const mainEvent = draft.mainEvent ? toTemplateEvent(draft.mainEvent) : null;
   const secondaryEvent = draft.secondaryEvent ? toTemplateEvent(draft.secondaryEvent) : null;
   const events = [mainEvent, secondaryEvent].filter((event): event is NonNullable<typeof event> => Boolean(event));
   const firstEvent = events[0];
+
+  const storyEntries = draft.story?.entries.filter((entry) => entry.title || entry.text) ?? [];
+  const giftAccounts = draft.gift?.accounts.filter((account) => account.bank || account.accountNumber || account.accountName) ?? [];
+  const story = capabilities.includes("story") && draft.story && (draft.story.intro || storyEntries.length > 0)
+    ? {
+        intro: draft.story.intro || undefined,
+        entries: storyEntries.map((entry, index) => ({
+          ...entry,
+          photo: {
+            id: `workspace-story-${index + 1}`,
+            alt: entry.title || `Cerita ${index + 1}`,
+            tone: (["sand", "rose", "leaf", "sky"] as const)[index % 4],
+          },
+        })),
+      }
+    : undefined;
+  const gift = capabilities.includes("gift") && draft.gift && (
+    draft.gift.intro || giftAccounts.length > 0 || draft.gift.physicalAddress
+  )
+    ? {
+        intro: draft.gift.intro,
+        accounts: giftAccounts,
+        physicalAddress: draft.gift.physicalAddress || undefined,
+      }
+    : undefined;
 
   return {
     eyebrow: "Undangan pernikahan",
@@ -181,6 +234,8 @@ export function toTemplateContentViewModel(
       address: event.address,
       mapUrl: event.mapUrl,
     })),
+    story,
+    gift,
     closing: templateCopy.closing,
     branding: "Undangan oleh Undango",
   };

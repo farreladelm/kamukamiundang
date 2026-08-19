@@ -6,8 +6,8 @@ import type { WorkspaceInvitationDto } from "@/features/invitations/workspace-dt
 
 afterEach(cleanup);
 
-function workspaceFixture(): WorkspaceInvitationDto {
-  const runtime = getTemplateRuntimeManifest("template-1", 1);
+function workspaceFixture(templateKey = "template-1"): WorkspaceInvitationDto {
+  const runtime = getTemplateRuntimeManifest(templateKey, 1);
   if (!runtime) throw new Error("Expected Template 1 v1");
 
   return {
@@ -30,7 +30,9 @@ function workspaceFixture(): WorkspaceInvitationDto {
         address: "Jl. Taman Sari No. 18, Yogyakarta",
         mapUrl: "https://maps.google.com/?q=Pendopo+Joglo+Sari",
       },
-      secondaryEvent: null,
+        secondaryEvent: null,
+        story: null,
+        gift: null,
     },
     palettes: runtime.palettes,
   };
@@ -58,5 +60,34 @@ describe("WorkspaceEditor", () => {
     expect(screen.getAllByText(/Naya/).length).toBeGreaterThan(0);
     expect(screen.queryByRole("textbox", { name: "Pesan pembuka" })).not.toBeInTheDocument();
     expect(screen.queryByRole("textbox", { name: "Pesan penutup" })).not.toBeInTheDocument();
+  });
+
+  it("supports gated story and gift sections with placeholder preview content", () => {
+    render(<WorkspaceEditor workspace={workspaceFixture()} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Tambah cerita" }));
+    fireEvent.click(screen.getByRole("button", { name: "Tambah bab" }));
+    fireEvent.change(screen.getByRole("textbox", { name: "Judul bab" }), { target: { value: "Pertama bertemu" } });
+    fireEvent.change(screen.getByRole("textbox", { name: "Teks cerita" }), { target: { value: "Kami bertemu di kampus." } });
+    expect(screen.getByText("Pertama bertemu")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Buka undangan" }));
+    expect(screen.getByRole("heading", { name: "Yang membawa kami ke sini" })).toBeInTheDocument();
+    expect(screen.getByTestId("invitation-experience")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Tambah informasi hadiah" }));
+    fireEvent.click(screen.getByRole("button", { name: "Tambah rekening" }));
+    fireEvent.change(screen.getByRole("textbox", { name: "Bank" }), { target: { value: "Bank Nusantara" } });
+    expect(screen.getByDisplayValue("Bank Nusantara")).toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Tanda kasih" })).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Hapus cerita" }));
+    expect(screen.queryByRole("textbox", { name: "Judul bab" })).not.toBeInTheDocument();
+  });
+
+  it("does not enable optional controls for unsupported template capabilities", () => {
+    render(<WorkspaceEditor workspace={workspaceFixture("template-2")} />);
+
+    expect(screen.queryByRole("button", { name: "Tambah cerita" })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Tambah informasi hadiah" })).toBeInTheDocument();
   });
 });

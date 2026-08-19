@@ -7,6 +7,7 @@ import {
   type WorkspaceDraft,
   workspaceDraftSchema,
 } from "@/features/invitations/workspace-dto";
+import { MAX_GIFT_ACCOUNTS, MAX_STORY_ENTRIES } from "@/features/invitations/content-schema";
 import {
   initialWorkspaceSaveState,
   type WorkspaceSaveState,
@@ -29,6 +30,11 @@ type WorkspaceSaveInput = {
   expectedContentVersion: number;
   content: WorkspaceDraft;
 };
+
+function parseFormCount(value: FormDataEntryValue | null, max: number) {
+  const count = Number(value);
+  return Number.isInteger(count) && count >= 0 ? Math.min(count, max) : 0;
+}
 
 export type WorkspaceSaveResult =
   | { status: "success"; contentVersion: number }
@@ -58,8 +64,9 @@ export async function saveWorkspaceDraftForCustomer(
   if (!invitation) return { status: "unavailable" };
   if (!invitation.editingEnabled) return { status: "locked" };
 
+  let runtime: ReturnType<typeof assertWorkspaceRuntime>;
   try {
-    assertWorkspaceRuntime(
+    runtime = assertWorkspaceRuntime(
       invitation.templateKey,
       invitation.templateVersion,
       invitation.contentSchemaVersion,
@@ -69,6 +76,11 @@ export async function saveWorkspaceDraftForCustomer(
     return { status: "unavailable" };
   }
 
+  const content: WorkspaceDraft = {
+    ...input.content,
+    story: runtime.capabilities.includes("story") ? input.content.story : null,
+    gift: runtime.capabilities.includes("gift") ? input.content.gift : null,
+  };
   const result = await db.invitationContent.updateMany({
     where: {
       invitationId: invitation.id,
@@ -76,7 +88,7 @@ export async function saveWorkspaceDraftForCustomer(
       contentSchemaVersion: invitation.contentSchemaVersion,
     },
     data: {
-      content: input.content as Prisma.InputJsonObject,
+      content: content as Prisma.InputJsonObject,
       contentVersion: input.expectedContentVersion + 1,
       updatedByActorType: "CUSTOMER",
       updatedByActorId: input.customerId,
@@ -131,6 +143,22 @@ function parseWorkspaceFormData(formData: FormData) {
         venue: formData.get("secondaryEventVenue"),
         address: formData.get("secondaryEventAddress"),
         mapUrl: formData.get("secondaryEventMapUrl"),
+      },
+      story: formData.get("storyEnabled") === null ? null : {
+        intro: formData.get("storyIntro"),
+        entries: Array.from({ length: parseFormCount(formData.get("storyEntryCount"), MAX_STORY_ENTRIES) }, (_, index) => ({
+          title: formData.get(`storyEntryTitle_${index}`),
+          text: formData.get(`storyEntryText_${index}`),
+        })),
+      },
+      gift: formData.get("giftEnabled") === null ? null : {
+        intro: "",
+        accounts: Array.from({ length: parseFormCount(formData.get("giftAccountCount"), MAX_GIFT_ACCOUNTS) }, (_, index) => ({
+          bank: formData.get(`giftAccountBank_${index}`),
+          accountNumber: formData.get(`giftAccountAccountNumber_${index}`),
+          accountName: formData.get(`giftAccountAccountName_${index}`),
+        })),
+        physicalAddress: formData.get("giftPhysicalAddress"),
       },
     },
   });

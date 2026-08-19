@@ -73,6 +73,15 @@ function workspaceDraft(): WorkspaceDraft {
       mapUrl: "https://maps.google.com/?q=Pendopo+Joglo+Sari",
     },
     secondaryEvent: null,
+    story: {
+      intro: "Cerita kami.",
+      entries: [{ title: "Pertama bertemu", text: "Di kampus." }],
+    },
+    gift: {
+      intro: "Tanda kasih.",
+      accounts: [{ bank: "Bank Nusantara", accountNumber: "123", accountName: "Rani" }],
+      physicalAddress: "Jl. Taman Sari",
+    },
   };
 }
 
