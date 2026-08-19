@@ -52,6 +52,23 @@ export function isAllowedMapsUrl(value: string) {
   }
 }
 
+export function isValidEventDate(value: string) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+  if (!match) return false;
+
+  const year = Number(match[1]);
+  const month = Number(match[2]);
+  const day = Number(match[3]);
+  const date = new Date(Date.UTC(year, month - 1, day));
+  return date.getUTCFullYear() === year && date.getUTCMonth() === month - 1 && date.getUTCDate() === day;
+}
+
+export function isValidEventTime(value: string) {
+  const match = /^(\d{2}):(\d{2})$/.exec(value);
+  if (!match) return false;
+  return Number(match[1]) <= 23 && Number(match[2]) <= 59;
+}
+
 function getTimeZoneOffset(date: Date, timeZone: string) {
   const parts = new Intl.DateTimeFormat("en-CA", {
     timeZone,
@@ -82,7 +99,7 @@ function getTimeZoneOffset(date: Date, timeZone: string) {
 export function toEventInstant(date: string, time: string, timeZone: string) {
   const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(date);
   const timeMatch = /^(\d{2}):(\d{2})$/.exec(time);
-  if (!match || !timeMatch || !isIanaTimeZone(timeZone)) return null;
+  if (!match || !timeMatch || !isValidEventDate(date) || !isValidEventTime(time) || !isIanaTimeZone(timeZone)) return null;
 
   const target = Date.UTC(
     Number(match[1]),

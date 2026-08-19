@@ -3,6 +3,8 @@ import {
   defaultWeddingEvents,
   isAllowedMapsUrl,
   isIanaTimeZone,
+  isValidEventDate,
+  isValidEventTime,
   toEventInstant,
 } from "./events";
 import { z } from "zod";
@@ -38,8 +40,8 @@ const partnerSchema = z.object({
   motherName: parentText,
 });
 
-const eventDateSchema = z.string().regex(/^\d{4}-\d{2}-\d{2}$/).or(z.literal("")).default("");
-const eventTimeSchema = z.string().regex(/^\d{2}:\d{2}$/).or(z.literal("")).default("");
+const eventDateSchema = z.string().refine((value) => !value || isValidEventDate(value), "Tanggal acara tidak valid.").default("");
+const eventTimeSchema = z.string().refine((value) => !value || isValidEventTime(value), "Waktu acara tidak valid.").default("");
 const eventText = z.string().trim().max(300, "Maksimal 300 karakter.").default("");
 const mapsUrlSchema = z.string().trim().max(2048, "Tautan Maps terlalu panjang.")
   .refine(isAllowedMapsUrl, "Gunakan tautan Google Maps HTTPS yang valid.")

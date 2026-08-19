@@ -3,6 +3,8 @@ import {
   defaultWeddingEvents,
   isAllowedMapsUrl,
   isIanaTimeZone,
+  isValidEventDate,
+  isValidEventTime,
   toEventInstant,
 } from "./events";
 
@@ -27,5 +29,13 @@ describe("workspace event utilities", () => {
     expect(toEventInstant("2026-11-14", "08:00", "Asia/Jakarta")?.toISOString()).toBe(
       "2026-11-14T01:00:00.000Z",
     );
+  });
+
+  it("rejects impossible dates and out-of-range times", () => {
+    expect(isValidEventDate("2026-02-30")).toBe(false);
+    expect(isValidEventDate("2026-02-28")).toBe(true);
+    expect(isValidEventTime("99:99")).toBe(false);
+    expect(isValidEventTime("23:59")).toBe(true);
+    expect(toEventInstant("2026-02-30", "10:00", "Asia/Jakarta")).toBeNull();
   });
 });
