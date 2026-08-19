@@ -119,29 +119,6 @@ describe("versioned customer workspace drafts", () => {
     await expect(db.invitationContent.findUniqueOrThrow({ where: { invitationId: invitation.id } })).resolves.toMatchObject({ contentVersion: 1 });
   });
 
-  it("preserves unsupported MVP-19 JSON when saving a typed draft", async () => {
-    const legacyDraft = { draftNote: "keep this MVP-19 data" };
-    const { customer, invitation } = await setupWorkspace(2, legacyDraft);
-
-    await expect(
-      saveWorkspaceDraftForCustomer({
-        customerId: customer.id,
-        invitationId: invitation.id,
-        expectedContentVersion: 0,
-        content: workspaceDraft(),
-      }),
-    ).resolves.toEqual({ status: "success", contentVersion: 1 });
-
-    await expect(
-      db.invitationContent.findUniqueOrThrow({ where: { invitationId: invitation.id } }),
-    ).resolves.toMatchObject({
-      content: {
-        ...workspaceDraft(),
-        legacyMvp19Draft: legacyDraft,
-      },
-    });
-  });
-
   it("rejects locked, non-owned, and missing-runtime writes", async () => {
     const { customer, invitation } = await setupWorkspace();
 

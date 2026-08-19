@@ -36,19 +36,6 @@ export type WorkspaceSaveResult =
   | { status: "locked" }
   | { status: "unavailable" };
 
-const typedDraftKeys = new Set(["bride", "groom", "quoteKey"]);
-
-function getLegacyMvp19Draft(content: unknown): unknown {
-  if (!content || typeof content !== "object" || Array.isArray(content)) return content;
-
-  const draft = content as Record<string, unknown>;
-  if (Object.keys(draft).length === 0) return undefined;
-  if ("legacyMvp19Draft" in draft) return draft.legacyMvp19Draft;
-  if (Object.keys(draft).every((key) => typedDraftKeys.has(key))) return undefined;
-
-  return content;
-}
-
 export async function saveWorkspaceDraftForCustomer(
   input: WorkspaceSaveInput,
 ): Promise<WorkspaceSaveResult> {
@@ -82,21 +69,6 @@ export async function saveWorkspaceDraftForCustomer(
     return { status: "unavailable" };
   }
 
-  const currentContent = await db.invitationContent.findFirst({
-    where: {
-      invitationId: invitation.id,
-      contentVersion: input.expectedContentVersion,
-      contentSchemaVersion: invitation.contentSchemaVersion,
-    },
-    select: { content: true },
-  });
-  const legacyMvp19Draft = currentContent
-    ? getLegacyMvp19Draft(currentContent.content)
-    : undefined;
-  const nextContent = legacyMvp19Draft === undefined
-    ? input.content
-    : { ...input.content, legacyMvp19Draft };
-
   const result = await db.invitationContent.updateMany({
     where: {
       invitationId: invitation.id,
@@ -104,8 +76,7 @@ export async function saveWorkspaceDraftForCustomer(
       contentSchemaVersion: invitation.contentSchemaVersion,
     },
     data: {
-      // MVP-19 accepted arbitrary root JSON. Retain it until a later migration can interpret it.
-      content: nextContent as Prisma.InputJsonObject,
+      content: input.content as Prisma.InputJsonObject,
       contentVersion: input.expectedContentVersion + 1,
       updatedByActorType: "CUSTOMER",
       updatedByActorId: input.customerId,
