@@ -16,7 +16,10 @@ beforeEach(async () => {
   );
 });
 
-async function setupWorkspace(contentSchemaVersion = 2) {
+async function setupWorkspace(
+  contentSchemaVersion = 2,
+  draftContent: Record<string, string> = {},
+) {
   const customer = await db.customer.create({ data: { name: "Customer" } });
   const order = await db.order.create({
     data: {
@@ -45,7 +48,7 @@ async function setupWorkspace(contentSchemaVersion = 2) {
   await db.invitationContent.create({
     data: {
       invitationId: invitation.id,
-      content: {},
+       content: draftContent,
       contentSchemaVersion: invitation.contentSchemaVersion,
       updatedByActorType: "ADMIN",
       updatedByActorId: customer.id,
@@ -114,6 +117,29 @@ describe("versioned customer workspace drafts", () => {
     expect(results.filter((result) => result.status === "success")).toHaveLength(1);
     expect(results.filter((result) => result.status === "conflict")).toHaveLength(1);
     await expect(db.invitationContent.findUniqueOrThrow({ where: { invitationId: invitation.id } })).resolves.toMatchObject({ contentVersion: 1 });
+  });
+
+  it("preserves unsupported MVP-19 JSON when saving a typed draft", async () => {
+    const legacyDraft = { draftNote: "keep this MVP-19 data" };
+    const { customer, invitation } = await setupWorkspace(2, legacyDraft);
+
+    await expect(
+      saveWorkspaceDraftForCustomer({
+        customerId: customer.id,
+        invitationId: invitation.id,
+        expectedContentVersion: 0,
+        content: workspaceDraft(),
+      }),
+    ).resolves.toEqual({ status: "success", contentVersion: 1 });
+
+    await expect(
+      db.invitationContent.findUniqueOrThrow({ where: { invitationId: invitation.id } }),
+    ).resolves.toMatchObject({
+      content: {
+        ...workspaceDraft(),
+        legacyMvp19Draft: legacyDraft,
+      },
+    });
   });
 
   it("rejects locked, non-owned, and missing-runtime writes", async () => {
