@@ -63,6 +63,7 @@ export const ModelName = {
   PublishedSnapshot: 'PublishedSnapshot',
   SnapshotAsset: 'SnapshotAsset',
   Asset: 'Asset',
+  MusicLibraryTrack: 'MusicLibraryTrack',
   Session: 'Session',
   MagicLink: 'MagicLink',
   Rsvp: 'Rsvp',
@@ -262,6 +263,23 @@ export const AssetScalarFieldEnum = {
 } as const
 
 export type AssetScalarFieldEnum = (typeof AssetScalarFieldEnum)[keyof typeof AssetScalarFieldEnum]
+
+
+export const MusicLibraryTrackScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  status: 'status',
+  storagePath: 'storagePath',
+  byteSize: 'byteSize',
+  metadata: 'metadata',
+  failureCode: 'failureCode',
+  uploadedByAdminId: 'uploadedByAdminId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt'
+} as const
+
+export type MusicLibraryTrackScalarFieldEnum = (typeof MusicLibraryTrackScalarFieldEnum)[keyof typeof MusicLibraryTrackScalarFieldEnum]
 
 
 export const SessionScalarFieldEnum = {

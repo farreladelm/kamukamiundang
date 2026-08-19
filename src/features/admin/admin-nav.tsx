@@ -7,6 +7,7 @@ import { adminLogoutAction } from "@/app/auth/admin/actions";
 const navItems = [
   { href: "/admin/templates", label: "Template" },
   { href: "/admin/orders", label: "Order" },
+  { href: "/admin/music", label: "Musik" },
 ];
 
 export function AdminNav({ email }: { email: string }) {

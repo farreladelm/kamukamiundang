@@ -80,6 +80,7 @@ model Admin {
   sessions               Session[]
   templateVisibilities   TemplateVisibility[]
   templateCatalogUpdates TemplateCatalog[]    @relation("TemplateCatalogUpdatedBy")
+  musicLibraryTracks    MusicLibraryTrack[]
 }
 
 model TemplateVisibility {
@@ -245,6 +246,24 @@ model Asset {
   snapshots    SnapshotAsset[]
 
   @@index([invitationId, status])
+}
+
+model MusicLibraryTrack {
+  id                String      @id @default(uuid()) @db.Uuid
+  title             String
+  status            AssetStatus @default(PENDING)
+  storagePath       String      @unique
+  byteSize          BigInt      @default(0)
+  metadata          Json?
+  failureCode       String?
+  uploadedByAdminId String      @db.Uuid
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  deletedAt         DateTime?
+  uploadedByAdmin   Admin       @relation(fields: [uploadedByAdminId], references: [id], onDelete: Restrict)
+
+  @@index([status])
+  @@index([uploadedByAdminId])
 }
 
 model Session {
