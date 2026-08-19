@@ -8,6 +8,7 @@ import { db } from "@/lib/server/db";
 
 const MAX_MUSIC_BYTES = 15 * 1024 * 1024;
 const MAX_DURATION_SECONDS = 10 * 60;
+const STALE_UPLOAD_MS = 24 * 60 * 60 * 1000;
 type MusicMimeType = "audio/mpeg" | "audio/mp4";
 
 class AudioValidationError extends Error {}
@@ -34,7 +35,7 @@ function isExpectedFormat(mimeType: MusicMimeType, format: { container?: string;
   if (!format.duration || format.duration > MAX_DURATION_SECONDS || !format.numberOfChannels) return false;
   return mimeType === "audio/mpeg"
     ? format.container?.includes("MPEG") && format.codec?.includes("Layer 3")
-    : format.container === "MPEG-4" && format.codec?.includes("AAC");
+    : ["MPEG-4", "M4A", "M4B", "isom", "mp42"].some((container) => format.container?.includes(container)) && format.codec?.includes("AAC");
 }
 
 async function writeTemporaryAudio(path: string, stream: AsyncIterable<Uint8Array>) {
@@ -64,6 +65,7 @@ export async function uploadMusicLibraryTrack(input: { adminId: string; title: s
   if (!title || title.length > 100) return { status: "invalid_audio" as const };
 
   const root = getStorageRoot(input.storageRoot);
+  await reconcileMusicLibraryStorage(root);
   const trackId = randomUUID();
   const storagePath = `music-library/${trackId}`;
   const temporaryDirectory = join(root, ".tmp", `${trackId}.processing`);
@@ -99,8 +101,9 @@ export async function getMusicLibraryTrack(trackId: string, storageRoot?: string
   if (!track || (metadata?.mimeType !== "audio/mpeg" && metadata?.mimeType !== "audio/mp4")) return null;
   try {
     const extension = metadata.mimeType === "audio/mpeg" ? "mp3" : "m4a";
-    const file = await open(join(trackDirectory(getStorageRoot(storageRoot), track.storagePath), `track.${extension}`), "r");
-    return { contentType: metadata.mimeType, stream: file.createReadStream({ autoClose: true }) };
+    const path = join(trackDirectory(getStorageRoot(storageRoot), track.storagePath), `track.${extension}`);
+    const file = await stat(path);
+    return { contentType: metadata.mimeType, path, byteSize: file.size };
   } catch { return null; }
 }
 
@@ -110,4 +113,32 @@ export async function deleteMusicLibraryTrack(trackId: string, storageRoot?: str
   await db.musicLibraryTrack.update({ where: { id: track.id }, data: { status: "DELETED", deletedAt: new Date() } });
   await rm(trackDirectory(getStorageRoot(storageRoot), track.storagePath), { recursive: true, force: true });
   return true;
+}
+
+export async function reconcileMusicLibraryStorage(storageRoot?: string) {
+  const root = getStorageRoot(storageRoot);
+  const staleBefore = new Date(Date.now() - STALE_UPLOAD_MS);
+  const staleInFlight = await db.musicLibraryTrack.findMany({
+    where: { status: { in: ["PENDING", "PROCESSING"] }, updatedAt: { lt: staleBefore } },
+    select: { id: true, storagePath: true },
+  });
+  const reconciledPaths: string[] = [];
+  const reconciledTemporaryDirectories: string[] = [];
+  for (const track of staleInFlight) {
+    const result = await db.musicLibraryTrack.updateMany({
+      where: { id: track.id, status: { in: ["PENDING", "PROCESSING"] }, updatedAt: { lt: staleBefore } },
+      data: { status: "FAILED", failureCode: "STALE_PROCESSING" },
+    });
+    if (result.count === 1) {
+      reconciledPaths.push(track.storagePath);
+      reconciledTemporaryDirectories.push(join(root, ".tmp", `${track.id}.processing`));
+    }
+  }
+  const removable = await db.musicLibraryTrack.findMany({
+    where: { status: { in: ["FAILED", "DELETED"] } },
+    select: { storagePath: true },
+  });
+  await Promise.all([...new Set([...reconciledPaths, ...removable.map((track) => track.storagePath)])]
+    .map((path) => rm(trackDirectory(root, path), { recursive: true, force: true })));
+  await Promise.all(reconciledTemporaryDirectories.map((path) => rm(path, { recursive: true, force: true })));
 }

@@ -14,10 +14,15 @@ export function MusicLibraryManager({ tracks }: { tracks: Track[] }) {
     const file = fileInput.current?.files?.[0];
     if (!file) return setMessage("Pilih file MP3 atau M4A.");
     setPending(true);
-    const response = await fetch("/api/admin/music", { method: "POST", headers: { "x-track-title": title }, body: file });
-    setPending(false);
-    if (!response.ok) return setMessage("Upload gagal. Periksa format, ukuran, dan durasi audio.");
-    window.location.reload();
+    try {
+      const response = await fetch("/api/admin/music", { method: "POST", headers: { "x-track-title": encodeURIComponent(title) }, body: file });
+      if (!response.ok) return setMessage("Upload gagal. Periksa format, ukuran, dan durasi audio.");
+      window.location.reload();
+    } catch {
+      setMessage("Upload gagal karena koneksi bermasalah.");
+    } finally {
+      setPending(false);
+    }
   }
 
   async function remove(trackId: string) {
