@@ -296,13 +296,17 @@ Task lama tetap selesai. Tabel ini mencatat bagian yang memerlukan remediation k
 
 ### MVP-20: Add identity and copy fields
 
-**Acceptance:** Couple/parent names, quote, opening, and closing use shared server/client schema; errors retain draft; optional omissions render without broken layout.  
+**Status:** Complete and approved.
+
+**Acceptance:** Bride/groom names plus separate father/mother names and curated quote selection use shared server/client schema; opening and closing remain source-controlled template copy; errors retain draft; optional omissions render without broken layout.  
 **Verify:** Section tests and manual mobile focus/keyboard check.  
 **Dependencies:** `MVP-19`  
 **Likely files:** `src/features/invitations/content-schema.ts`, `src/features/workspace/identity-section.tsx`, `src/features/workspace/copy-section.tsx`, `src/features/workspace/identity-section.test.tsx`  
 **Scope:** Medium, 4 files
 
 ### MVP-21: Add events, location, and countdown
+
+**Status:** Complete and approved.
 
 **Acceptance:** Event date/time stores explicit IANA timezone, Maps URL uses allowlist, and countdown handles browser timezone/past events consistently.  
 **Verify:** Timezone/Maps unit tests and manual timezone matrix.  
@@ -312,6 +316,8 @@ Task lama tetap selesai. Tabel ini mencatat bagian yang memerlukan remediation k
 
 ### MVP-22: Add story, gift, and section controls
 
+**Status:** Complete and approved.
+
 **Acceptance:** Gift remains informational, unsupported capabilities cannot be enabled, and empty/disabled sections collapse cleanly across three pinned template versions.  
 **Verify:** Optional-section tests and three-template preview review.  
 **Dependencies:** `MVP-19`, `MVP-20`  
@@ -319,6 +325,8 @@ Task lama tetap selesai. Tabel ini mencatat bagian yang memerlukan remediation k
 **Scope:** Medium, 5 files
 
 ### MVP-23: Implement image asset lifecycle
+
+**Status:** Complete and approved.
 
 **Acceptance:** Rate-limited image upload follows pending/processing/ready/failed/deleted, validates magic bytes/10 MB/2560 px/photo cap/250 MB quota, atomically writes variants, cleans partial files, and prevents deleting published references.  
 **Verify:** Malicious upload, failure cleanup, quota, reconciliation, and protected-delivery integration tests.  
@@ -328,6 +336,8 @@ Task lama tetap selesai. Tabel ini mencatat bagian yang memerlukan remediation k
 
 ### MVP-24: Implement music asset lifecycle
 
+**Status:** Complete and approved. Admin manages global curated tracks; customer selection remains a follow-up scope.
+
 **Acceptance:** MP3/M4A upload follows shared lifecycle, validates magic bytes/15 MB/10 minutes/quota, cleans failure paths, protects delivery, and audio remains optional with user-controlled playback.  
 **Verify:** Music lifecycle integration tests and Safari/Chrome mobile manual check.  
 **Dependencies:** `MVP-19`, `MVP-23`  
@@ -336,10 +346,10 @@ Task lama tetap selesai. Tabel ini mencatat bagian yang memerlukan remediation k
 
 ### Checkpoint MVP-D: Workspace
 
-- [ ] `MVP-19` - `MVP-24` reviewed.
-- [ ] Stale write and locked-workspace writes fail.
-- [ ] Asset lifecycle, cleanup, published-reference protection, and quota pass.
-- [ ] Workspace preview works at 360 px.
+- [x] `MVP-19` - `MVP-24` reviewed.
+- [x] Stale write and locked-workspace writes fail.
+- [x] Asset lifecycle, cleanup, published-reference protection, and quota pass.
+- [x] Workspace preview works at 360 px.
 
 ## MVP Publish and Guest Flow
 

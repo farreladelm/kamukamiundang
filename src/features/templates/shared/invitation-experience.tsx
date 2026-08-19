@@ -60,11 +60,15 @@ function PlaceholderPhoto({ photo, palette }: { photo: TemplatePhoto; palette: T
 }
 
 function Countdown({ target }: { target: string }) {
-  const [remaining, setRemaining] = useState(() => getRemaining(target));
+  const [remaining, setRemaining] = useState({ hari: "00", jam: "00", menit: "00", detik: "00" });
 
   useEffect(() => {
+    const initialUpdate = window.setTimeout(() => setRemaining(getRemaining(target)), 0);
     const timer = window.setInterval(() => setRemaining(getRemaining(target)), 1000);
-    return () => window.clearInterval(timer);
+    return () => {
+      window.clearTimeout(initialUpdate);
+      window.clearInterval(timer);
+    };
   }, [target]);
 
   return (
@@ -287,7 +291,7 @@ export function InvitationExperience({
         <section className="px-7 py-14 sm:px-12" style={{ backgroundColor: palette.tokens.surface }}>
           <SectionHeading eyebrow="Save the date" title={content.eventDate} palette={palette} />
           <p className="mt-5 text-sm leading-6" style={{ color: palette.tokens.muted }}>Menghitung hari menuju perayaan kecil kami.</p>
-          <div className="mt-8"><Countdown target={content.eventDateIso} /></div>
+            {content.eventDateIso && <div className="mt-8"><Countdown target={content.eventDateIso} /></div>}
         </section>
 
         <section className="px-7 py-14 sm:px-12">
@@ -300,9 +304,9 @@ export function InvitationExperience({
                 <p className="mt-2 text-sm font-semibold">{event.date}</p>
                 <p className="mt-5 font-semibold">{event.venue}</p>
                 <p className="mt-1 text-sm leading-6" style={{ color: palette.tokens.muted }}>{event.address}</p>
-                <a className="mt-5 inline-block border-b pb-1 text-xs font-semibold" style={{ borderColor: palette.tokens.accent }} href={event.mapUrl} target="_blank" rel="noreferrer">
+                {event.mapUrl && <a className="mt-5 inline-block border-b pb-1 text-xs font-semibold" style={{ borderColor: palette.tokens.accent }} href={event.mapUrl} target="_blank" rel="noreferrer">
                   {mapLinkLabel}
-                </a>
+                </a>}
               </div>
             ))}
           </div>

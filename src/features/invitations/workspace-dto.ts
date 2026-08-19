@@ -4,30 +4,13 @@ import { db } from "@/lib/server/db";
 import { getTemplateRuntimeManifest } from "@/features/templates/registry";
 import type { TemplatePalette } from "@/features/templates/types";
 import { requireCustomer } from "@/features/auth/policies";
-import { z } from "zod";
+import {
+  emptyWorkspaceDraft,
+  type WorkspaceDraft,
+  workspaceDraftSchema,
+} from "./content-schema";
 
-export type WorkspaceJsonValue =
-  | string
-  | number
-  | boolean
-  | null
-  | WorkspaceJsonValue[]
-  | { [key: string]: WorkspaceJsonValue };
-
-export type WorkspaceDraft = { [key: string]: WorkspaceJsonValue };
-
-const workspaceJsonValueSchema: z.ZodType<WorkspaceJsonValue> = z.lazy(() =>
-  z.union([
-    z.string(),
-    z.number().finite(),
-    z.boolean(),
-    z.null(),
-    z.array(workspaceJsonValueSchema),
-    z.record(z.string(), workspaceJsonValueSchema),
-  ]),
-);
-
-export const workspaceDraftSchema = z.record(z.string(), workspaceJsonValueSchema);
+export { type WorkspaceDraft, workspaceDraftSchema } from "./content-schema";
 
 export type WorkspaceInvitationDto = {
   invitationId: string;
@@ -69,7 +52,12 @@ function getValidatedRuntime(
 export function validateWorkspaceDraft(content: unknown): WorkspaceDraft {
   const parsed = workspaceDraftSchema.safeParse(content);
 
-  if (!parsed.success) throw new WorkspaceUnavailableError();
+  if (!parsed.success) {
+    if (content && typeof content === "object" && Object.keys(content).length === 0) {
+      return emptyWorkspaceDraft;
+    }
+    throw new WorkspaceUnavailableError();
+  }
   return parsed.data;
 }
 

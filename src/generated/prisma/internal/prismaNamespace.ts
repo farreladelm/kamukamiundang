@@ -396,6 +396,7 @@ export const ModelName = {
   PublishedSnapshot: 'PublishedSnapshot',
   SnapshotAsset: 'SnapshotAsset',
   Asset: 'Asset',
+  MusicLibraryTrack: 'MusicLibraryTrack',
   Session: 'Session',
   MagicLink: 'MagicLink',
   Rsvp: 'Rsvp',
@@ -417,7 +418,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "customer" | "admin" | "templateVisibility" | "templateCategory" | "templateCatalog" | "templateSlugAlias" | "order" | "invitation" | "invitationContent" | "publishedSnapshot" | "snapshotAsset" | "asset" | "session" | "magicLink" | "rsvp" | "wish" | "analyticsEvent" | "auditEvent"
+    modelProps: "customer" | "admin" | "templateVisibility" | "templateCategory" | "templateCatalog" | "templateSlugAlias" | "order" | "invitation" | "invitationContent" | "publishedSnapshot" | "snapshotAsset" | "asset" | "musicLibraryTrack" | "session" | "magicLink" | "rsvp" | "wish" | "analyticsEvent" | "auditEvent"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1309,6 +1310,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    MusicLibraryTrack: {
+      payload: Prisma.$MusicLibraryTrackPayload<ExtArgs>
+      fields: Prisma.MusicLibraryTrackFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.MusicLibraryTrackFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MusicLibraryTrackPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.MusicLibraryTrackFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MusicLibraryTrackPayload>
+        }
+        findFirst: {
+          args: Prisma.MusicLibraryTrackFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MusicLibraryTrackPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.MusicLibraryTrackFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MusicLibraryTrackPayload>
+        }
+        findMany: {
+          args: Prisma.MusicLibraryTrackFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MusicLibraryTrackPayload>[]
+        }
+        create: {
+          args: Prisma.MusicLibraryTrackCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MusicLibraryTrackPayload>
+        }
+        createMany: {
+          args: Prisma.MusicLibraryTrackCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.MusicLibraryTrackCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MusicLibraryTrackPayload>[]
+        }
+        delete: {
+          args: Prisma.MusicLibraryTrackDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MusicLibraryTrackPayload>
+        }
+        update: {
+          args: Prisma.MusicLibraryTrackUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MusicLibraryTrackPayload>
+        }
+        deleteMany: {
+          args: Prisma.MusicLibraryTrackDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.MusicLibraryTrackUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.MusicLibraryTrackUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MusicLibraryTrackPayload>[]
+        }
+        upsert: {
+          args: Prisma.MusicLibraryTrackUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MusicLibraryTrackPayload>
+        }
+        aggregate: {
+          args: Prisma.MusicLibraryTrackAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateMusicLibraryTrack>
+        }
+        groupBy: {
+          args: Prisma.MusicLibraryTrackGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MusicLibraryTrackGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.MusicLibraryTrackCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MusicLibraryTrackCountAggregateOutputType> | number
+        }
+      }
+    }
     Session: {
       payload: Prisma.$SessionPayload<ExtArgs>
       fields: Prisma.SessionFieldRefs
@@ -1969,6 +2044,23 @@ export const AssetScalarFieldEnum = {
 export type AssetScalarFieldEnum = (typeof AssetScalarFieldEnum)[keyof typeof AssetScalarFieldEnum]
 
 
+export const MusicLibraryTrackScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  status: 'status',
+  storagePath: 'storagePath',
+  byteSize: 'byteSize',
+  metadata: 'metadata',
+  failureCode: 'failureCode',
+  uploadedByAdminId: 'uploadedByAdminId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt'
+} as const
+
+export type MusicLibraryTrackScalarFieldEnum = (typeof MusicLibraryTrackScalarFieldEnum)[keyof typeof MusicLibraryTrackScalarFieldEnum]
+
+
 export const SessionScalarFieldEnum = {
   id: 'id',
   tokenHash: 'tokenHash',
@@ -2414,6 +2506,7 @@ export type GlobalOmitConfig = {
   publishedSnapshot?: Prisma.PublishedSnapshotOmit
   snapshotAsset?: Prisma.SnapshotAssetOmit
   asset?: Prisma.AssetOmit
+  musicLibraryTrack?: Prisma.MusicLibraryTrackOmit
   session?: Prisma.SessionOmit
   magicLink?: Prisma.MagicLinkOmit
   rsvp?: Prisma.RsvpOmit

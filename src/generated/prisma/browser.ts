@@ -78,6 +78,11 @@ export type SnapshotAsset = Prisma.SnapshotAssetModel
  */
 export type Asset = Prisma.AssetModel
 /**
+ * Model MusicLibraryTrack
+ * 
+ */
+export type MusicLibraryTrack = Prisma.MusicLibraryTrackModel
+/**
  * Model Session
  * 
  */

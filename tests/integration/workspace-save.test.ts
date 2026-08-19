@@ -5,6 +5,10 @@ import {
   WorkspaceUnavailableError,
 } from "@/features/invitations/workspace-dto";
 import { saveWorkspaceDraftForCustomer } from "@/features/workspace/actions";
+import {
+  emptyWorkspaceDraft,
+  type WorkspaceDraft,
+} from "@/features/invitations/content-schema";
 
 beforeEach(async () => {
   await db.$executeRawUnsafe(
@@ -12,7 +16,10 @@ beforeEach(async () => {
   );
 });
 
-async function setupWorkspace(contentSchemaVersion = 2) {
+async function setupWorkspace(
+  contentSchemaVersion = 2,
+  draftContent: Record<string, string> = {},
+) {
   const customer = await db.customer.create({ data: { name: "Customer" } });
   const order = await db.order.create({
     data: {
@@ -41,7 +48,7 @@ async function setupWorkspace(contentSchemaVersion = 2) {
   await db.invitationContent.create({
     data: {
       invitationId: invitation.id,
-      content: {},
+       content: draftContent,
       contentSchemaVersion: invitation.contentSchemaVersion,
       updatedByActorType: "ADMIN",
       updatedByActorId: customer.id,
@@ -49,6 +56,32 @@ async function setupWorkspace(contentSchemaVersion = 2) {
   });
 
   return { customer, invitation };
+}
+
+function workspaceDraft(): WorkspaceDraft {
+  return {
+    bride: { nickname: "Rani", fullName: "Rani Prameswari", fatherName: "Hadi", motherName: "Rani" },
+    groom: { nickname: "Dimas", fullName: "Dimas Adinata", fatherName: "Surya", motherName: "Ratih" },
+    quoteKey: "matthew-19-6",
+    mainEvent: {
+      label: "Akad Nikah",
+      date: "2026-11-14",
+      time: "08:00",
+      timeZone: "Asia/Jakarta",
+      venue: "Pendopo Joglo Sari",
+      address: "Jl. Taman Sari No. 18, Yogyakarta",
+      mapUrl: "https://maps.google.com/?q=Pendopo+Joglo+Sari",
+    },
+    secondaryEvent: null,
+    story: {
+      intro: "Cerita kami.",
+      entries: [{ title: "Pertama bertemu", text: "Di kampus." }],
+    },
+    gift: {
+      accounts: [{ bank: "Bank Nusantara", accountNumber: "123", accountName: "Rani" }],
+      physicalAddress: "Jl. Taman Sari",
+    },
+  };
 }
 
 describe("versioned customer workspace drafts", () => {
@@ -62,7 +95,7 @@ describe("versioned customer workspace drafts", () => {
       contentSchemaVersion: 2,
       paletteKey: "gading",
       contentVersion: 0,
-      draft: {},
+       draft: emptyWorkspaceDraft,
     });
 
     await expect(
@@ -70,13 +103,16 @@ describe("versioned customer workspace drafts", () => {
         customerId: customer.id,
         invitationId: invitation.id,
         expectedContentVersion: 0,
-        content: { draftNote: "first save" },
+        content: workspaceDraft(),
       }),
     ).resolves.toEqual({ status: "success", contentVersion: 1 });
 
     await expect(
       db.invitationContent.findUniqueOrThrow({ where: { invitationId: invitation.id } }),
-    ).resolves.toMatchObject({ content: { draftNote: "first save" }, contentVersion: 1 });
+    ).resolves.toMatchObject({
+      content: workspaceDraft(),
+      contentVersion: 1,
+    });
   });
 
   it("allows only one concurrent save from the same version", async () => {
@@ -86,13 +122,13 @@ describe("versioned customer workspace drafts", () => {
         customerId: customer.id,
         invitationId: invitation.id,
         expectedContentVersion: 0,
-        content: { draftNote: "first writer" },
+        content: workspaceDraft(),
       }),
       saveWorkspaceDraftForCustomer({
         customerId: customer.id,
         invitationId: invitation.id,
         expectedContentVersion: 0,
-        content: { draftNote: "second writer" },
+        content: workspaceDraft(),
       }),
     ]);
 
@@ -110,7 +146,7 @@ describe("versioned customer workspace drafts", () => {
         customerId: customer.id,
         invitationId: invitation.id,
         expectedContentVersion: 0,
-        content: { draftNote: "locked" },
+        content: workspaceDraft(),
       }),
     ).resolves.toEqual({ status: "locked" });
 
@@ -119,7 +155,7 @@ describe("versioned customer workspace drafts", () => {
         customerId: "00000000-0000-0000-0000-000000000099",
         invitationId: invitation.id,
         expectedContentVersion: 0,
-        content: { draftNote: "other customer" },
+        content: workspaceDraft(),
       }),
     ).resolves.toEqual({ status: "unavailable" });
 
@@ -132,7 +168,7 @@ describe("versioned customer workspace drafts", () => {
         customerId: customer.id,
         invitationId: invitation.id,
         expectedContentVersion: 0,
-        content: { draftNote: "missing runtime" },
+        content: workspaceDraft(),
       }),
     ).resolves.toEqual({ status: "unavailable" });
   });
