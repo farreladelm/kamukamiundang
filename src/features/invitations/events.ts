@@ -25,13 +25,6 @@ export const defaultWeddingEvents = {
   },
 } as const;
 
-const mapsHosts = new Set([
-  "maps.google.com",
-  "www.google.com",
-  "goo.gl",
-  "maps.app.goo.gl",
-]);
-
 export function isIanaTimeZone(value: string) {
   try {
     new Intl.DateTimeFormat("en-US", { timeZone: value });
@@ -46,7 +39,10 @@ export function isAllowedMapsUrl(value: string) {
 
   try {
     const url = new URL(value);
-    return url.protocol === "https:" && mapsHosts.has(url.hostname);
+    if (url.protocol !== "https:") return false;
+    if (url.hostname === "maps.google.com" || url.hostname === "maps.app.goo.gl") return true;
+    if (url.hostname === "www.google.com") return url.pathname === "/maps" || url.pathname.startsWith("/maps/");
+    return url.hostname === "goo.gl" && (url.pathname === "/maps" || url.pathname.startsWith("/maps/"));
   } catch {
     return false;
   }

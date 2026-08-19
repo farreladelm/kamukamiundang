@@ -22,6 +22,10 @@ describe("workspace event utilities", () => {
     expect(isIanaTimeZone("WIB")).toBe(false);
     expect(isAllowedMapsUrl("https://maps.google.com/?q=Jakarta")).toBe(true);
     expect(isAllowedMapsUrl("https://maps.app.goo.gl/example")).toBe(true);
+    expect(isAllowedMapsUrl("https://www.google.com/maps/search/?api=1&query=Jakarta")).toBe(true);
+    expect(isAllowedMapsUrl("https://goo.gl/maps/example")).toBe(true);
+    expect(isAllowedMapsUrl("https://www.google.com/")).toBe(false);
+    expect(isAllowedMapsUrl("https://goo.gl/")).toBe(false);
     expect(isAllowedMapsUrl("https://example.com/maps")).toBe(false);
   });
 
