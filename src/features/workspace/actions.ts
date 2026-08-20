@@ -45,67 +45,71 @@ export type WorkspaceSaveResult =
 export async function saveWorkspaceDraftForCustomer(
   input: WorkspaceSaveInput,
 ): Promise<WorkspaceSaveResult> {
-  const invitation = await db.invitation.findFirst({
-    where: {
-      id: input.invitationId,
-      customerId: input.customerId,
-      status: { not: "ARCHIVED" },
-    },
-    select: {
-      id: true,
-      editingEnabled: true,
-      templateKey: true,
-      templateVersion: true,
-      contentSchemaVersion: true,
-      paletteKey: true,
-    },
+  return db.$transaction(async (tx) => {
+    // Publication and archival take this lock before capturing or disabling a draft.
+    await tx.$queryRaw`SELECT "id" FROM "Invitation" WHERE "id" = ${input.invitationId} FOR UPDATE`;
+    const invitation = await tx.invitation.findFirst({
+      where: {
+        id: input.invitationId,
+        customerId: input.customerId,
+        status: { not: "ARCHIVED" },
+      },
+      select: {
+        id: true,
+        editingEnabled: true,
+        templateKey: true,
+        templateVersion: true,
+        contentSchemaVersion: true,
+        paletteKey: true,
+      },
+    });
+
+    if (!invitation) return { status: "unavailable" };
+    if (!invitation.editingEnabled) return { status: "locked" };
+
+    let runtime: ReturnType<typeof assertWorkspaceRuntime>;
+    try {
+      runtime = assertWorkspaceRuntime(
+        invitation.templateKey,
+        invitation.templateVersion,
+        invitation.contentSchemaVersion,
+        invitation.paletteKey,
+      );
+    } catch {
+      return { status: "unavailable" };
+    }
+
+    const content: WorkspaceDraft = {
+      ...input.content,
+      story: runtime.capabilities.includes("story") ? input.content.story : null,
+      gift: runtime.capabilities.includes("gift") ? input.content.gift : null,
+    };
+    const result = await tx.invitationContent.updateMany({
+      where: {
+        invitationId: invitation.id,
+        contentVersion: input.expectedContentVersion,
+        contentSchemaVersion: invitation.contentSchemaVersion,
+      },
+      data: {
+        content: content as Prisma.InputJsonObject,
+        contentVersion: input.expectedContentVersion + 1,
+        updatedByActorType: "CUSTOMER",
+        updatedByActorId: input.customerId,
+      },
+    });
+
+    if (result.count === 1) {
+      return { status: "success", contentVersion: input.expectedContentVersion + 1 };
+    }
+
+    const current = await tx.invitationContent.findUnique({
+      where: { invitationId: invitation.id },
+      select: { contentVersion: true },
+    });
+
+    if (!current) return { status: "unavailable" };
+    return { status: "conflict", currentContentVersion: current.contentVersion };
   });
-
-  if (!invitation) return { status: "unavailable" };
-  if (!invitation.editingEnabled) return { status: "locked" };
-
-  let runtime: ReturnType<typeof assertWorkspaceRuntime>;
-  try {
-    runtime = assertWorkspaceRuntime(
-      invitation.templateKey,
-      invitation.templateVersion,
-      invitation.contentSchemaVersion,
-      invitation.paletteKey,
-    );
-  } catch {
-    return { status: "unavailable" };
-  }
-
-  const content: WorkspaceDraft = {
-    ...input.content,
-    story: runtime.capabilities.includes("story") ? input.content.story : null,
-    gift: runtime.capabilities.includes("gift") ? input.content.gift : null,
-  };
-  const result = await db.invitationContent.updateMany({
-    where: {
-      invitationId: invitation.id,
-      contentVersion: input.expectedContentVersion,
-      contentSchemaVersion: invitation.contentSchemaVersion,
-    },
-    data: {
-      content: content as Prisma.InputJsonObject,
-      contentVersion: input.expectedContentVersion + 1,
-      updatedByActorType: "CUSTOMER",
-      updatedByActorId: input.customerId,
-    },
-  });
-
-  if (result.count === 1) {
-    return { status: "success", contentVersion: input.expectedContentVersion + 1 };
-  }
-
-  const current = await db.invitationContent.findUnique({
-    where: { invitationId: invitation.id },
-    select: { contentVersion: true },
-  });
-
-  if (!current) return { status: "unavailable" };
-  return { status: "conflict", currentContentVersion: current.contentVersion };
 }
 
 function parseWorkspaceFormData(formData: FormData) {

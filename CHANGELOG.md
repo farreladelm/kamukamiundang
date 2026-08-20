@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Customer workspace now supports optional Love Story chapters and informational gift details.
 - Added secure invitation image upload, delivery, cleanup, and storage-quota safeguards.
 - Added an admin-managed curated music library with validated MP3/M4A uploads and optional playback controls.
+- Added admin controls to publish, unpublish, lock, and irreversibly archive invitation snapshots.
 
 ### Changed
 - Catalog cards now display administrator-configured marketing thumbnails while preserving runtime previews when no thumbnail is set.
