@@ -35,6 +35,7 @@ export async function issueMagicLink({
   const tokenHash = hashOpaqueToken(rawToken);
 
   const link = await db.$transaction(async (tx) => {
+    await tx.$queryRaw`SELECT "id" FROM "Invitation" WHERE "id" = ${invitationId} FOR UPDATE`;
     const invitation = await tx.invitation.findUnique({
       where: { id: invitationId },
       select: { id: true, customerId: true, status: true, archivedAt: true, editingEnabled: true },

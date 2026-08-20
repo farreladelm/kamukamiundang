@@ -6,9 +6,10 @@ import {
   publishInvitationAction,
   setInvitationEditingEnabledAction,
   unpublishInvitationAction,
+  type InvitationPublicationActionResult,
 } from "./actions";
 import { MagicLinkPanel, type MagicLinkActionState } from "@/features/auth/magic-link-panel";
-import { ArchiveInvitationControl } from "@/features/invitations/archive-invitation-control";
+import { InvitationPublicationControls } from "@/features/invitations/publication-controls";
 
 export default async function AdminInvitationPage({ params }: { params: Promise<{ invitationId: string }> }) {
   const { invitationId } = await params;
@@ -23,24 +24,23 @@ export default async function AdminInvitationPage({ params }: { params: Promise<
     return issueInvitationMagicLinkAction(invitationId);
   }
 
-  async function publish() {
+  async function mutatePublication(
+    _state: InvitationPublicationActionResult,
+    formData: FormData,
+  ): Promise<InvitationPublicationActionResult> {
     "use server";
-    await publishInvitationAction(invitationId);
-  }
-
-  async function unpublish() {
-    "use server";
-    await unpublishInvitationAction(invitationId);
-  }
-
-  async function archive() {
-    "use server";
-    await archiveInvitationAction(invitationId);
-  }
-
-  async function toggleEditing() {
-    "use server";
-    await setInvitationEditingEnabledAction(invitationId, !editingEnabled);
+    switch (formData.get("intent")) {
+      case "publish":
+        return publishInvitationAction(invitationId);
+      case "unpublish":
+        return unpublishInvitationAction(invitationId);
+      case "archive":
+        return archiveInvitationAction(invitationId);
+      case "toggle-editing":
+        return setInvitationEditingEnabledAction(invitationId, !editingEnabled);
+      default:
+        return { error: "Aksi publikasi tidak valid." };
+    }
   }
 
   return (
@@ -52,24 +52,11 @@ export default async function AdminInvitationPage({ params }: { params: Promise<
       </p>
       {invitation.status !== "ARCHIVED" && (
         <>
-          <div className="mt-6 flex flex-wrap gap-3">
-            <form action={publish}>
-              <button className="rounded-full bg-stone-900 px-4 py-2 text-sm font-semibold text-white" type="submit">
-                {invitation.status === "PUBLISHED" ? "Publish ulang" : "Publish"}
-              </button>
-            </form>
-            {invitation.status === "PUBLISHED" && (
-              <form action={unpublish}>
-                <button className="rounded-full border border-stone-300 px-4 py-2 text-sm font-semibold text-stone-800" type="submit">Batalkan publikasi</button>
-              </form>
-            )}
-            <form action={toggleEditing}>
-              <button className="rounded-full border border-stone-300 px-4 py-2 text-sm font-semibold text-stone-800" type="submit">
-                {invitation.editingEnabled ? "Kunci editing" : "Buka editing"}
-              </button>
-            </form>
-            <ArchiveInvitationControl action={archive} />
-          </div>
+          <InvitationPublicationControls
+            action={mutatePublication}
+            editingEnabled={invitation.editingEnabled}
+            status={invitation.status}
+          />
           <div className="mt-8"><MagicLinkPanel action={issueLink} /></div>
           <p className="mt-4 text-xs leading-5 text-stone-500">Link lama langsung dicabut. Link baru hanya tampil dari hasil aksi ini.</p>
         </>

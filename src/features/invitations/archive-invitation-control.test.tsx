@@ -6,7 +6,7 @@ afterEach(cleanup);
 
 describe("ArchiveInvitationControl", () => {
   it("requires explicit confirmation before submitting archive", () => {
-    render(<ArchiveInvitationControl action={vi.fn()} />);
+    render(<ArchiveInvitationControl disabled={false} formAction={vi.fn()} isSubmitting={false} onConfirm={vi.fn()} />);
 
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Arsipkan" }));
@@ -17,7 +17,7 @@ describe("ArchiveInvitationControl", () => {
   });
 
   it("closes without archiving when cancelled", () => {
-    render(<ArchiveInvitationControl action={vi.fn()} />);
+    render(<ArchiveInvitationControl disabled={false} formAction={vi.fn()} isSubmitting={false} onConfirm={vi.fn()} />);
 
     fireEvent.click(screen.getByRole("button", { name: "Arsipkan" }));
     fireEvent.click(screen.getByRole("button", { name: "Batalkan" }));

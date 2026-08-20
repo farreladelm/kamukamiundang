@@ -7,6 +7,9 @@ import {
   setInvitationEditingEnabled,
   unpublishInvitation,
 } from "@/features/invitations/publication";
+import { issueMagicLink } from "@/features/auth/magic-link";
+import { workspaceDraftSchema } from "@/features/invitations/workspace-dto";
+import { saveWorkspaceDraftForCustomer } from "@/features/workspace/actions";
 
 const adminId = "00000000-0000-0000-0000-000000000010";
 
@@ -55,6 +58,25 @@ async function setupInvitation(content: object = {}) {
     },
   });
   return { admin, customer, invitation };
+}
+
+async function holdInvitationLock(invitationId: string) {
+  let releaseLock!: () => void;
+  let markLocked!: () => void;
+  const released = new Promise<void>((resolve) => {
+    releaseLock = resolve;
+  });
+  const locked = new Promise<void>((resolve) => {
+    markLocked = resolve;
+  });
+  const transaction = db.$transaction(async (tx) => {
+    await tx.$queryRaw`SELECT "id" FROM "Invitation" WHERE "id" = ${invitationId} FOR UPDATE`;
+    markLocked();
+    await released;
+  });
+
+  await locked;
+  return { releaseLock, transaction };
 }
 
 describe("invitation publication lifecycle", () => {
@@ -173,5 +195,51 @@ describe("invitation publication lifecycle", () => {
       revokedAt: expect.any(Date),
     });
     await expect(unpublishInvitation(invitation.id, admin.id)).rejects.toBeInstanceOf(PublicationError);
+  });
+
+  it("serializes customer saves with publication so snapshots never miss a successful save", async () => {
+    const { admin, customer, invitation } = await setupInvitation({ bride: { nickname: "Rani" } });
+    const lock = await holdInvitationLock(invitation.id);
+    const draft = workspaceDraftSchema.parse({ bride: { nickname: "Sari" } });
+    const save = saveWorkspaceDraftForCustomer({
+      customerId: customer.id,
+      invitationId: invitation.id,
+      expectedContentVersion: 0,
+      content: draft,
+    });
+    const publish = publishInvitation(invitation.id, admin.id);
+
+    lock.releaseLock();
+    await lock.transaction;
+    const [saveResult] = await Promise.all([save, publish]);
+    const snapshot = await db.publishedSnapshot.findUniqueOrThrow({ where: { invitationId: invitation.id } });
+
+    if (saveResult.status === "success") {
+      expect(snapshot.content).toMatchObject({ bride: { nickname: "Sari" } });
+    } else {
+      expect(saveResult).toEqual({ status: "locked" });
+      expect(snapshot.content).toMatchObject({ bride: { nickname: "Rani" } });
+    }
+  });
+
+  it("serializes magic-link issuance with archive so no active link survives", async () => {
+    const { admin, invitation } = await setupInvitation();
+    const lock = await holdInvitationLock(invitation.id);
+    const archive = archiveInvitation(invitation.id, admin.id);
+    const issue = issueMagicLink({
+      invitationId: invitation.id,
+      adminId: admin.id,
+      origin: "https://undango.test",
+    });
+
+    lock.releaseLock();
+    await lock.transaction;
+    const [archiveResult, issueResult] = await Promise.allSettled([archive, issue]);
+
+    expect(archiveResult.status).toBe("fulfilled");
+    expect(issueResult.status === "rejected" || issueResult.status === "fulfilled").toBe(true);
+    await expect(db.magicLink.count({
+      where: { invitationId: invitation.id, consumedAt: null, revokedAt: null },
+    })).resolves.toBe(0);
   });
 });
