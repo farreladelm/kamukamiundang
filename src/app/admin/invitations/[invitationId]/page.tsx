@@ -50,6 +50,11 @@ export default async function AdminInvitationPage({ params }: { params: Promise<
       <p className="mt-3 text-sm text-stone-600">
         {invitation.templateKey} v{invitation.templateVersion} · {invitation.status} · editing {invitation.editingEnabled ? "aktif" : "terkunci"}
       </p>
+      {invitation.status === "PUBLISHED" && (
+        <a className="mt-3 inline-block text-sm font-semibold text-stone-800 underline underline-offset-4" href={`/i/${invitation.slug}`} target="_blank" rel="noreferrer">
+          Buka invitation publik
+        </a>
+      )}
       {invitation.status !== "ARCHIVED" && (
         <>
           <InvitationPublicationControls
