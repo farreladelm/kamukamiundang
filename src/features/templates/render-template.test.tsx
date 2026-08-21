@@ -38,4 +38,14 @@ describe("renderTemplate", () => {
       renderTemplate(template, "tidak-ada", template.demo.content),
     ).toThrow("Unknown palette");
   });
+
+  it("renders public invitations without a JavaScript-gated cover", () => {
+    const template = getTemplateRuntimeManifest("template-1", 1);
+
+    if (!template) throw new Error("Expected Template 1 v1 in registry");
+    render(renderTemplate(template, template.demo.paletteKey, template.demo.content, true));
+
+    expect(screen.queryByRole("button", { name: "Buka undangan" })).not.toBeInTheDocument();
+    expect(screen.getByRole("heading", { name: "Aruna & Bima" })).toBeInTheDocument();
+  });
 });

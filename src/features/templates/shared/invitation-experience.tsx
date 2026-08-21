@@ -17,6 +17,7 @@ type InvitationExperienceProps = {
   templateName: string;
   variant: InvitationVariant;
   mapLinkLabel: string;
+  initiallyOpen?: boolean;
 };
 
 const toneColors: Record<TemplatePhoto["tone"], string> = {
@@ -105,8 +106,9 @@ export function InvitationExperience({
   templateName,
   variant,
   mapLinkLabel,
+  initiallyOpen = false,
 }: InvitationExperienceProps) {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(initiallyOpen);
   const [copiedAccount, setCopiedAccount] = useState<string | null>(null);
   const [rsvpSent, setRsvpSent] = useState(false);
   const [wishSent, setWishSent] = useState(false);

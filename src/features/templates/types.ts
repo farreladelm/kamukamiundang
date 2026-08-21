@@ -110,6 +110,7 @@ export type TemplateWishes = {
 export type TemplateRendererProps = {
   content: TemplateContentViewModel;
   palette: TemplatePalette;
+  initiallyOpen?: boolean;
 };
 
 export type TemplateRuntimeManifest = {
