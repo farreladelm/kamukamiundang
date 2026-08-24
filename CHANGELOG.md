@@ -15,6 +15,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Added an admin-managed curated music library with validated MP3/M4A uploads and optional playback controls.
 - Added admin controls to publish, unpublish, lock, and irreversibly archive invitation snapshots.
 - Added public invitation pages that render only current published snapshots.
+- Added admin-managed public invitation URL reservations, draft URL editing, and publication safeguards.
 
 ### Changed
 - Published invitations and previews now share responsive template presentation across desktop and mobile layouts.
