@@ -45,6 +45,12 @@ export function OrderForm({ selections }: { selections: TemplateSelection[] }) {
         <input id="customer-email" name="email" type="email" aria-invalid={Boolean(state.fieldErrors.email?.length)} aria-describedby={state.fieldErrors.email?.length ? "customer-email-error" : undefined} className="min-h-12 border border-stone-300 px-3 aria-[invalid=true]:border-red-700" />
         <FieldError id="customer-email" errors={state.fieldErrors.email} />
       </label>
+      <label className="grid gap-2 text-sm font-medium" htmlFor="requested-invitation-slug">
+        URL publik
+        <span className="text-xs font-normal text-stone-500">/i/ kosongkan bila belum ditentukan</span>
+        <input id="requested-invitation-slug" name="requestedInvitationSlug" autoCapitalize="none" aria-invalid={Boolean(state.fieldErrors.requestedInvitationSlug?.length)} aria-describedby={state.fieldErrors.requestedInvitationSlug?.length ? "requested-invitation-slug-error" : undefined} className="min-h-12 border border-stone-300 px-3 aria-[invalid=true]:border-red-700" placeholder="farrel-kinan-wedding" />
+        <FieldError id="requested-invitation-slug" errors={state.fieldErrors.requestedInvitationSlug} />
+      </label>
       <label className="grid gap-2 text-sm font-medium" htmlFor="template-selection">
         Template dan palette
         <select id="template-selection" name="templateSelection" defaultValue={selections[0]?.value} aria-invalid={Boolean(state.fieldErrors.templateSelection?.length)} aria-describedby={state.fieldErrors.templateSelection?.length ? "template-selection-error" : undefined} className="min-h-12 border border-stone-300 px-3 aria-[invalid=true]:border-red-700">

@@ -29,4 +29,27 @@ describe("form schemas", () => {
       expect.arrayContaining(["customerName", "email", "templateSelection", "photoLimit"]),
     );
   });
+
+  it("accepts blank and kebab-case requested invitation slugs", () => {
+    const baseOrder = {
+      customerName: "Farrel",
+      templateSelection: "template-1|1|gading",
+      photoLimit: "20",
+    };
+
+    expect(orderIntakeSchema.parse({ ...baseOrder, requestedInvitationSlug: "" }).requestedInvitationSlug).toBeUndefined();
+    expect(orderIntakeSchema.parse({ ...baseOrder, requestedInvitationSlug: "farrel-kinan-wedding" }).requestedInvitationSlug).toBe("farrel-kinan-wedding");
+  });
+
+  it("rejects malformed requested invitation slugs", () => {
+    const baseOrder = {
+      customerName: "Farrel",
+      templateSelection: "template-1|1|gading",
+      photoLimit: "20",
+    };
+
+    for (const requestedInvitationSlug of ["ab", "Farrel", "farrel kinan", "farrel--kinan", "-farrel", "farrel-"]) {
+      expect(orderIntakeSchema.safeParse({ ...baseOrder, requestedInvitationSlug }).success).toBe(false);
+    }
+  });
 });
