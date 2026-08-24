@@ -17,6 +17,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Added public invitation pages that render only current published snapshots.
 
 ### Changed
+- Published invitations and previews now share responsive template presentation across desktop and mobile layouts.
 - Catalog cards now display administrator-configured marketing thumbnails while preserving runtime previews when no thumbnail is set.
 - Admin order rows now expose payment confirmation and activation actions before linking to invitation operations.
 - Admin logout now revokes its database session before clearing the browser cookie.
