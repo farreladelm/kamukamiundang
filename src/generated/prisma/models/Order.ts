@@ -49,6 +49,7 @@ export type OrderMinAggregateOutputType = {
   templateVersion: number | null
   contentSchemaVersion: number | null
   paletteKey: string | null
+  requestedInvitationSlug: string | null
   priceInRupiah: number | null
   photoLimit: number | null
   storageQuotaBytes: bigint | null
@@ -67,6 +68,7 @@ export type OrderMaxAggregateOutputType = {
   templateVersion: number | null
   contentSchemaVersion: number | null
   paletteKey: string | null
+  requestedInvitationSlug: string | null
   priceInRupiah: number | null
   photoLimit: number | null
   storageQuotaBytes: bigint | null
@@ -85,6 +87,7 @@ export type OrderCountAggregateOutputType = {
   templateVersion: number
   contentSchemaVersion: number
   paletteKey: number
+  requestedInvitationSlug: number
   priceInRupiah: number
   photoLimit: number
   storageQuotaBytes: number
@@ -121,6 +124,7 @@ export type OrderMinAggregateInputType = {
   templateVersion?: true
   contentSchemaVersion?: true
   paletteKey?: true
+  requestedInvitationSlug?: true
   priceInRupiah?: true
   photoLimit?: true
   storageQuotaBytes?: true
@@ -139,6 +143,7 @@ export type OrderMaxAggregateInputType = {
   templateVersion?: true
   contentSchemaVersion?: true
   paletteKey?: true
+  requestedInvitationSlug?: true
   priceInRupiah?: true
   photoLimit?: true
   storageQuotaBytes?: true
@@ -157,6 +162,7 @@ export type OrderCountAggregateInputType = {
   templateVersion?: true
   contentSchemaVersion?: true
   paletteKey?: true
+  requestedInvitationSlug?: true
   priceInRupiah?: true
   photoLimit?: true
   storageQuotaBytes?: true
@@ -262,6 +268,7 @@ export type OrderGroupByOutputType = {
   templateVersion: number
   contentSchemaVersion: number
   paletteKey: string
+  requestedInvitationSlug: string | null
   priceInRupiah: number
   photoLimit: number
   storageQuotaBytes: bigint
@@ -303,6 +310,7 @@ export type OrderWhereInput = {
   templateVersion?: Prisma.IntFilter<"Order"> | number
   contentSchemaVersion?: Prisma.IntFilter<"Order"> | number
   paletteKey?: Prisma.StringFilter<"Order"> | string
+  requestedInvitationSlug?: Prisma.StringNullableFilter<"Order"> | string | null
   priceInRupiah?: Prisma.IntFilter<"Order"> | number
   photoLimit?: Prisma.IntFilter<"Order"> | number
   storageQuotaBytes?: Prisma.BigIntFilter<"Order"> | bigint | number
@@ -323,6 +331,7 @@ export type OrderOrderByWithRelationInput = {
   templateVersion?: Prisma.SortOrder
   contentSchemaVersion?: Prisma.SortOrder
   paletteKey?: Prisma.SortOrder
+  requestedInvitationSlug?: Prisma.SortOrderInput | Prisma.SortOrder
   priceInRupiah?: Prisma.SortOrder
   photoLimit?: Prisma.SortOrder
   storageQuotaBytes?: Prisma.SortOrder
@@ -338,6 +347,7 @@ export type OrderOrderByWithRelationInput = {
 
 export type OrderWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  requestedInvitationSlug?: string
   AND?: Prisma.OrderWhereInput | Prisma.OrderWhereInput[]
   OR?: Prisma.OrderWhereInput[]
   NOT?: Prisma.OrderWhereInput | Prisma.OrderWhereInput[]
@@ -357,7 +367,7 @@ export type OrderWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"Order"> | Date | string
   customer?: Prisma.XOR<Prisma.CustomerScalarRelationFilter, Prisma.CustomerWhereInput>
   invitation?: Prisma.XOR<Prisma.InvitationNullableScalarRelationFilter, Prisma.InvitationWhereInput> | null
-}, "id">
+}, "id" | "requestedInvitationSlug">
 
 export type OrderOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -366,6 +376,7 @@ export type OrderOrderByWithAggregationInput = {
   templateVersion?: Prisma.SortOrder
   contentSchemaVersion?: Prisma.SortOrder
   paletteKey?: Prisma.SortOrder
+  requestedInvitationSlug?: Prisma.SortOrderInput | Prisma.SortOrder
   priceInRupiah?: Prisma.SortOrder
   photoLimit?: Prisma.SortOrder
   storageQuotaBytes?: Prisma.SortOrder
@@ -392,6 +403,7 @@ export type OrderScalarWhereWithAggregatesInput = {
   templateVersion?: Prisma.IntWithAggregatesFilter<"Order"> | number
   contentSchemaVersion?: Prisma.IntWithAggregatesFilter<"Order"> | number
   paletteKey?: Prisma.StringWithAggregatesFilter<"Order"> | string
+  requestedInvitationSlug?: Prisma.StringNullableWithAggregatesFilter<"Order"> | string | null
   priceInRupiah?: Prisma.IntWithAggregatesFilter<"Order"> | number
   photoLimit?: Prisma.IntWithAggregatesFilter<"Order"> | number
   storageQuotaBytes?: Prisma.BigIntWithAggregatesFilter<"Order"> | bigint | number
@@ -409,6 +421,7 @@ export type OrderCreateInput = {
   templateVersion: number
   contentSchemaVersion: number
   paletteKey: string
+  requestedInvitationSlug?: string | null
   priceInRupiah: number
   photoLimit: number
   storageQuotaBytes: bigint | number
@@ -429,6 +442,7 @@ export type OrderUncheckedCreateInput = {
   templateVersion: number
   contentSchemaVersion: number
   paletteKey: string
+  requestedInvitationSlug?: string | null
   priceInRupiah: number
   photoLimit: number
   storageQuotaBytes: bigint | number
@@ -447,6 +461,7 @@ export type OrderUpdateInput = {
   templateVersion?: Prisma.IntFieldUpdateOperationsInput | number
   contentSchemaVersion?: Prisma.IntFieldUpdateOperationsInput | number
   paletteKey?: Prisma.StringFieldUpdateOperationsInput | string
+  requestedInvitationSlug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   priceInRupiah?: Prisma.IntFieldUpdateOperationsInput | number
   photoLimit?: Prisma.IntFieldUpdateOperationsInput | number
   storageQuotaBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
@@ -467,6 +482,7 @@ export type OrderUncheckedUpdateInput = {
   templateVersion?: Prisma.IntFieldUpdateOperationsInput | number
   contentSchemaVersion?: Prisma.IntFieldUpdateOperationsInput | number
   paletteKey?: Prisma.StringFieldUpdateOperationsInput | string
+  requestedInvitationSlug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   priceInRupiah?: Prisma.IntFieldUpdateOperationsInput | number
   photoLimit?: Prisma.IntFieldUpdateOperationsInput | number
   storageQuotaBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
@@ -486,6 +502,7 @@ export type OrderCreateManyInput = {
   templateVersion: number
   contentSchemaVersion: number
   paletteKey: string
+  requestedInvitationSlug?: string | null
   priceInRupiah: number
   photoLimit: number
   storageQuotaBytes: bigint | number
@@ -503,6 +520,7 @@ export type OrderUpdateManyMutationInput = {
   templateVersion?: Prisma.IntFieldUpdateOperationsInput | number
   contentSchemaVersion?: Prisma.IntFieldUpdateOperationsInput | number
   paletteKey?: Prisma.StringFieldUpdateOperationsInput | string
+  requestedInvitationSlug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   priceInRupiah?: Prisma.IntFieldUpdateOperationsInput | number
   photoLimit?: Prisma.IntFieldUpdateOperationsInput | number
   storageQuotaBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
@@ -521,6 +539,7 @@ export type OrderUncheckedUpdateManyInput = {
   templateVersion?: Prisma.IntFieldUpdateOperationsInput | number
   contentSchemaVersion?: Prisma.IntFieldUpdateOperationsInput | number
   paletteKey?: Prisma.StringFieldUpdateOperationsInput | string
+  requestedInvitationSlug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   priceInRupiah?: Prisma.IntFieldUpdateOperationsInput | number
   photoLimit?: Prisma.IntFieldUpdateOperationsInput | number
   storageQuotaBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
@@ -549,6 +568,7 @@ export type OrderCountOrderByAggregateInput = {
   templateVersion?: Prisma.SortOrder
   contentSchemaVersion?: Prisma.SortOrder
   paletteKey?: Prisma.SortOrder
+  requestedInvitationSlug?: Prisma.SortOrder
   priceInRupiah?: Prisma.SortOrder
   photoLimit?: Prisma.SortOrder
   storageQuotaBytes?: Prisma.SortOrder
@@ -575,6 +595,7 @@ export type OrderMaxOrderByAggregateInput = {
   templateVersion?: Prisma.SortOrder
   contentSchemaVersion?: Prisma.SortOrder
   paletteKey?: Prisma.SortOrder
+  requestedInvitationSlug?: Prisma.SortOrder
   priceInRupiah?: Prisma.SortOrder
   photoLimit?: Prisma.SortOrder
   storageQuotaBytes?: Prisma.SortOrder
@@ -593,6 +614,7 @@ export type OrderMinOrderByAggregateInput = {
   templateVersion?: Prisma.SortOrder
   contentSchemaVersion?: Prisma.SortOrder
   paletteKey?: Prisma.SortOrder
+  requestedInvitationSlug?: Prisma.SortOrder
   priceInRupiah?: Prisma.SortOrder
   photoLimit?: Prisma.SortOrder
   storageQuotaBytes?: Prisma.SortOrder
@@ -695,6 +717,7 @@ export type OrderCreateWithoutCustomerInput = {
   templateVersion: number
   contentSchemaVersion: number
   paletteKey: string
+  requestedInvitationSlug?: string | null
   priceInRupiah: number
   photoLimit: number
   storageQuotaBytes: bigint | number
@@ -713,6 +736,7 @@ export type OrderUncheckedCreateWithoutCustomerInput = {
   templateVersion: number
   contentSchemaVersion: number
   paletteKey: string
+  requestedInvitationSlug?: string | null
   priceInRupiah: number
   photoLimit: number
   storageQuotaBytes: bigint | number
@@ -761,6 +785,7 @@ export type OrderScalarWhereInput = {
   templateVersion?: Prisma.IntFilter<"Order"> | number
   contentSchemaVersion?: Prisma.IntFilter<"Order"> | number
   paletteKey?: Prisma.StringFilter<"Order"> | string
+  requestedInvitationSlug?: Prisma.StringNullableFilter<"Order"> | string | null
   priceInRupiah?: Prisma.IntFilter<"Order"> | number
   photoLimit?: Prisma.IntFilter<"Order"> | number
   storageQuotaBytes?: Prisma.BigIntFilter<"Order"> | bigint | number
@@ -778,6 +803,7 @@ export type OrderCreateWithoutInvitationInput = {
   templateVersion: number
   contentSchemaVersion: number
   paletteKey: string
+  requestedInvitationSlug?: string | null
   priceInRupiah: number
   photoLimit: number
   storageQuotaBytes: bigint | number
@@ -797,6 +823,7 @@ export type OrderUncheckedCreateWithoutInvitationInput = {
   templateVersion: number
   contentSchemaVersion: number
   paletteKey: string
+  requestedInvitationSlug?: string | null
   priceInRupiah: number
   photoLimit: number
   storageQuotaBytes: bigint | number
@@ -830,6 +857,7 @@ export type OrderUpdateWithoutInvitationInput = {
   templateVersion?: Prisma.IntFieldUpdateOperationsInput | number
   contentSchemaVersion?: Prisma.IntFieldUpdateOperationsInput | number
   paletteKey?: Prisma.StringFieldUpdateOperationsInput | string
+  requestedInvitationSlug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   priceInRupiah?: Prisma.IntFieldUpdateOperationsInput | number
   photoLimit?: Prisma.IntFieldUpdateOperationsInput | number
   storageQuotaBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
@@ -849,6 +877,7 @@ export type OrderUncheckedUpdateWithoutInvitationInput = {
   templateVersion?: Prisma.IntFieldUpdateOperationsInput | number
   contentSchemaVersion?: Prisma.IntFieldUpdateOperationsInput | number
   paletteKey?: Prisma.StringFieldUpdateOperationsInput | string
+  requestedInvitationSlug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   priceInRupiah?: Prisma.IntFieldUpdateOperationsInput | number
   photoLimit?: Prisma.IntFieldUpdateOperationsInput | number
   storageQuotaBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
@@ -866,6 +895,7 @@ export type OrderCreateManyCustomerInput = {
   templateVersion: number
   contentSchemaVersion: number
   paletteKey: string
+  requestedInvitationSlug?: string | null
   priceInRupiah: number
   photoLimit: number
   storageQuotaBytes: bigint | number
@@ -883,6 +913,7 @@ export type OrderUpdateWithoutCustomerInput = {
   templateVersion?: Prisma.IntFieldUpdateOperationsInput | number
   contentSchemaVersion?: Prisma.IntFieldUpdateOperationsInput | number
   paletteKey?: Prisma.StringFieldUpdateOperationsInput | string
+  requestedInvitationSlug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   priceInRupiah?: Prisma.IntFieldUpdateOperationsInput | number
   photoLimit?: Prisma.IntFieldUpdateOperationsInput | number
   storageQuotaBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
@@ -901,6 +932,7 @@ export type OrderUncheckedUpdateWithoutCustomerInput = {
   templateVersion?: Prisma.IntFieldUpdateOperationsInput | number
   contentSchemaVersion?: Prisma.IntFieldUpdateOperationsInput | number
   paletteKey?: Prisma.StringFieldUpdateOperationsInput | string
+  requestedInvitationSlug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   priceInRupiah?: Prisma.IntFieldUpdateOperationsInput | number
   photoLimit?: Prisma.IntFieldUpdateOperationsInput | number
   storageQuotaBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
@@ -919,6 +951,7 @@ export type OrderUncheckedUpdateManyWithoutCustomerInput = {
   templateVersion?: Prisma.IntFieldUpdateOperationsInput | number
   contentSchemaVersion?: Prisma.IntFieldUpdateOperationsInput | number
   paletteKey?: Prisma.StringFieldUpdateOperationsInput | string
+  requestedInvitationSlug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   priceInRupiah?: Prisma.IntFieldUpdateOperationsInput | number
   photoLimit?: Prisma.IntFieldUpdateOperationsInput | number
   storageQuotaBytes?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
@@ -939,6 +972,7 @@ export type OrderSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   templateVersion?: boolean
   contentSchemaVersion?: boolean
   paletteKey?: boolean
+  requestedInvitationSlug?: boolean
   priceInRupiah?: boolean
   photoLimit?: boolean
   storageQuotaBytes?: boolean
@@ -959,6 +993,7 @@ export type OrderSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   templateVersion?: boolean
   contentSchemaVersion?: boolean
   paletteKey?: boolean
+  requestedInvitationSlug?: boolean
   priceInRupiah?: boolean
   photoLimit?: boolean
   storageQuotaBytes?: boolean
@@ -978,6 +1013,7 @@ export type OrderSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensi
   templateVersion?: boolean
   contentSchemaVersion?: boolean
   paletteKey?: boolean
+  requestedInvitationSlug?: boolean
   priceInRupiah?: boolean
   photoLimit?: boolean
   storageQuotaBytes?: boolean
@@ -997,6 +1033,7 @@ export type OrderSelectScalar = {
   templateVersion?: boolean
   contentSchemaVersion?: boolean
   paletteKey?: boolean
+  requestedInvitationSlug?: boolean
   priceInRupiah?: boolean
   photoLimit?: boolean
   storageQuotaBytes?: boolean
@@ -1008,7 +1045,7 @@ export type OrderSelectScalar = {
   updatedAt?: boolean
 }
 
-export type OrderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "customerId" | "templateKey" | "templateVersion" | "contentSchemaVersion" | "paletteKey" | "priceInRupiah" | "photoLimit" | "storageQuotaBytes" | "status" | "paidAt" | "activatedAt" | "refundedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["order"]>
+export type OrderOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "customerId" | "templateKey" | "templateVersion" | "contentSchemaVersion" | "paletteKey" | "requestedInvitationSlug" | "priceInRupiah" | "photoLimit" | "storageQuotaBytes" | "status" | "paidAt" | "activatedAt" | "refundedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["order"]>
 export type OrderInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   customer?: boolean | Prisma.CustomerDefaultArgs<ExtArgs>
   invitation?: boolean | Prisma.Order$invitationArgs<ExtArgs>
@@ -1033,6 +1070,7 @@ export type $OrderPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     templateVersion: number
     contentSchemaVersion: number
     paletteKey: string
+    requestedInvitationSlug: string | null
     priceInRupiah: number
     photoLimit: number
     storageQuotaBytes: bigint
@@ -1473,6 +1511,7 @@ export interface OrderFieldRefs {
   readonly templateVersion: Prisma.FieldRef<"Order", 'Int'>
   readonly contentSchemaVersion: Prisma.FieldRef<"Order", 'Int'>
   readonly paletteKey: Prisma.FieldRef<"Order", 'String'>
+  readonly requestedInvitationSlug: Prisma.FieldRef<"Order", 'String'>
   readonly priceInRupiah: Prisma.FieldRef<"Order", 'Int'>
   readonly photoLimit: Prisma.FieldRef<"Order", 'Int'>
   readonly storageQuotaBytes: Prisma.FieldRef<"Order", 'BigInt'>
