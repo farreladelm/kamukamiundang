@@ -68,6 +68,7 @@ async function setupPublishedInvitation() {
 describe("public invitation data", () => {
   it("uses only published snapshot content and exact pinned runtime", async () => {
     const { invitation } = await setupPublishedInvitation();
+    if (!invitation.slug) throw new Error("Published fixture requires a slug");
 
     await expect(getPublicInvitationBySlug(invitation.slug)).resolves.toMatchObject({
       slug: invitation.slug,
@@ -81,6 +82,7 @@ describe("public invitation data", () => {
 
   it("fails closed for unknown, non-public, missing, or incompatible snapshots", async () => {
     const { invitation } = await setupPublishedInvitation();
+    if (!invitation.slug) throw new Error("Published fixture requires a slug");
 
     await expect(getPublicInvitationBySlug("unknown-invitation")).resolves.toBeNull();
     await db.invitation.update({ where: { id: invitation.id }, data: { status: "DRAFT" } });
