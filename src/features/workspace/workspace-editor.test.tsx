@@ -54,6 +54,9 @@ describe("WorkspaceEditor", () => {
     fireEvent.change(mapsUrlInput, { target: { value: "https://example.com/maps" } });
     expect(screen.getByText("Gunakan tautan Google Maps HTTPS yang valid.")).toBeInTheDocument();
     expect(screen.getByTestId("invitation-experience")).toBeInTheDocument();
+    expect(screen.getByTestId("workspace-mobile-preview")).toHaveClass("max-w-[30rem]", "mx-auto");
+    expect(screen.getByTestId("invitation-presentation")).toHaveClass("@container");
+    expect(screen.getByTestId("invitation-desktop-panel").className).toContain("@[64rem]:flex");
 
     fireEvent.change(firstNameInput, { target: { value: "Naya" } });
     expect(firstNameInput).toHaveValue("Naya");

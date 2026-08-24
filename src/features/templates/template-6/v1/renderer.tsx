@@ -1,7 +1,7 @@
 import { InvitationExperience } from "@/features/templates/shared/invitation-experience";
 import type { TemplateRendererProps } from "@/features/templates/types";
 
-export function TemplateSixRenderer({ content, palette, initiallyOpen }: TemplateRendererProps) {
+export function TemplateSixRenderer({ content, palette }: TemplateRendererProps) {
   return (
     <InvitationExperience
       content={content}
@@ -9,7 +9,6 @@ export function TemplateSixRenderer({ content, palette, initiallyOpen }: Templat
       templateName="Alinea Baru"
       variant="line"
       mapLinkLabel="Buka peta"
-      initiallyOpen={initiallyOpen}
     />
   );
 }

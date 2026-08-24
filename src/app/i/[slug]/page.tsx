@@ -33,6 +33,5 @@ export default async function PublicInvitationPage({ params }: InvitationPagePro
     invitation.runtime,
     invitation.paletteKey,
     invitation.content,
-    true,
   );
 }

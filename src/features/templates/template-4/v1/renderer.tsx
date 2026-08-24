@@ -1,7 +1,7 @@
 import { InvitationExperience } from "@/features/templates/shared/invitation-experience";
 import type { TemplateRendererProps } from "@/features/templates/types";
 
-export function TemplateFourRenderer({ content, palette, initiallyOpen }: TemplateRendererProps) {
+export function TemplateFourRenderer({ content, palette }: TemplateRendererProps) {
   return (
     <InvitationExperience
       content={content}
@@ -9,7 +9,6 @@ export function TemplateFourRenderer({ content, palette, initiallyOpen }: Templa
       templateName="Cahaya Hati"
       variant="crescent"
       mapLinkLabel="Buka Google Maps"
-      initiallyOpen={initiallyOpen}
     />
   );
 }

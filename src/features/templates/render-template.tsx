@@ -8,7 +8,6 @@ export function renderTemplate(
   template: TemplateRuntimeManifest,
   paletteKey: string,
   content: TemplateContentViewModel,
-  initiallyOpen = false,
 ): ReactElement {
   const palette = template.palettes.find((candidate) => candidate.key === paletteKey);
 
@@ -18,5 +17,5 @@ export function renderTemplate(
 
   const Renderer = template.renderer;
 
-  return <Renderer content={content} palette={palette} initiallyOpen={initiallyOpen} />;
+  return <Renderer content={content} palette={palette} />;
 }

@@ -39,13 +39,13 @@ describe("renderTemplate", () => {
     ).toThrow("Unknown palette");
   });
 
-  it("renders public invitations without a JavaScript-gated cover", () => {
+  it("starts invitations behind the same cover on every surface", () => {
     const template = getTemplateRuntimeManifest("template-1", 1);
 
     if (!template) throw new Error("Expected Template 1 v1 in registry");
-    render(renderTemplate(template, template.demo.paletteKey, template.demo.content, true));
+    render(renderTemplate(template, template.demo.paletteKey, template.demo.content));
 
-    expect(screen.queryByRole("button", { name: "Buka undangan" })).not.toBeInTheDocument();
-    expect(screen.getByRole("heading", { name: "Aruna & Bima" })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: "Buka undangan" })).toBeInTheDocument();
+    expect(screen.getByTestId("invitation-content")).toHaveAttribute("aria-hidden", "true");
   });
 });

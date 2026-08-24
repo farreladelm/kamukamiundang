@@ -1,7 +1,7 @@
 import { InvitationExperience } from "@/features/templates/shared/invitation-experience";
 import type { TemplateRendererProps } from "@/features/templates/types";
 
-export function TemplateThreeRenderer({ content, palette, initiallyOpen }: TemplateRendererProps) {
+export function TemplateThreeRenderer({ content, palette }: TemplateRendererProps) {
   return (
     <InvitationExperience
       content={content}
@@ -9,7 +9,6 @@ export function TemplateThreeRenderer({ content, palette, initiallyOpen }: Templ
       templateName="Taman Aksara"
       variant="garden"
       mapLinkLabel="Petunjuk arah"
-      initiallyOpen={initiallyOpen}
     />
   );
 }

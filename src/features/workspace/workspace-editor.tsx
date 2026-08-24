@@ -90,7 +90,10 @@ export function WorkspaceEditor({ workspace }: { workspace: WorkspaceInvitationD
             Draft v{saveState.contentVersion}
           </p>
         </div>
-        <div className="overflow-hidden border border-stone-300 bg-white shadow-sm">
+        <div
+          data-testid="workspace-mobile-preview"
+          className="mx-auto w-full max-w-[30rem] overflow-hidden border border-stone-300 bg-white shadow-sm"
+        >
           {renderTemplate(
             runtime,
             workspace.paletteKey,

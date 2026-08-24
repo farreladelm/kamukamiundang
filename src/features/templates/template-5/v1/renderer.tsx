@@ -1,7 +1,7 @@
 import { InvitationExperience } from "@/features/templates/shared/invitation-experience";
 import type { TemplateRendererProps } from "@/features/templates/types";
 
-export function TemplateFiveRenderer({ content, palette, initiallyOpen }: TemplateRendererProps) {
+export function TemplateFiveRenderer({ content, palette }: TemplateRendererProps) {
   return (
     <InvitationExperience
       content={content}
@@ -9,7 +9,6 @@ export function TemplateFiveRenderer({ content, palette, initiallyOpen }: Templa
       templateName="Ratri Kirana"
       variant="noir"
       mapLinkLabel="Lihat lokasi"
-      initiallyOpen={initiallyOpen}
     />
   );
 }

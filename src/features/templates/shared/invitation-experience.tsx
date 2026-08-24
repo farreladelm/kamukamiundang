@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import Image from "next/image";
 import type {
   TemplateContentViewModel,
@@ -17,7 +17,6 @@ type InvitationExperienceProps = {
   templateName: string;
   variant: InvitationVariant;
   mapLinkLabel: string;
-  initiallyOpen?: boolean;
 };
 
 const toneColors: Record<TemplatePhoto["tone"], string> = {
@@ -27,6 +26,18 @@ const toneColors: Record<TemplatePhoto["tone"], string> = {
   sky: "#7397a5",
   night: "#384047",
 };
+
+function subscribeToHydration() {
+  return () => undefined;
+}
+
+function getHydratedSnapshot() {
+  return true;
+}
+
+function getServerSnapshot() {
+  return false;
+}
 
 function PlaceholderPhoto({ photo, palette }: { photo: TemplatePhoto; palette: TemplatePalette }) {
   if (photo.src) {
@@ -106,9 +117,9 @@ export function InvitationExperience({
   templateName,
   variant,
   mapLinkLabel,
-  initiallyOpen = false,
 }: InvitationExperienceProps) {
-  const [isOpen, setIsOpen] = useState(initiallyOpen);
+  const isEnhanced = useSyncExternalStore(subscribeToHydration, getHydratedSnapshot, getServerSnapshot);
+  const [isOpen, setIsOpen] = useState(false);
   const [copiedAccount, setCopiedAccount] = useState<string | null>(null);
   const [rsvpSent, setRsvpSent] = useState(false);
   const [wishSent, setWishSent] = useState(false);
@@ -116,27 +127,28 @@ export function InvitationExperience({
   const [wishErrors, setWishErrors] = useState<Record<string, string>>({});
   const articleRef = useRef<HTMLElement>(null);
   const contentRef = useRef<HTMLElement>(null);
+  const isLocked = isEnhanced && !isOpen;
 
   useEffect(() => {
-    if (isOpen) return;
+    if (!isLocked) return;
 
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     return () => {
       document.body.style.overflow = previousOverflow;
     };
-  }, [isOpen]);
+  }, [isLocked]);
 
   useEffect(() => {
     const scrollContainer = articleRef.current?.closest<HTMLElement>("[data-testid='invitation-scroll']");
-    if (!scrollContainer || isOpen) return;
+    if (!scrollContainer || !isLocked) return;
 
     const previousOverflowY = scrollContainer.style.overflowY;
     scrollContainer.style.overflowY = "hidden";
     return () => {
       scrollContainer.style.overflowY = previousOverflowY;
     };
-  }, [isOpen]);
+  }, [isLocked]);
 
   function openInvitation() {
     setIsOpen(true);
@@ -182,23 +194,67 @@ export function InvitationExperience({
   }
 
   return (
-    <article
-      ref={articleRef}
-      data-testid="invitation-experience"
-      data-invitation-locked={!isOpen}
-      className={`invitation-experience invitation-${variant} relative mx-auto max-w-[30rem] overflow-hidden border`}
-      style={{
-        backgroundColor: palette.tokens.canvas,
-        borderColor: palette.tokens.line,
-        color: palette.tokens.ink,
-      }}
-      onWheel={(event) => {
-        if (!isOpen) event.preventDefault();
-      }}
-      onTouchMove={(event) => {
-        if (!isOpen) event.preventDefault();
-      }}
+    <div
+      data-testid="invitation-presentation"
+      className="@container w-full"
     >
+      <div
+        data-testid="invitation-layout"
+        className="flex min-h-dvh w-full flex-col bg-stone-950 text-stone-900 @[64rem]:h-screen @[64rem]:flex-row @[64rem]:overflow-hidden"
+      >
+        <section
+        data-testid="invitation-desktop-panel"
+        className={`invitation-desktop-panel invitation-${variant} relative hidden min-h-[35rem] flex-1 flex-col justify-between overflow-hidden p-6 sm:p-10 @[64rem]:sticky @[64rem]:top-0 @[64rem]:flex @[64rem]:h-screen @[64rem]:min-h-0 @[64rem]:p-16`}
+        style={{ backgroundColor: palette.tokens.canvas, color: palette.tokens.ink }}
+      >
+        <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
+          <div className="absolute inset-0 opacity-75" style={{ background: `linear-gradient(135deg, ${palette.tokens.surface}, ${palette.tokens.canvas} 48%, ${palette.tokens.accent}66)` }} />
+          <div className="absolute top-1/2 left-1/2 aspect-[3/4] w-[min(42vw,30rem)] -translate-x-1/2 -translate-y-1/2 border border-current opacity-35" />
+          <div className="absolute top-[18%] left-[18%] h-28 w-28 rounded-full border opacity-35" style={{ borderColor: palette.tokens.accent }} />
+          <div className="absolute right-[14%] bottom-[14%] h-56 w-56 rounded-full border opacity-25" style={{ borderColor: palette.tokens.line }} />
+        </div>
+        <div className="relative z-10 flex justify-end">
+          <span className="text-xs font-semibold tracking-[0.16em] uppercase opacity-60">Undangan pernikahan</span>
+        </div>
+        <div className="relative z-10 max-w-xl py-16 lg:py-8">
+          <p className="text-xs font-semibold tracking-[0.24em] uppercase" style={{ color: palette.tokens.accent }}>
+            {content.cover.title}
+          </p>
+          <p className="mt-8 font-serif text-[clamp(3.5rem,8vw,8rem)] leading-[0.86]">
+            {content.couple.firstName}
+            <span className="block pl-[0.6em] italic opacity-50">&amp;</span>
+            <span className="block">{content.couple.secondName}</span>
+          </p>
+          <p className="mt-8 max-w-sm text-sm leading-7 opacity-70">{content.eventDate}. {content.opening}</p>
+        </div>
+        <div className="relative z-10 border-t pt-5" style={{ borderColor: palette.tokens.line }}>
+          <p className="max-w-xs text-xs leading-5 opacity-60">Invitation dirancang untuk dibaca nyaman dari layar ponsel.</p>
+        </div>
+      </section>
+
+        <section
+        data-testid="invitation-scroll"
+        className="flex w-full justify-center overflow-y-visible @[64rem]:h-screen @[64rem]:w-[30rem] @[64rem]:shrink-0 @[64rem]:overflow-y-auto"
+        style={{ backgroundColor: palette.tokens.canvas }}
+      >
+        <div data-testid="invitation-frame" className="h-fit w-full overflow-hidden bg-white">
+          <article
+            ref={articleRef}
+            data-testid="invitation-experience"
+            data-invitation-locked={isLocked}
+            className={`invitation-experience invitation-${variant} relative w-full overflow-hidden border`}
+            style={{
+              backgroundColor: palette.tokens.canvas,
+              borderColor: palette.tokens.line,
+              color: palette.tokens.ink,
+            }}
+            onWheel={(event) => {
+              if (isLocked) event.preventDefault();
+            }}
+            onTouchMove={(event) => {
+              if (isLocked) event.preventDefault();
+            }}
+          >
       {!isOpen && (
         <div
           data-testid="invitation-cover"
@@ -234,14 +290,18 @@ export function InvitationExperience({
         </div>
       )}
 
+      <noscript>
+        <style>{`[data-testid="invitation-cover"] { display: none !important; }`}</style>
+      </noscript>
+
       <main
         id="invitation-content"
         data-testid="invitation-content"
         ref={contentRef}
         tabIndex={-1}
         className="outline-none"
-        aria-hidden={!isOpen}
-        inert={!isOpen ? true : undefined}
+        aria-hidden={isLocked}
+        inert={isLocked ? true : undefined}
       >
         <section className="relative flex min-h-[88dvh] flex-col justify-end overflow-hidden px-7 py-10 sm:px-12">
           <div className="pointer-events-none absolute inset-0 opacity-45" style={{ background: `linear-gradient(145deg, ${palette.tokens.surface}, transparent 62%)` }} />
@@ -405,7 +465,11 @@ export function InvitationExperience({
           {content.branding}
         </footer>
       </main>
-    </article>
+          </article>
+        </div>
+        </section>
+      </div>
+    </div>
   );
 }
 
