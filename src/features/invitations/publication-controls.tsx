@@ -8,10 +8,12 @@ type InvitationStatus = "DRAFT" | "PUBLISHED" | "ARCHIVED";
 export function InvitationPublicationControls({
   action,
   editingEnabled,
+  hasSlug,
   status,
 }: {
   action: InvitationPublicationAction;
   editingEnabled: boolean;
+  hasSlug: boolean;
   status: InvitationStatus;
 }) {
   const [state, formAction, pending] = useActionState(action, {});
@@ -28,10 +30,11 @@ export function InvitationPublicationControls({
   return (
     <div className="mt-6 flex flex-wrap gap-3">
       <form action={formAction}>
-        <button className="rounded-full bg-stone-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50" disabled={pending} name="intent" onClick={() => setActiveIntent("publish")} type="submit" value="publish">
+        <button className="rounded-full bg-stone-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50" disabled={pending || !hasSlug} name="intent" onClick={() => setActiveIntent("publish")} type="submit" value="publish">
           {pending && activeIntent === "publish" ? "Mempublikasikan..." : status === "PUBLISHED" ? "Publish ulang" : "Publish"}
         </button>
       </form>
+      {!hasSlug && <p className="basis-full text-sm text-amber-800">Atur URL publik sebelum publish.</p>}
       {status === "PUBLISHED" && (
         <form action={formAction}>
           <button className="rounded-full border border-stone-300 px-4 py-2 text-sm font-semibold text-stone-800 disabled:opacity-50" disabled={pending} name="intent" onClick={() => setActiveIntent("unpublish")} type="submit" value="unpublish">

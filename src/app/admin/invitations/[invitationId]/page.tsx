@@ -6,10 +6,13 @@ import {
   publishInvitationAction,
   setInvitationEditingEnabledAction,
   unpublishInvitationAction,
+  updateInvitationSlugAction,
   type InvitationPublicationActionResult,
 } from "./actions";
 import { MagicLinkPanel, type MagicLinkActionState } from "@/features/auth/magic-link-panel";
 import { InvitationPublicationControls } from "@/features/invitations/publication-controls";
+import { InvitationSlugForm } from "@/features/invitations/invitation-slug-form";
+import { type FormActionState } from "@/features/forms/action-state";
 
 export default async function AdminInvitationPage({ params }: { params: Promise<{ invitationId: string }> }) {
   const { invitationId } = await params;
@@ -43,6 +46,14 @@ export default async function AdminInvitationPage({ params }: { params: Promise<
     }
   }
 
+  async function updateSlug(
+    state: FormActionState,
+    formData: FormData,
+  ): Promise<FormActionState> {
+    "use server";
+    return updateInvitationSlugAction(invitationId, state, formData);
+  }
+
   return (
     <section className="mx-auto max-w-2xl">
       <p className="text-xs font-semibold tracking-[0.18em] text-stone-500 uppercase">Invitation</p>
@@ -50,16 +61,24 @@ export default async function AdminInvitationPage({ params }: { params: Promise<
       <p className="mt-3 text-sm text-stone-600">
         {invitation.templateKey} v{invitation.templateVersion} · {invitation.status} · editing {invitation.editingEnabled ? "aktif" : "terkunci"}
       </p>
-      {invitation.status === "PUBLISHED" && (
+      {invitation.status === "PUBLISHED" && invitation.slug && (
         <a className="mt-3 inline-block text-sm font-semibold text-stone-800 underline underline-offset-4" href={`/i/${invitation.slug}`} target="_blank" rel="noreferrer">
           Buka invitation publik
         </a>
+      )}
+      {invitation.status === "DRAFT" ? (
+        <InvitationSlugForm action={updateSlug} slug={invitation.slug} />
+      ) : (
+        <p className="mt-6 text-sm text-stone-600">
+          {invitation.slug ? `URL publik: /i/${invitation.slug}` : "URL publik belum diatur"}
+        </p>
       )}
       {invitation.status !== "ARCHIVED" && (
         <>
           <InvitationPublicationControls
             action={mutatePublication}
             editingEnabled={invitation.editingEnabled}
+            hasSlug={Boolean(invitation.slug)}
             status={invitation.status}
           />
           <div className="mt-8"><MagicLinkPanel action={issueLink} /></div>

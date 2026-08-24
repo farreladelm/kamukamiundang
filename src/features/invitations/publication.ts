@@ -11,9 +11,16 @@ export class PublicationError extends Error {
   }
 }
 
+export class InvitationSlugRequiredError extends PublicationError {
+  constructor() {
+    super("Atur URL publik sebelum publish.");
+    this.name = "InvitationSlugRequiredError";
+  }
+}
+
 type PublicationResult = {
   action: "published" | "republished" | "unpublished" | "archived" | "editing-enabled" | "editing-locked";
-  slug: string;
+  slug: string | null;
 };
 
 function toSnapshotContent(invitation: {
@@ -56,6 +63,7 @@ export async function publishInvitation(invitationId: string, adminId: string): 
     if (!invitation || invitation.status === "ARCHIVED") {
       throw new PublicationError("Invitation cannot be published.");
     }
+    if (!invitation.slug) throw new InvitationSlugRequiredError();
 
     const content = toSnapshotContent(invitation);
     const assets = await tx.asset.findMany({

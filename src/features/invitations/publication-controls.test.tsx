@@ -14,6 +14,7 @@ describe("InvitationPublicationControls", () => {
       <InvitationPublicationControls
         action={failedAction}
         editingEnabled
+        hasSlug
         status="DRAFT"
       />,
     );
@@ -29,7 +30,7 @@ describe("InvitationPublicationControls", () => {
       resolveAction = resolve;
     }));
 
-    render(<InvitationPublicationControls action={action} editingEnabled status="PUBLISHED" />);
+    render(<InvitationPublicationControls action={action} editingEnabled hasSlug status="PUBLISHED" />);
     const publishButton = screen.getByRole("button", { name: "Publish ulang" });
     const unpublishButton = screen.getByRole("button", { name: "Batalkan publikasi" });
     const editingButton = screen.getByRole("button", { name: "Kunci editing" });
@@ -46,5 +47,12 @@ describe("InvitationPublicationControls", () => {
 
     resolveAction({});
     await waitFor(() => expect(publishButton).not.toBeDisabled());
+  });
+
+  it("blocks publishing until a public URL exists", () => {
+    render(<InvitationPublicationControls action={async () => ({})} editingEnabled hasSlug={false} status="DRAFT" />);
+
+    expect(screen.getByRole("button", { name: "Publish" })).toBeDisabled();
+    expect(screen.getByText("Atur URL publik sebelum publish.")).toBeInTheDocument();
   });
 });

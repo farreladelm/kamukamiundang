@@ -2,11 +2,13 @@ import { beforeEach, describe, expect, it } from "vitest";
 import { db } from "@/lib/server/db";
 import {
   archiveInvitation,
+  InvitationSlugRequiredError,
   PublicationError,
   publishInvitation,
   setInvitationEditingEnabled,
   unpublishInvitation,
 } from "@/features/invitations/publication";
+import { InvitationSlugStateError, updateDraftInvitationSlug } from "@/features/invitations/slug-claim";
 import { issueMagicLink } from "@/features/auth/magic-link";
 import { workspaceDraftSchema } from "@/features/invitations/workspace-dto";
 import { saveWorkspaceDraftForCustomer } from "@/features/workspace/actions";
@@ -19,7 +21,7 @@ beforeEach(async () => {
   );
 });
 
-async function setupInvitation(content: object = {}) {
+async function setupInvitation(content: object = {}, slug: string | null = "publication-invitation") {
   const [admin, customer] = await Promise.all([
     db.admin.create({ data: { id: adminId, email: "admin@example.com", passwordHash: "hash" } }),
     db.customer.create({ data: { name: "Customer" } }),
@@ -45,7 +47,7 @@ async function setupInvitation(content: object = {}) {
       templateVersion: order.templateVersion,
       contentSchemaVersion: order.contentSchemaVersion,
       paletteKey: order.paletteKey,
-      slug: "publication-invitation",
+      slug,
     },
   });
   await db.invitationContent.create({
@@ -164,6 +166,48 @@ describe("invitation publication lifecycle", () => {
       editingEnabled: true,
       publishedAt: null,
     });
+  });
+
+  it("rejects publishing without a public slug before snapshot mutation", async () => {
+    const { admin, invitation } = await setupInvitation({}, null);
+
+    await expect(publishInvitation(invitation.id, admin.id)).rejects.toBeInstanceOf(InvitationSlugRequiredError);
+    await expect(db.publishedSnapshot.count({ where: { invitationId: invitation.id } })).resolves.toBe(0);
+    await expect(db.invitation.findUniqueOrThrow({ where: { id: invitation.id } })).resolves.toMatchObject({
+      status: "DRAFT",
+      editingEnabled: true,
+      publishedAt: null,
+    });
+  });
+
+  it("updates a draft slug and its order reservation atomically", async () => {
+    const { admin, invitation } = await setupInvitation({}, "old-public-url");
+
+    await expect(updateDraftInvitationSlug({
+      invitationId: invitation.id,
+      adminId: admin.id,
+      slug: "new-public-url",
+    })).resolves.toEqual({ previousSlug: "old-public-url", slug: "new-public-url" });
+    await expect(db.invitation.findUniqueOrThrow({ where: { id: invitation.id } })).resolves.toMatchObject({
+      slug: "new-public-url",
+    });
+    await expect(db.order.findUniqueOrThrow({ where: { id: invitation.orderId } })).resolves.toMatchObject({
+      requestedInvitationSlug: "new-public-url",
+    });
+    await expect(db.auditEvent.findMany({ where: { entityId: invitation.id } })).resolves.toMatchObject([
+      { action: "SLUG_UPDATED", actorId: admin.id, properties: { previousSlug: "old-public-url", slug: "new-public-url" } },
+    ]);
+  });
+
+  it("rejects slug changes outside draft state", async () => {
+    const { admin, invitation } = await setupInvitation();
+    await publishInvitation(invitation.id, admin.id);
+
+    await expect(updateDraftInvitationSlug({
+      invitationId: invitation.id,
+      adminId: admin.id,
+      slug: "new-public-url",
+    })).rejects.toBeInstanceOf(InvitationSlugStateError);
   });
 
   it("unpublishes and archives only through allowed lifecycle states", async () => {
