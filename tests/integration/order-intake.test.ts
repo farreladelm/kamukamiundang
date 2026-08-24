@@ -87,6 +87,26 @@ describe("order intake and activation", () => {
     );
   });
 
+  it("allows only one concurrent pending order to reserve a slug", async () => {
+    const order = {
+      templateKey: "template-1",
+      templateVersion: 1,
+      paletteKey: "gading",
+      photoLimit: 20,
+      requestedInvitationSlug: "concurrent-wedding-url",
+    };
+
+    const claims = await Promise.allSettled([
+      createPendingOrder({ ...order, customer: { name: "Alya & Bima" } }),
+      createPendingOrder({ ...order, customer: { name: "Citra & Danu" } }),
+    ]);
+
+    expect(claims.filter((claim) => claim.status === "fulfilled")).toHaveLength(1);
+    expect(claims.filter((claim) => claim.status === "rejected")[0]?.reason).toBeInstanceOf(
+      InvitationSlugConflictError,
+    );
+  });
+
   it("rejects unknown registry versions before persistence", async () => {
     await expect(createPendingOrder({
       customer: { name: "Customer" },
