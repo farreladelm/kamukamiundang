@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import type { TemplateRendererProps } from "@/features/templates/types";
-import { rsvpDemoSchema, wishDemoSchema } from "@/features/forms/schemas";
+import { rsvpDemoSchema, rsvpSubmissionSchema, wishDemoSchema } from "@/features/forms/schemas";
 
 function OrbitLine({ className }: { className?: string }) {
   return (
@@ -199,19 +199,30 @@ function StickyQuote({
   );
 }
 
-export function TemplateSevenRenderer({ content, palette }: TemplateRendererProps) {
+export function TemplateSevenRenderer({ content, palette, publicInvitationSlug }: TemplateRendererProps) {
   const reduceMotion = useReducedMotion() ?? false;
   const [copiedAccount, setCopiedAccount] = useState<string | null>(null);
   const [rsvpSent, setRsvpSent] = useState(false);
+  const [rsvpPending, setRsvpPending] = useState(false);
   const [wishSent, setWishSent] = useState(false);
   const [rsvpErrors, setRsvpErrors] = useState<Record<string, string>>({});
+  const [rsvpServerError, setRsvpServerError] = useState<string | null>(null);
   const [wishErrors, setWishErrors] = useState<Record<string, string>>({});
 
-  function submitRsvp(event: React.FormEvent<HTMLFormElement>) {
+  const rsvpIdempotencyKey = useRef<string | null>(null);
+
+  async function submitRsvp(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const result = rsvpDemoSchema.safeParse(
-      Object.fromEntries(new FormData(event.currentTarget).entries()),
-    );
+    const formData = new FormData(event.currentTarget);
+    const result = publicInvitationSlug
+      ? rsvpSubmissionSchema.safeParse({
+          name: formData.get("name"),
+          attendance: formData.get("attendance"),
+          guestCount: formData.get("attendance") === "ATTENDING" ? formData.get("guestCount") : 0,
+          eventKeys: formData.get("attendance") === "ATTENDING" ? formData.getAll("eventKeys") : [],
+          honeypot: formData.get("honeypot"),
+        })
+      : rsvpDemoSchema.safeParse(Object.fromEntries(formData.entries()));
     if (!result.success) {
       setRsvpErrors(
         Object.fromEntries(
@@ -221,7 +232,34 @@ export function TemplateSevenRenderer({ content, palette }: TemplateRendererProp
       return;
     }
     setRsvpErrors({});
-    setRsvpSent(true);
+    setRsvpServerError(null);
+    if (!publicInvitationSlug) {
+      setRsvpSent(true);
+      return;
+    }
+
+    if (!rsvpIdempotencyKey.current) rsvpIdempotencyKey.current = window.crypto.randomUUID();
+    setRsvpPending(true);
+    try {
+      const response = await fetch(`/api/invitations/${encodeURIComponent(publicInvitationSlug)}/rsvp`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Idempotency-Key": rsvpIdempotencyKey.current,
+        },
+        body: JSON.stringify(result.data),
+      });
+      if (!response.ok) {
+        const body = await response.json().catch(() => null) as { message?: unknown } | null;
+        setRsvpServerError(typeof body?.message === "string" ? body.message : "RSVP gagal dikirim.");
+        return;
+      }
+      setRsvpSent(true);
+    } catch {
+      setRsvpServerError("Koneksi gagal. Silakan coba lagi.");
+    } finally {
+      setRsvpPending(false);
+    }
   }
 
   function submitWish(event: React.FormEvent<HTMLFormElement>) {
@@ -400,7 +438,7 @@ export function TemplateSevenRenderer({ content, palette }: TemplateRendererProp
             </p>
             {rsvpSent ? (
               <p className="mt-8 border p-4 text-sm" role="status" style={{ borderColor: palette.tokens.accent }}>
-                Terima kasih, konfirmasi Anda sudah tercatat di demo ini.
+                {publicInvitationSlug ? "Terima kasih, konfirmasi Anda sudah tercatat." : "Terima kasih, konfirmasi Anda sudah tercatat di demo ini."}
               </p>
             ) : (
               <form className="mt-8 grid gap-4" noValidate onSubmit={submitRsvp}>
@@ -426,9 +464,9 @@ export function TemplateSevenRenderer({ content, palette }: TemplateRendererProp
                 </label>
                 <select
                   id="rsvp-count"
-                  name="guests"
-                  aria-invalid={Boolean(rsvpErrors.guests)}
-                  aria-describedby={rsvpErrors.guests ? "rsvp-count-error" : undefined}
+                   name={publicInvitationSlug ? "guestCount" : "guests"}
+                   aria-invalid={Boolean(rsvpErrors.guests || rsvpErrors.guestCount)}
+                   aria-describedby={rsvpErrors.guests || rsvpErrors.guestCount ? "rsvp-count-error" : undefined}
                   className="min-h-11 border bg-transparent px-3 text-sm focus-visible:outline-2 aria-[invalid=true]:border-red-700"
                   style={{ borderColor: palette.tokens.line }}
                   defaultValue="1"
@@ -439,31 +477,43 @@ export function TemplateSevenRenderer({ content, palette }: TemplateRendererProp
                     </option>
                   ))}
                 </select>
-                {rsvpErrors.guests && (
+                {(rsvpErrors.guests || rsvpErrors.guestCount) && (
                   <p id="rsvp-count-error" className="text-xs text-red-800" role="alert">
-                    {rsvpErrors.guests}
+                    {rsvpErrors.guests || rsvpErrors.guestCount}
                   </p>
                 )}
+                {publicInvitationSlug && content.rsvp.events && content.rsvp.events.length > 1 && (
+                  <fieldset className="grid gap-3 border-0 p-0">
+                    <legend className="mb-1 text-xs font-semibold">Acara yang dihadiri</legend>
+                    {content.rsvp.events.map((event) => <label key={event.key} className="flex items-center gap-2 text-sm"><input type="checkbox" name="eventKeys" value={event.key} /> {event.label}</label>)}
+                    {rsvpErrors.eventKeys && <p className="text-xs text-red-800" role="alert">{rsvpErrors.eventKeys}</p>}
+                  </fieldset>
+                )}
+                {publicInvitationSlug && content.rsvp.events && content.rsvp.events.length === 1 && <input type="hidden" name="eventKeys" value={content.rsvp.events[0].key} />}
                 <fieldset className="grid gap-3 border-0 p-0">
                   <legend className="mb-1 text-xs font-semibold">Kehadiran</legend>
                   <label className="flex items-center gap-2 text-sm">
-                    <input type="radio" name="attendance" value="yes" defaultChecked /> Ya, saya hadir
+                    <input type="radio" name="attendance" value={publicInvitationSlug ? "ATTENDING" : "yes"} defaultChecked /> Ya, saya hadir
                   </label>
                   <label className="flex items-center gap-2 text-sm">
-                    <input type="radio" name="attendance" value="no" /> Maaf, saya tidak dapat hadir
+                    <input type="radio" name="attendance" value={publicInvitationSlug ? "NOT_ATTENDING" : "no"} /> Maaf, saya tidak dapat hadir
                   </label>
+                  {publicInvitationSlug && <label className="flex items-center gap-2 text-sm"><input type="radio" name="attendance" value="UNDECIDED" /> Belum menentukan</label>}
                   {rsvpErrors.attendance && (
                     <p className="text-xs text-red-800" role="alert">
                       {rsvpErrors.attendance}
                     </p>
                   )}
                 </fieldset>
+                {publicInvitationSlug && <input name="honeypot" tabIndex={-1} autoComplete="off" aria-hidden="true" className="absolute -left-[10000px] h-px w-px overflow-hidden" />}
+                {rsvpServerError && <p className="text-xs text-red-800" role="alert">{rsvpServerError}</p>}
                 <button
                   type="submit"
-                  className="mt-2 min-h-11 border px-4 text-xs font-semibold uppercase tracking-[0.14em]"
+                  disabled={rsvpPending}
+                  className="mt-2 min-h-11 border px-4 text-xs font-semibold uppercase tracking-[0.14em] disabled:cursor-wait disabled:opacity-60"
                   style={{ borderColor: palette.tokens.accent }}
                 >
-                  Kirim RSVP
+                  {rsvpPending ? "Mengirim..." : "Kirim RSVP"}
                 </button>
               </form>
             )}
