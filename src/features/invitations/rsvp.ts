@@ -89,10 +89,6 @@ export async function submitRsvp({
   clientKey: string;
   submission: RsvpSubmission;
 }): Promise<RsvpResult> {
-  if (!allowRateLimitedSubmission(`${slug}:${clientKey}`)) {
-    throw new RsvpSubmissionError("rate_limited", "Terlalu banyak percobaan. Coba lagi nanti.");
-  }
-
   const result = await db.$transaction(async (tx) => {
     await tx.$queryRaw`SELECT "id" FROM "Invitation" WHERE "slug" = ${slug} AND "status" = 'PUBLISHED' FOR UPDATE`;
     const invitation = await tx.invitation.findFirst({
@@ -126,6 +122,10 @@ export async function submitRsvp({
         guestCount: existing.guestCount,
         eventKeys: existing.eventKeys,
       };
+    }
+
+    if (!allowRateLimitedSubmission(`${slug}:${clientKey}`)) {
+      throw new RsvpSubmissionError("rate_limited", "Terlalu banyak percobaan. Coba lagi nanti.");
     }
 
     if (submission.honeypot) {

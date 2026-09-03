@@ -3,6 +3,7 @@ import "server-only";
 import type { Prisma } from "@/generated/prisma/client";
 import { db } from "@/lib/server/db";
 import { assertWorkspaceRuntime, validateWorkspaceDraft } from "./workspace-dto";
+import { toTemplateContentViewModel } from "./content-schema";
 
 export class PublicationError extends Error {
   constructor(message: string) {
@@ -42,6 +43,10 @@ function toSnapshotContent(invitation: {
       invitation.paletteKey,
     );
     const draft = validateWorkspaceDraft(invitation.content.content);
+    const content = toTemplateContentViewModel(draft, runtime.demo.content, runtime.capabilities);
+    if (draft.rsvp.enabled && runtime.capabilities.includes("rsvp") && !content.rsvp?.events?.length) {
+      throw new PublicationError("Atur kapasitas RSVP untuk minimal satu acara.");
+    }
 
     return {
       ...draft,

@@ -179,6 +179,20 @@ describe("RSVP submissions", () => {
     expect(response.status).toBe(404);
   });
 
+  it("returns generic success for honeypot requests through the public route", async () => {
+    const invitation = await setupPublishedInvitation();
+    const response = await POST(
+      new Request("https://undango.example/api/invitations/rsvp-invitation/rsvp", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Idempotency-Key": "route-bot-one" },
+        body: JSON.stringify({ ...attendingSubmission(), honeypot: "filled" }),
+      }),
+      { params: Promise.resolve({ slug: invitation.slug! }) },
+    );
+    expect(response.status).toBe(201);
+    await expect(db.rsvp.count({ where: { invitationId: invitation.id } })).resolves.toBe(0);
+  });
+
   it("rate limits repeated submissions from the same invitation and client", async () => {
     const invitation = await setupPublishedInvitation();
     const makeRequest = (index: number) => POST(
