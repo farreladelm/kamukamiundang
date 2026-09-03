@@ -59,7 +59,7 @@ export const rsvpSubmissionSchema = z.object({
   name: z.string().trim().min(1, "Nama wajib diisi.").max(100, "Nama maksimal 100 karakter."),
   attendance: z.enum(["ATTENDING", "NOT_ATTENDING", "UNDECIDED"], "Pilih status kehadiran."),
   guestCount: z.coerce.number().int("Jumlah tamu harus berupa angka bulat.").min(0, "Jumlah tamu tidak valid."),
-  eventKeys: z.array(z.enum(["mainEvent", "secondaryEvent"])).max(2, "Pilihan acara tidak valid."),
+  eventKeys: z.array(z.enum(["mainEvent", "secondaryEvent"])).max(2, "Pilihan acara tidak valid.").refine((keys) => new Set(keys).size === keys.length, "Pilihan acara tidak valid."),
   honeypot: z.string().max(0, "Permintaan tidak valid.").default(""),
 }).strict().superRefine((value, context) => {
   if (value.attendance === "ATTENDING" && (value.guestCount < 1 || value.eventKeys.length === 0)) {

@@ -4,10 +4,15 @@ import type {
   TemplateRuntimeManifest,
 } from "@/features/templates/types";
 
+type RenderTemplateOptions = {
+  publicInvitationSlug?: string;
+};
+
 export function renderTemplate(
   template: TemplateRuntimeManifest,
   paletteKey: string,
   content: TemplateContentViewModel,
+  options: RenderTemplateOptions = {},
 ): ReactElement {
   const palette = template.palettes.find((candidate) => candidate.key === paletteKey);
 
@@ -17,5 +22,5 @@ export function renderTemplate(
 
   const Renderer = template.renderer;
 
-  return <Renderer content={content} palette={palette} />;
+  return <Renderer content={content} palette={palette} publicInvitationSlug={options.publicInvitationSlug} />;
 }
