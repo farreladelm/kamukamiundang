@@ -18,6 +18,8 @@ export function TemplateDetail({
     throw new Error(`Unknown template ${template.templateKey} v${template.templateVersion}`);
   }
 
+  const isEditorialPreview = template.templateKey === "template-7";
+
   const [paletteKey, setPaletteKey] = useState(template.demo.paletteKey);
   const [isPaletteOpen, setIsPaletteOpen] = useState(false);
   const selectedPalette = template.palettes.find((palette) => palette.key === paletteKey)!;

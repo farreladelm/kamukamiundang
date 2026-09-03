@@ -230,3 +230,23 @@ body {
   height: 0;
   border-top: 1px solid var(--thumbnail-accent);
 }
+
+/* editorial: a wide orbit ellipse with a small spark accent — echoes template-7's neon-orbit motif */
+.template-thumbnail-editorial::before {
+  top: 12%;
+  right: -10%;
+  left: -10%;
+  height: 40%;
+  border: 1px solid var(--thumbnail-accent);
+  border-radius: 50%;
+  transform: rotate(-4deg);
+}
+
+.template-thumbnail-editorial::after {
+  right: 16%;
+  bottom: 20%;
+  width: 0.6rem;
+  height: 0.6rem;
+  background: var(--thumbnail-accent);
+  transform: rotate(45deg);
+}
