@@ -6,7 +6,7 @@ export const templateOneV1: TemplateRuntimeManifest = {
   templateVersion: 1,
   contentSchemaVersion: 2,
   previewStyle: "arch",
-  capabilities: ["gallery", "gift", "map", "music", "story", "wishes"],
+  capabilities: ["gallery", "gift", "map", "music", "story", "rsvp", "wishes"],
   palettes: [
     {
       key: "gading",
