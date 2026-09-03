@@ -2097,7 +2097,7 @@ export const RsvpScalarFieldEnum = {
   name: 'name',
   attendance: 'attendance',
   guestCount: 'guestCount',
-  eventKey: 'eventKey',
+  eventKeys: 'eventKeys',
   idempotencyKey: 'idempotencyKey',
   createdAt: 'createdAt'
 } as const

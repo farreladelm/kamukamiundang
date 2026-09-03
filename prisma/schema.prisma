@@ -304,7 +304,7 @@ model Rsvp {
   name           String
   attendance     RsvpAttendance
   guestCount     Int
-  eventKey       String?
+  eventKeys      String[]
   idempotencyKey String
   createdAt      DateTime       @default(now())
   invitation     Invitation     @relation(fields: [invitationId], references: [id], onDelete: Cascade)
