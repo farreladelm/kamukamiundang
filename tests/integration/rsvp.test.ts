@@ -195,18 +195,25 @@ describe("RSVP submissions", () => {
 
   it("rate limits repeated submissions from the same invitation and client", async () => {
     const invitation = await setupPublishedInvitation();
-    const makeRequest = (index: number) => POST(
-      new Request("https://undango.example/api/invitations/rsvp-invitation/rsvp", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Idempotency-Key": `route-${index}-key`,
-          "X-Forwarded-For": "198.51.100.12",
-        },
-        body: JSON.stringify({ name: "Guest", attendance: "NOT_ATTENDING", guestCount: 0, eventKeys: [], honeypot: "" }),
-      }),
-      { params: Promise.resolve({ slug: invitation.slug! }) },
-    );
+    let clientCookie = "";
+    const makeRequest = async (index: number) => {
+      const headers = new Headers({
+        "Content-Type": "application/json",
+        "Idempotency-Key": `route-${index}-key`,
+      });
+      if (clientCookie) headers.set("Cookie", clientCookie);
+      const response = await POST(
+        new Request("https://undango.example/api/invitations/rsvp-invitation/rsvp", {
+          method: "POST",
+          headers,
+          body: JSON.stringify({ name: "Guest", attendance: "NOT_ATTENDING", guestCount: 0, eventKeys: [], honeypot: "" }),
+        }),
+        { params: Promise.resolve({ slug: invitation.slug! }) },
+      );
+      const setCookie = response.headers.get("set-cookie")?.split(";", 1)[0];
+      if (setCookie) clientCookie = setCookie;
+      return response;
+    };
 
     const responses = [];
     for (let index = 0; index < 6; index += 1) responses.push(await makeRequest(index));

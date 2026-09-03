@@ -9,6 +9,7 @@ import type { z } from "zod";
 
 export const RSVP_RATE_LIMIT = 5;
 export const RSVP_RATE_WINDOW_MS = 15 * 60_000;
+const MAX_RATE_LIMIT_KEYS = 10_000;
 
 export type RsvpSubmission = z.infer<typeof rsvpSubmissionSchema>;
 
@@ -30,6 +31,22 @@ export class RsvpSubmissionError extends Error {
 const rateLimitTimestamps = new Map<string, number[]>();
 
 function allowRateLimitedSubmission(key: string, now = Date.now()) {
+  for (const [storedKey, storedTimestamps] of rateLimitTimestamps) {
+    const activeTimestamps = storedTimestamps.filter(
+      (timestamp) => now - timestamp < RSVP_RATE_WINDOW_MS,
+    );
+    if (activeTimestamps.length === 0) rateLimitTimestamps.delete(storedKey);
+    else rateLimitTimestamps.set(storedKey, activeTimestamps);
+  }
+
+  if (!rateLimitTimestamps.has(key)) {
+    while (rateLimitTimestamps.size >= MAX_RATE_LIMIT_KEYS) {
+      const oldestKey = rateLimitTimestamps.keys().next().value;
+      if (oldestKey === undefined) break;
+      rateLimitTimestamps.delete(oldestKey);
+    }
+  }
+
   const timestamps = (rateLimitTimestamps.get(key) ?? []).filter(
     (timestamp) => now - timestamp < RSVP_RATE_WINDOW_MS,
   );

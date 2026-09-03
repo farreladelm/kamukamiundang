@@ -53,7 +53,8 @@ function toSnapshotContent(invitation: {
       story: runtime.capabilities.includes("story") ? draft.story : null,
       gift: runtime.capabilities.includes("gift") ? draft.gift : null,
     } as Prisma.InputJsonObject;
-  } catch {
+  } catch (error) {
+    if (error instanceof PublicationError) throw error;
     throw new PublicationError("Draft invitation is incompatible with its pinned template.");
   }
 }
