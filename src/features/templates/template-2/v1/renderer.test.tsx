@@ -27,7 +27,7 @@ describe("TemplateTwoRenderer", () => {
       "href",
       "https://maps.google.com/?q=Ruang+Ombak+Nusa+Dua",
     );
-    expect(container.querySelector(".sm\\:grid-cols-2")).not.toBeNull();
+    expect(container.querySelector(".\\@sm\\:grid-cols-2")).not.toBeNull();
   }, 15_000);
 
   it("keeps three named palette choices", () => {

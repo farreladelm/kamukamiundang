@@ -27,7 +27,7 @@ describe("TemplateFiveRenderer", () => {
       "href",
       "https://maps.google.com/?q=Hotel+Arunika+Jakarta",
     );
-    expect(container.querySelector(".sm\\:grid-cols-2")).not.toBeNull();
+    expect(container.querySelector(".\\@sm\\:grid-cols-2")).not.toBeNull();
   }, 15_000);
 
   it("keeps three named palette choices", () => {

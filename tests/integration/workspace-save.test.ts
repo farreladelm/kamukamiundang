@@ -82,7 +82,7 @@ function workspaceDraft(): WorkspaceDraft {
       physicalAddress: "Jl. Taman Sari",
     },
     rsvp: {
-      enabled: true,
+      enabled: false,
       intro: "Konfirmasi kehadiran.",
       maxGuests: 2,
       eventCapacities: { mainEvent: 100, secondaryEvent: 0 },
