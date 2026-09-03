@@ -258,7 +258,7 @@ export function InvitationExperience({
       {!isOpen && (
         <div
           data-testid="invitation-cover"
-          className="absolute inset-x-0 top-0 z-20 flex h-dvh flex-col justify-between overflow-hidden px-7 py-10 text-center sm:px-12"
+          className="absolute inset-x-0 top-0 z-20 flex h-dvh flex-col justify-between overflow-hidden px-7 py-10 text-center @sm:px-12"
           style={{ backgroundColor: palette.tokens.ink, color: palette.tokens.canvas }}
           onWheel={(event) => event.preventDefault()}
           onTouchMove={(event) => event.preventDefault()}
@@ -270,7 +270,7 @@ export function InvitationExperience({
           </div>
           <div className="relative z-10">
             <p className="text-xs font-semibold tracking-[0.28em] uppercase opacity-70">{content.cover.title}</p>
-            <h1 className="mt-6 font-serif text-5xl leading-[0.9] sm:text-6xl">
+            <h1 className="mt-6 font-serif text-5xl leading-[0.9] @sm:text-6xl">
               {content.couple.firstName} &amp; {content.couple.secondName}
             </h1>
             <p className="mt-8 text-xs tracking-[0.18em] uppercase opacity-70">{content.cover.recipientLabel}</p>
@@ -303,13 +303,13 @@ export function InvitationExperience({
         aria-hidden={isLocked}
         inert={isLocked ? true : undefined}
       >
-        <section className="relative flex min-h-[88dvh] flex-col justify-end overflow-hidden px-7 py-10 sm:px-12">
+        <section className="relative flex min-h-[88dvh] flex-col justify-end overflow-hidden px-7 py-10 @sm:px-12">
           <div className="pointer-events-none absolute inset-0 opacity-45" style={{ background: `linear-gradient(145deg, ${palette.tokens.surface}, transparent 62%)` }} />
           <div className="relative z-10">
             <p className="text-xs font-semibold tracking-[0.25em] uppercase" style={{ color: palette.tokens.accent }}>
               {content.eyebrow}
             </p>
-            <h2 className="mt-5 font-serif text-5xl leading-[0.9] sm:text-6xl">
+            <h2 className="mt-5 font-serif text-5xl leading-[0.9] @sm:text-6xl">
               {content.couple.firstName} <span className="italic opacity-55">&amp;</span> {content.couple.secondName}
             </h2>
             <p className="mt-7 max-w-xs text-sm leading-7" style={{ color: palette.tokens.muted }}>
@@ -321,16 +321,16 @@ export function InvitationExperience({
           </div>
         </section>
 
-        <section className="border-y px-7 py-14 text-center sm:px-12" style={{ borderColor: palette.tokens.line, backgroundColor: palette.tokens.surface }}>
+        <section className="border-y px-7 py-14 text-center @sm:px-12" style={{ borderColor: palette.tokens.line, backgroundColor: palette.tokens.surface }}>
           <p className="text-xs font-semibold tracking-[0.22em] uppercase" style={{ color: palette.tokens.accent }}>
             Sebuah doa
           </p>
-          <blockquote className="mx-auto mt-6 max-w-xl font-serif text-2xl leading-relaxed italic sm:text-3xl">
+          <blockquote className="mx-auto mt-6 max-w-xl font-serif text-2xl leading-relaxed italic @sm:text-3xl">
             &ldquo;{content.quote}&rdquo;
           </blockquote>
         </section>
 
-        <section className="px-7 py-14 sm:px-12">
+        <section className="px-7 py-14 @sm:px-12">
           <SectionHeading eyebrow="Kedua mempelai" title="Dengan penuh kasih" palette={palette} />
           <div className="mt-10 grid gap-10">
             {content.profiles.map((profile) => (
@@ -350,15 +350,15 @@ export function InvitationExperience({
           </div>
         </section>
 
-        <section className="px-7 py-14 sm:px-12" style={{ backgroundColor: palette.tokens.surface }}>
+        <section className="px-7 py-14 @sm:px-12" style={{ backgroundColor: palette.tokens.surface }}>
           <SectionHeading eyebrow="Save the date" title={content.eventDate} palette={palette} />
           <p className="mt-5 text-sm leading-6" style={{ color: palette.tokens.muted }}>Menghitung hari menuju perayaan kecil kami.</p>
             {content.eventDateIso && <div className="mt-8"><Countdown target={content.eventDateIso} /></div>}
         </section>
 
-        <section className="px-7 py-14 sm:px-12">
+        <section className="px-7 py-14 @sm:px-12">
           <SectionHeading eyebrow="Rangkaian acara" title="Hari yang kami nantikan" palette={palette} />
-          <div className="mt-10 grid gap-5 sm:grid-cols-2">
+          <div className="mt-10 grid gap-5 @sm:grid-cols-2">
             {content.events.map((event) => (
               <div key={event.label} className="border p-5" style={{ borderColor: palette.tokens.line }}>
                 <p className="text-xs font-semibold tracking-[0.18em] uppercase" style={{ color: palette.tokens.accent }}>{event.label}</p>
@@ -375,7 +375,7 @@ export function InvitationExperience({
         </section>
 
         {content.rsvp && (
-          <section className="border-y px-7 py-14 sm:px-12" style={{ borderColor: palette.tokens.line, backgroundColor: palette.tokens.surface }}>
+          <section className="border-y px-7 py-14 @sm:px-12" style={{ borderColor: palette.tokens.line, backgroundColor: palette.tokens.surface }}>
             <SectionHeading eyebrow="RSVP" title="Sampaikan kehadiran" palette={palette} />
             <p className="mt-5 text-sm leading-6" style={{ color: palette.tokens.muted }}>{content.rsvp.intro}</p>
             {rsvpSent ? (
@@ -403,7 +403,7 @@ export function InvitationExperience({
         )}
 
         {content.gallery && (
-          <section className="px-7 py-14 sm:px-12">
+          <section className="px-7 py-14 @sm:px-12">
             <SectionHeading eyebrow="Gallery" title="Potongan hari-hari kami" palette={palette} />
             {content.gallery.videoLabel && <p className="mt-5 border p-4 text-sm" style={{ borderColor: palette.tokens.line }}>{content.gallery.videoLabel} <span className="ml-2 text-xs opacity-65">(placeholder)</span></p>}
             <div className="mt-8 grid grid-cols-2 gap-2">
@@ -413,7 +413,7 @@ export function InvitationExperience({
         )}
 
         {content.story && (
-          <section className="border-y px-7 py-14 sm:px-12" style={{ borderColor: palette.tokens.line, backgroundColor: palette.tokens.surface }}>
+          <section className="border-y px-7 py-14 @sm:px-12" style={{ borderColor: palette.tokens.line, backgroundColor: palette.tokens.surface }}>
             <SectionHeading eyebrow="Love story" title="Yang membawa kami ke sini" palette={palette} />
             {content.story.intro && <p className="mt-5 text-sm leading-7" style={{ color: palette.tokens.muted }}>{content.story.intro}</p>}
             <div className="mt-10 grid gap-8">
@@ -429,7 +429,7 @@ export function InvitationExperience({
         )}
 
         {content.gift && (
-          <section className="px-7 py-14 sm:px-12">
+          <section className="px-7 py-14 @sm:px-12">
             <SectionHeading eyebrow="Wedding gift" title="Tanda kasih" palette={palette} />
             <p className="mt-5 text-sm leading-7" style={{ color: palette.tokens.muted }}>{content.gift.intro}</p>
             <div className="mt-8 grid gap-4">
@@ -447,7 +447,7 @@ export function InvitationExperience({
         )}
 
         {content.wishes && (
-          <section className="border-y px-7 py-14 sm:px-12" style={{ borderColor: palette.tokens.line, backgroundColor: palette.tokens.surface }}>
+          <section className="border-y px-7 py-14 @sm:px-12" style={{ borderColor: palette.tokens.line, backgroundColor: palette.tokens.surface }}>
             <SectionHeading eyebrow="Ucapan dan doa" title="Kirimkan kata baik" palette={palette} />
             <p className="mt-5 text-sm leading-6" style={{ color: palette.tokens.muted }}>{content.wishes.prompt}</p>
             <div className="mt-8 grid gap-3">{content.wishes.entries.map((entry) => <blockquote key={entry.name} className="border-l-2 pl-4 text-sm leading-6" style={{ borderColor: palette.tokens.accent }}><p>&ldquo;{entry.message}&rdquo;</p><cite className="mt-2 block text-xs not-italic font-semibold">{entry.name}</cite></blockquote>)}</div>
@@ -455,7 +455,7 @@ export function InvitationExperience({
           </section>
         )}
 
-        <section className="px-7 py-16 text-center sm:px-12">
+        <section className="px-7 py-16 text-center @sm:px-12">
           <p className="mx-auto max-w-sm font-serif text-2xl leading-relaxed italic">&ldquo;{content.quote}&rdquo;</p>
           <p className="mx-auto mt-8 max-w-sm text-sm leading-7" style={{ color: palette.tokens.muted }}>{content.closing}</p>
           <p className="mt-8 font-serif text-2xl">{content.couple.firstName} &amp; {content.couple.secondName}</p>
