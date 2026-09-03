@@ -39,6 +39,7 @@ export type TemplateContentViewModel = {
   eventDate: string;
   eventDateIso: string;
   events: Array<{
+    key?: "mainEvent" | "secondaryEvent";
     label: string;
     date: string;
     time: string;
@@ -97,6 +98,11 @@ export type TemplateGift = {
 export type TemplateRsvp = {
   intro: string;
   maxGuests: number;
+  events?: Array<{
+    key: "mainEvent" | "secondaryEvent";
+    label: string;
+    capacity: number;
+  }>;
 };
 
 export type TemplateWishes = {
@@ -110,6 +116,7 @@ export type TemplateWishes = {
 export type TemplateRendererProps = {
   content: TemplateContentViewModel;
   palette: TemplatePalette;
+  publicInvitationSlug?: string;
 };
 
 export type TemplateRuntimeManifest = {

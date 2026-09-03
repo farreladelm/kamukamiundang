@@ -33,6 +33,12 @@ function workspaceFixture(templateKey = "template-1"): WorkspaceInvitationDto {
         secondaryEvent: null,
         story: null,
         gift: null,
+        rsvp: {
+          enabled: false,
+          intro: "",
+          maxGuests: 2,
+          eventCapacities: { mainEvent: 100, secondaryEvent: 0 },
+        },
     },
     palettes: runtime.palettes,
   };
@@ -92,5 +98,13 @@ describe("WorkspaceEditor", () => {
 
     expect(screen.queryByRole("button", { name: "Tambah cerita" })).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Tambah informasi hadiah" })).toBeInTheDocument();
+  });
+
+  it("renders RSVP configuration for supported templates", () => {
+    render(<WorkspaceEditor workspace={workspaceFixture("template-2")} />);
+
+    expect(screen.getByRole("checkbox", { name: "Aktifkan RSVP publik" })).not.toBeChecked();
+    expect(screen.getByRole("spinbutton", { name: "Maksimal tamu per RSVP" })).toHaveValue(2);
+    expect(screen.getByRole("spinbutton", { name: "Kapasitas akad nikah" })).toHaveValue(100);
   });
 });

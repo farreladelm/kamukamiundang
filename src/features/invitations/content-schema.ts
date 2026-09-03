@@ -81,6 +81,18 @@ const workspaceGiftSchema = z.object({
   physicalAddress: z.string().trim().max(500, "Maksimal 500 karakter.").default(""),
 });
 
+const workspaceRsvpSchema = z.object({
+  enabled: z.boolean().default(false),
+  intro: z.string().trim().max(500, "Maksimal 500 karakter.").default(""),
+  maxGuests: z.coerce.number().int("Batas tamu harus berupa angka bulat.").min(1, "Batas tamu minimal 1.").max(20, "Batas tamu maksimal 20."),
+  eventCapacities: z.object({
+    mainEvent: z.coerce.number().int("Kapasitas harus berupa angka bulat.").min(0, "Kapasitas tidak boleh negatif.").max(100000, "Kapasitas terlalu besar."),
+    secondaryEvent: z.coerce.number().int("Kapasitas harus berupa angka bulat.").min(0, "Kapasitas tidak boleh negatif.").max(100000, "Kapasitas terlalu besar."),
+  }),
+});
+
+export type WorkspaceRsvp = z.infer<typeof workspaceRsvpSchema>;
+
 export const workspaceDraftSchema = z.object({
   bride: partnerSchema.default(() => ({
     nickname: "",
@@ -99,6 +111,12 @@ export const workspaceDraftSchema = z.object({
   secondaryEvent: workspaceEventSchema.nullable().default(() => ({ ...defaultWeddingEvents.secondary })),
   story: workspaceStorySchema.nullable().default(null),
   gift: workspaceGiftSchema.nullable().default(null),
+  rsvp: workspaceRsvpSchema.default(() => ({
+    enabled: false,
+    intro: "",
+    maxGuests: 1,
+    eventCapacities: { mainEvent: 0, secondaryEvent: 0 },
+  })),
 });
 
 export type WorkspaceDraft = z.infer<typeof workspaceDraftSchema>;
@@ -165,12 +183,15 @@ function toTemplateEvent(event: NonNullable<WorkspaceDraft["mainEvent"]>) {
 /** Maps editable draft fields to preview while retaining source-controlled template copy. */
 export function toTemplateContentViewModel(
   draft: WorkspaceDraft,
-  templateCopy: Pick<TemplateContentViewModel, "opening" | "closing" | "gift">,
+  templateCopy: Pick<TemplateContentViewModel, "opening" | "closing" | "gift" | "rsvp">,
   capabilities: readonly TemplateCapability[] = [],
 ): TemplateContentViewModel {
   const mainEvent = draft.mainEvent ? toTemplateEvent(draft.mainEvent) : null;
   const secondaryEvent = draft.secondaryEvent ? toTemplateEvent(draft.secondaryEvent) : null;
-  const events = [mainEvent, secondaryEvent].filter((event): event is NonNullable<typeof event> => Boolean(event));
+  const events = [
+    mainEvent && { ...mainEvent, key: "mainEvent" as const },
+    secondaryEvent && { ...secondaryEvent, key: "secondaryEvent" as const },
+  ].filter((event): event is NonNullable<typeof event> => Boolean(event));
   const firstEvent = events[0];
 
   const storyEntries = draft.story?.entries.filter((entry) => entry.title || entry.text) ?? [];
@@ -195,6 +216,21 @@ export function toTemplateContentViewModel(
         intro: templateCopy.gift.intro,
         accounts: giftAccounts,
         physicalAddress: draft.gift.physicalAddress || undefined,
+      }
+    : undefined;
+  const rsvp = capabilities.includes("rsvp") && draft.rsvp.enabled && (
+    templateCopy.rsvp || draft.rsvp.intro || events.length > 0
+  )
+    ? {
+        intro: draft.rsvp.intro || templateCopy.rsvp?.intro || "Konfirmasi kehadiran Anda.",
+        maxGuests: draft.rsvp.maxGuests,
+        events: events
+          .filter((event) => draft.rsvp.eventCapacities[event.key] > 0)
+          .map((event) => ({
+            key: event.key,
+            label: event.label,
+            capacity: draft.rsvp.eventCapacities[event.key],
+          })),
       }
     : undefined;
 
@@ -235,6 +271,7 @@ export function toTemplateContentViewModel(
     })),
     story,
     gift,
+    rsvp,
     closing: templateCopy.closing,
     branding: "Undangan oleh Undango",
   };
