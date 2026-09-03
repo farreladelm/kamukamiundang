@@ -10,10 +10,10 @@ import { SocialProof } from "@/components/site/social-proof";
 import { Faq } from "@/components/site/faq";
 import { Reveal } from "@/components/motion/reveal";
 import { ShowroomExperience } from "@/features/showroom/showroom-experience";
-import { getVisibleTemplateCatalogFromDatabase } from "@/features/templates/visibility";
+import { getVisibleTemplateCatalog } from "@/features/templates/catalog";
 
 export default async function ShowroomPage() {
-  const templates = await getVisibleTemplateCatalogFromDatabase();
+  const templates = await getVisibleTemplateCatalog();
   const requestHeaders = await headers();
   const host = requestHeaders.get("host") ?? "localhost:3000";
   const protocol = requestHeaders.get("x-forwarded-proto") ?? "http";

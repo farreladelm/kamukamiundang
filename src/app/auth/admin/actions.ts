@@ -1,11 +1,13 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
 import {
   clearSessionCookie,
   setSessionCookie,
   ADMIN_SESSION_COOKIE,
   CUSTOMER_SESSION_COOKIE,
+  revokeSession,
 } from "@/features/auth/session";
 import { loginAdmin } from "@/features/auth/admin-auth";
 import {
@@ -38,6 +40,8 @@ export async function adminLoginAction(
 }
 
 export async function adminLogoutAction() {
+  const cookieStore = await cookies();
+  await revokeSession(cookieStore.get(ADMIN_SESSION_COOKIE)?.value);
   await clearSessionCookie(ADMIN_SESSION_COOKIE);
   redirect("/auth/admin");
 }

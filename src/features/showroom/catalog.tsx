@@ -131,20 +131,31 @@ export function Catalog({
                     "radial-gradient(280px circle at var(--spot-x, 50%) var(--spot-y, 50%), rgba(180, 131, 61, 0.16), transparent 70%)",
                 }}
               />
-              <div
-                className={`template-thumbnail template-thumbnail-${template.previewStyle} aspect-[4/5] overflow-hidden rounded-2xl p-5 transition-transform duration-500 group-hover:scale-[1.02]`}
-                style={{
-                  backgroundColor: palette.tokens.canvas,
-                  color: palette.tokens.ink,
-                  "--thumbnail-accent": palette.tokens.accent,
-                  "--thumbnail-line": palette.tokens.line,
-                  "--thumbnail-surface": palette.tokens.surface,
-                } as React.CSSProperties}
-                aria-hidden="true"
-              >
-                <span className="template-thumbnail-mark">{template.name.slice(0, 1)}</span>
-                <span className="template-thumbnail-copy">{template.category}</span>
-              </div>
+              {template.marketingThumbnail ? (
+                // Thumbnail hosts are database-configured, not deployment-configured.
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={template.marketingThumbnail}
+                  alt={template.name}
+                  loading="lazy"
+                  className="aspect-[4/5] w-full rounded-2xl object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+                />
+              ) : (
+                <div
+                  className={`template-thumbnail template-thumbnail-${template.previewStyle} aspect-[4/5] overflow-hidden rounded-2xl p-5 transition-transform duration-500 group-hover:scale-[1.02]`}
+                  style={{
+                    backgroundColor: palette.tokens.canvas,
+                    color: palette.tokens.ink,
+                    "--thumbnail-accent": palette.tokens.accent,
+                    "--thumbnail-line": palette.tokens.line,
+                    "--thumbnail-surface": palette.tokens.surface,
+                  } as React.CSSProperties}
+                  aria-hidden="true"
+                >
+                  <span className="template-thumbnail-mark">{template.name.slice(0, 1)}</span>
+                  <span className="template-thumbnail-copy">{template.category}</span>
+                </div>
+              )}
               <div className="flex flex-1 flex-col px-2 pt-5 pb-2">
                 <p className="text-xs font-semibold tracking-[0.15em] text-stone-500 uppercase">
                   {template.category}

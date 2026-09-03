@@ -1,6 +1,6 @@
 # Task List: Undango
 
-**Status:** MVP-01 - MVP-18 and MVP-CAT-02 complete and approved; remaining hybrid template catalog amendment tasks pending  
+**Status:** MVP-01 - MVP-18 and MVP-CAT-01 - MVP-CAT-06 complete and approved; Checkpoint MVP-Catalog complete.  
 **Specification:** [`docs/PRD.md`](../docs/PRD.md) v0.5 Approved  
 **Plan:** [`tasks/plan.md`](./plan.md) v0.4 Approved  
 **Template catalog plan:** [`tasks/template-catalog-plan.md`](./template-catalog-plan.md)  
@@ -264,6 +264,7 @@ Task lama tetap selesai. Tabel ini mencatat bagian yang memerlukan remediation k
 
 ### MVP-CAT-06: Integrate order snapshots and deployment drift gate
 
+**Status:** Completed and verified 18 August 2026.  
 **Acceptance:** New-order selection includes only orderable resolved templates; server re-resolves selection and copies current database price plus immutable runtime/schema/palette identity into Order; later metadata edits do not alter old orders; reconciliation/reference scan blocks visible metadata without runtime and active references without runtime.  
 **Verify:** Order price-change snapshot, invalid/retired selection, concurrent metadata change, reconciliation drift, rollback compatibility, and full core-flow regression tests.  
 **Dependencies:** `MVP-CAT-03`, `MVP-CAT-04`, `MVP-15`  
@@ -274,16 +275,18 @@ Task lama tetap selesai. Tabel ini mencatat bagian yang memerlukan remediation k
 
 - [x] `MVP-01` - `MVP-18` historical completion remains recorded.
 - [x] `MVP-CAT-01` decision/specification approved.
-- [x] `MVP-CAT-02` and `MVP-CAT-03` implemented and reviewed; `MVP-CAT-04` - `MVP-CAT-06` remain pending.
+- [x] `MVP-CAT-01` - `MVP-CAT-06` implemented, reviewed, and merged.
 - [x] Runtime manifests, exact resolver, compatibility checks, and order/invitation/snapshot reference scan pass.
-- [ ] Empty and existing databases migrate without losing visibility or catalog metadata.
-- [ ] Showroom, WhatsApp, and new orders use database metadata plus exact source runtime.
-- [ ] Old order prices remain unchanged after catalog price edits.
-- [ ] Slug aliases, fail-closed missing pairs, reference scans, and rollback compatibility pass.
+- [x] Empty and existing databases migrate without losing visibility or catalog metadata.
+- [x] Showroom, WhatsApp, and new orders use database metadata plus exact source runtime.
+- [x] Old order prices remain unchanged after catalog price edits.
+- [x] Slug aliases, fail-closed missing pairs, reference scans, and rollback compatibility pass.
 
 ## MVP Workspace and Assets
 
 ### MVP-19: Build versioned draft workspace core
+
+**Status:** Implemented; focused workspace tests pass. 
 
 **Acceptance:** Workspace reads/writes mutable draft pinned to template/schema version; compare-and-swap rejects stale saves and preserves local input; locked editing rejects customer writes server-side.  
 **Verify:** Workspace-save integration and editor component tests.  
@@ -293,13 +296,17 @@ Task lama tetap selesai. Tabel ini mencatat bagian yang memerlukan remediation k
 
 ### MVP-20: Add identity and copy fields
 
-**Acceptance:** Couple/parent names, quote, opening, and closing use shared server/client schema; errors retain draft; optional omissions render without broken layout.  
+**Status:** Complete and approved.
+
+**Acceptance:** Bride/groom names plus separate father/mother names and curated quote selection use shared server/client schema; opening and closing remain source-controlled template copy; errors retain draft; optional omissions render without broken layout.  
 **Verify:** Section tests and manual mobile focus/keyboard check.  
 **Dependencies:** `MVP-19`  
 **Likely files:** `src/features/invitations/content-schema.ts`, `src/features/workspace/identity-section.tsx`, `src/features/workspace/copy-section.tsx`, `src/features/workspace/identity-section.test.tsx`  
 **Scope:** Medium, 4 files
 
 ### MVP-21: Add events, location, and countdown
+
+**Status:** Complete and approved.
 
 **Acceptance:** Event date/time stores explicit IANA timezone, Maps URL uses allowlist, and countdown handles browser timezone/past events consistently.  
 **Verify:** Timezone/Maps unit tests and manual timezone matrix.  
@@ -309,6 +316,8 @@ Task lama tetap selesai. Tabel ini mencatat bagian yang memerlukan remediation k
 
 ### MVP-22: Add story, gift, and section controls
 
+**Status:** Complete and approved.
+
 **Acceptance:** Gift remains informational, unsupported capabilities cannot be enabled, and empty/disabled sections collapse cleanly across three pinned template versions.  
 **Verify:** Optional-section tests and three-template preview review.  
 **Dependencies:** `MVP-19`, `MVP-20`  
@@ -316,6 +325,8 @@ Task lama tetap selesai. Tabel ini mencatat bagian yang memerlukan remediation k
 **Scope:** Medium, 5 files
 
 ### MVP-23: Implement image asset lifecycle
+
+**Status:** Complete and approved.
 
 **Acceptance:** Rate-limited image upload follows pending/processing/ready/failed/deleted, validates magic bytes/10 MB/2560 px/photo cap/250 MB quota, atomically writes variants, cleans partial files, and prevents deleting published references.  
 **Verify:** Malicious upload, failure cleanup, quota, reconciliation, and protected-delivery integration tests.  
@@ -325,6 +336,8 @@ Task lama tetap selesai. Tabel ini mencatat bagian yang memerlukan remediation k
 
 ### MVP-24: Implement music asset lifecycle
 
+**Status:** Complete and approved. Admin manages global curated tracks; customer selection remains a follow-up scope.
+
 **Acceptance:** MP3/M4A upload follows shared lifecycle, validates magic bytes/15 MB/10 minutes/quota, cleans failure paths, protects delivery, and audio remains optional with user-controlled playback.  
 **Verify:** Music lifecycle integration tests and Safari/Chrome mobile manual check.  
 **Dependencies:** `MVP-19`, `MVP-23`  
@@ -333,10 +346,10 @@ Task lama tetap selesai. Tabel ini mencatat bagian yang memerlukan remediation k
 
 ### Checkpoint MVP-D: Workspace
 
-- [ ] `MVP-19` - `MVP-24` reviewed.
-- [ ] Stale write and locked-workspace writes fail.
-- [ ] Asset lifecycle, cleanup, published-reference protection, and quota pass.
-- [ ] Workspace preview works at 360 px.
+- [x] `MVP-19` - `MVP-24` reviewed.
+- [x] Stale write and locked-workspace writes fail.
+- [x] Asset lifecycle, cleanup, published-reference protection, and quota pass.
+- [x] Workspace preview works at 360 px.
 
 ## MVP Publish and Guest Flow
 

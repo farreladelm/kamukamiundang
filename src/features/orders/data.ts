@@ -1,5 +1,7 @@
 import "server-only";
 
+import type { Prisma } from "@/generated/prisma/client";
+import { assertInvitationSlugAvailable } from "@/features/invitations/slug-claim";
 import { db } from "@/lib/server/db";
 import { resolveTemplateCatalogByIdentity } from "@/features/templates/catalog";
 
@@ -31,19 +33,23 @@ function cleanRequired(value: string, field: string): string {
   return cleaned;
 }
 
-export async function findOrCreateCustomer({
-  customerId,
-  name,
-  whatsapp,
-  email,
-}: {
+type CustomerInput = {
   customerId?: string;
   name: string;
   whatsapp?: string;
   email?: string;
-}) {
+};
+
+type CustomerClient = Pick<Prisma.TransactionClient, "customer">;
+
+async function findOrCreateCustomerWith(client: CustomerClient, {
+  customerId,
+  name,
+  whatsapp,
+  email,
+}: CustomerInput) {
   if (customerId) {
-    const existing = await db.customer.findUnique({ where: { id: customerId } });
+    const existing = await client.customer.findUnique({ where: { id: customerId } });
     if (!existing) throw new Error("Customer not found");
     return existing;
   }
@@ -51,7 +57,7 @@ export async function findOrCreateCustomer({
   const normalizedEmail = email?.trim().toLowerCase() || undefined;
   const normalizedWhatsapp = whatsapp?.trim() || undefined;
   const existing = normalizedEmail || normalizedWhatsapp
-    ? await db.customer.findFirst({
+    ? await client.customer.findFirst({
         where: {
           OR: [
             ...(normalizedEmail ? [{ email: normalizedEmail }] : []),
@@ -62,7 +68,7 @@ export async function findOrCreateCustomer({
     : null;
 
   if (existing) {
-    return db.customer.update({
+    return client.customer.update({
       where: { id: existing.id },
       data: {
         name: name.trim() || existing.name,
@@ -72,7 +78,7 @@ export async function findOrCreateCustomer({
     });
   }
 
-  return db.customer.create({
+  return client.customer.create({
     data: {
       name: cleanRequired(name, "Customer name"),
       whatsapp: normalizedWhatsapp,
@@ -81,19 +87,25 @@ export async function findOrCreateCustomer({
   });
 }
 
+export function findOrCreateCustomer(input: CustomerInput) {
+  return findOrCreateCustomerWith(db, input);
+}
+
 export async function createPendingOrder({
   customer,
   templateKey,
   templateVersion,
   paletteKey,
   photoLimit,
+  requestedInvitationSlug,
   storageQuotaBytes = DEFAULT_STORAGE_QUOTA_BYTES,
 }: {
-  customer: { customerId?: string; name: string; whatsapp?: string; email?: string };
+  customer: CustomerInput;
   templateKey: string;
   templateVersion: number;
   paletteKey: string;
   photoLimit: number;
+  requestedInvitationSlug?: string;
   storageQuotaBytes?: bigint;
 }) {
   const template = await resolveTemplateCatalogByIdentity(templateKey, templateVersion, {
@@ -101,24 +113,35 @@ export async function createPendingOrder({
     requireVisible: true,
   });
 
-  if ("ok" in template) throw new Error("Unknown template version or palette");
+  if ("ok" in template) {
+    if (template.reason === "NOT_VISIBLE") {
+      throw new Error("Template status is not visible for order creation");
+    }
+    throw new Error("Unknown template version or palette");
+  }
   if (!Number.isInteger(photoLimit) || photoLimit < 0) throw new Error("Invalid photo limit");
   if (storageQuotaBytes < BigInt(0)) throw new Error("Invalid storage quota");
 
-  const savedCustomer = await findOrCreateCustomer(customer);
+  return db.$transaction(async (tx) => {
+    if (requestedInvitationSlug) {
+      await assertInvitationSlugAvailable(tx, requestedInvitationSlug);
+    }
 
-  return db.order.create({
-    data: {
-      customerId: savedCustomer.id,
-      templateKey: template.templateKey,
-      templateVersion: template.templateVersion,
-      contentSchemaVersion: template.contentSchemaVersion,
-      paletteKey,
-      priceInRupiah: template.priceInRupiah,
-      photoLimit,
-      storageQuotaBytes,
-      status: "PENDING",
-    },
-    include: { customer: true },
+    const savedCustomer = await findOrCreateCustomerWith(tx, customer);
+    return tx.order.create({
+      data: {
+        customerId: savedCustomer.id,
+        templateKey: template.templateKey,
+        templateVersion: template.templateVersion,
+        contentSchemaVersion: template.contentSchemaVersion,
+        paletteKey,
+        requestedInvitationSlug,
+        priceInRupiah: template.priceInRupiah,
+        photoLimit,
+        storageQuotaBytes,
+        status: "PENDING",
+      },
+      include: { customer: true },
+    });
   });
 }

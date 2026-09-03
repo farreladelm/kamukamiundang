@@ -1,6 +1,7 @@
 "use server";
 
 import { requireAdmin } from "@/features/auth/policies";
+import { InvitationSlugConflictError } from "@/features/invitations/slug-claim";
 import { activatePaidOrder, transitionOrder } from "@/features/orders/activation";
 import { createPendingOrder, parseTemplateSelection } from "@/features/orders/data";
 import { formDataToObject, orderIntakeSchema } from "@/features/forms/schemas";
@@ -36,10 +37,14 @@ export async function createPendingOrderAction(
       templateVersion: selection.templateVersion,
       paletteKey: selection.paletteKey,
       photoLimit: parsed.data.photoLimit,
+      requestedInvitationSlug: parsed.data.requestedInvitationSlug,
     });
 
     return successState(`Order pending untuk ${order.customer.name} berhasil disimpan.`);
-  } catch {
+  } catch (error) {
+    if (error instanceof InvitationSlugConflictError) {
+      return formErrorState(error.message, { requestedInvitationSlug: [error.message] });
+    }
     return formErrorState(
       "Order tidak dapat disimpan. Periksa template dan data customer.",
       selection ? {} : { templateSelection: ["Template dan palette tidak valid."] },

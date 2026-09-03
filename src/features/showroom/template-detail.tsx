@@ -65,70 +65,11 @@ export function TemplateDetail({
 
   return (
     <main className="min-h-dvh bg-stone-950 text-stone-900">
-      <div
-        data-testid="template-detail-shell"
-        className={`mx-auto flex min-h-dvh max-w-[120rem] flex-col lg:flex-row${isEditorialPreview ? "" : " lg:h-screen lg:overflow-hidden"}`}
-      >
-        <section
-          data-testid="preview-cover"
-          className="relative hidden min-h-[35rem] flex-1 flex-col justify-between overflow-hidden p-6 sm:p-10 lg:sticky lg:top-0 lg:flex lg:h-screen lg:min-h-0 lg:p-16"
-          style={{ backgroundColor: selectedPalette.tokens.canvas, color: selectedPalette.tokens.ink }}
-        >
-          <div className="absolute inset-0 overflow-hidden" aria-hidden="true">
-            <div className="absolute inset-0 opacity-75" style={{ background: `linear-gradient(135deg, ${selectedPalette.tokens.surface}, ${selectedPalette.tokens.canvas} 48%, ${selectedPalette.tokens.accent}66)` }} />
-            <div className="absolute top-1/2 left-1/2 aspect-[3/4] w-[min(42vw,30rem)] -translate-x-1/2 -translate-y-1/2 border border-current opacity-35" />
-            <div className="absolute top-[18%] left-[18%] h-28 w-28 rounded-full border opacity-35" style={{ borderColor: selectedPalette.tokens.accent }} />
-            <div className="absolute right-[14%] bottom-[14%] h-56 w-56 rounded-full border opacity-25" style={{ borderColor: selectedPalette.tokens.line }} />
-          </div>
-          <div className="relative z-10 flex justify-end">
-            <span className="text-xs font-semibold tracking-[0.16em] uppercase opacity-60">
-              Preview publik
-            </span>
-          </div>
-
-          <div className="relative z-10 max-w-xl py-16 lg:py-8">
-            <p
-              className="text-xs font-semibold tracking-[0.24em] uppercase"
-              style={{ color: selectedPalette.tokens.accent }}
-            >
-              {template.category}
-            </p>
-            <h1 className="mt-2 font-serif text-3xl">{template.name}</h1>
-            <p className="mt-8 font-serif text-[clamp(3.5rem,8vw,8rem)] leading-[0.86]">
-              {template.demo.content.couple.firstName}
-              <span className="block pl-[0.6em] italic opacity-50">&amp;</span>
-              <span className="block">{template.demo.content.couple.secondName}</span>
-            </p>
-            <p className="mt-8 max-w-sm text-sm leading-7 opacity-70">
-              {template.demo.content.eventDate}. {template.description}
-             </p>
-          </div>
-
-          <div className="relative z-10 border-t pt-5" style={{ borderColor: selectedPalette.tokens.line }}>
-            <p className="max-w-xs text-xs leading-5 opacity-60">
-              Invitation dirancang untuk dibaca nyaman dari layar ponsel.
-            </p>
-          </div>
-
-        </section>
-
-        <section
-          data-testid="invitation-scroll"
-          className={`flex w-full justify-center overflow-y-visible lg:w-[30rem] lg:shrink-0${isEditorialPreview ? "" : " lg:h-screen lg:overflow-y-auto"}`}
-          style={{ backgroundColor: selectedPalette.tokens.canvas }}
-        >
-          <div
-            data-testid="invitation-frame"
-            className={`h-fit w-full bg-white${isEditorialPreview ? "" : " overflow-hidden"}`}
-          >
-            <div data-testid="template-demo">
-      {renderTemplate(runtime, paletteKey, {
-                 ...template.demo.content,
-                 cover: { ...template.demo.content.cover, recipientName },
-              })}
-            </div>
-          </div>
-        </section>
+      <div data-testid="template-demo">
+        {renderTemplate(runtime, paletteKey, {
+          ...template.demo.content,
+          cover: { ...template.demo.content.cover, recipientName },
+        })}
       </div>
 
       <div className="fixed right-5 bottom-5 z-30 sm:right-8 sm:bottom-8">

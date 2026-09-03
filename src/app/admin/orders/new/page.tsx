@@ -1,12 +1,20 @@
 import { getVisibleTemplateCatalog } from "@/features/templates/catalog";
 import { OrderForm } from "@/features/orders/order-form";
 
+function formatRupiah(priceInRupiah: number): string {
+  return new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    maximumFractionDigits: 0,
+  }).format(priceInRupiah);
+}
+
 export default async function NewOrderPage() {
   const templates = await getVisibleTemplateCatalog();
   const templateSelections = templates.flatMap((template) =>
     template.palettes.map((palette) => ({
       value: `${template.templateKey}|${template.templateVersion}|${palette.key}`,
-      label: `${template.name} · ${palette.name}`,
+      label: `${template.name} · ${palette.name} (${formatRupiah(template.priceInRupiah)})`,
     })),
   );
 

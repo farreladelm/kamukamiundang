@@ -1,5 +1,6 @@
 import "server-only";
 
+import { assertInvitationSlugAvailable } from "@/features/invitations/slug-claim";
 import { db } from "@/lib/server/db";
 import { assertOrderTransition } from "./policies";
 
@@ -23,10 +24,6 @@ export async function transitionOrder(
   });
 }
 
-function slugForOrder(orderId: string): string {
-  return `undangan-${orderId.replace(/[^a-z0-9]/gi, "").slice(0, 24).toLowerCase()}`;
-}
-
 export async function activatePaidOrder(orderId: string, adminId: string) {
   return db.$transaction(async (tx) => {
     await tx.$queryRaw`SELECT "id" FROM "Order" WHERE "id" = ${orderId} FOR UPDATE`;
@@ -44,6 +41,10 @@ export async function activatePaidOrder(orderId: string, adminId: string) {
       throw new Error("Only paid orders can be activated");
     }
 
+    if (order.requestedInvitationSlug) {
+      await assertInvitationSlugAvailable(tx, order.requestedInvitationSlug, { orderId: order.id });
+    }
+
     const invitation = await tx.invitation.create({
       data: {
         customerId: order.customerId,
@@ -52,7 +53,7 @@ export async function activatePaidOrder(orderId: string, adminId: string) {
         templateVersion: order.templateVersion,
         contentSchemaVersion: order.contentSchemaVersion,
         paletteKey: order.paletteKey,
-        slug: slugForOrder(order.id),
+        slug: order.requestedInvitationSlug,
       },
     });
 

@@ -38,4 +38,14 @@ describe("renderTemplate", () => {
       renderTemplate(template, "tidak-ada", template.demo.content),
     ).toThrow("Unknown palette");
   });
+
+  it("starts invitations behind the same cover on every surface", () => {
+    const template = getTemplateRuntimeManifest("template-1", 1);
+
+    if (!template) throw new Error("Expected Template 1 v1 in registry");
+    render(renderTemplate(template, template.demo.paletteKey, template.demo.content));
+
+    expect(screen.getByRole("button", { name: "Buka undangan" })).toBeInTheDocument();
+    expect(screen.getByTestId("invitation-content")).toHaveAttribute("aria-hidden", "true");
+  });
 });

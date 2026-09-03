@@ -193,6 +193,7 @@ export type AdminWhereInput = {
   sessions?: Prisma.SessionListRelationFilter
   templateVisibilities?: Prisma.TemplateVisibilityListRelationFilter
   templateCatalogUpdates?: Prisma.TemplateCatalogListRelationFilter
+  musicLibraryTracks?: Prisma.MusicLibraryTrackListRelationFilter
 }
 
 export type AdminOrderByWithRelationInput = {
@@ -205,6 +206,7 @@ export type AdminOrderByWithRelationInput = {
   sessions?: Prisma.SessionOrderByRelationAggregateInput
   templateVisibilities?: Prisma.TemplateVisibilityOrderByRelationAggregateInput
   templateCatalogUpdates?: Prisma.TemplateCatalogOrderByRelationAggregateInput
+  musicLibraryTracks?: Prisma.MusicLibraryTrackOrderByRelationAggregateInput
 }
 
 export type AdminWhereUniqueInput = Prisma.AtLeast<{
@@ -220,6 +222,7 @@ export type AdminWhereUniqueInput = Prisma.AtLeast<{
   sessions?: Prisma.SessionListRelationFilter
   templateVisibilities?: Prisma.TemplateVisibilityListRelationFilter
   templateCatalogUpdates?: Prisma.TemplateCatalogListRelationFilter
+  musicLibraryTracks?: Prisma.MusicLibraryTrackListRelationFilter
 }, "id" | "email">
 
 export type AdminOrderByWithAggregationInput = {
@@ -256,6 +259,7 @@ export type AdminCreateInput = {
   sessions?: Prisma.SessionCreateNestedManyWithoutAdminInput
   templateVisibilities?: Prisma.TemplateVisibilityCreateNestedManyWithoutUpdatedByAdminInput
   templateCatalogUpdates?: Prisma.TemplateCatalogCreateNestedManyWithoutUpdatedByAdminInput
+  musicLibraryTracks?: Prisma.MusicLibraryTrackCreateNestedManyWithoutUploadedByAdminInput
 }
 
 export type AdminUncheckedCreateInput = {
@@ -268,6 +272,7 @@ export type AdminUncheckedCreateInput = {
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutAdminInput
   templateVisibilities?: Prisma.TemplateVisibilityUncheckedCreateNestedManyWithoutUpdatedByAdminInput
   templateCatalogUpdates?: Prisma.TemplateCatalogUncheckedCreateNestedManyWithoutUpdatedByAdminInput
+  musicLibraryTracks?: Prisma.MusicLibraryTrackUncheckedCreateNestedManyWithoutUploadedByAdminInput
 }
 
 export type AdminUpdateInput = {
@@ -280,6 +285,7 @@ export type AdminUpdateInput = {
   sessions?: Prisma.SessionUpdateManyWithoutAdminNestedInput
   templateVisibilities?: Prisma.TemplateVisibilityUpdateManyWithoutUpdatedByAdminNestedInput
   templateCatalogUpdates?: Prisma.TemplateCatalogUpdateManyWithoutUpdatedByAdminNestedInput
+  musicLibraryTracks?: Prisma.MusicLibraryTrackUpdateManyWithoutUploadedByAdminNestedInput
 }
 
 export type AdminUncheckedUpdateInput = {
@@ -292,6 +298,7 @@ export type AdminUncheckedUpdateInput = {
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutAdminNestedInput
   templateVisibilities?: Prisma.TemplateVisibilityUncheckedUpdateManyWithoutUpdatedByAdminNestedInput
   templateCatalogUpdates?: Prisma.TemplateCatalogUncheckedUpdateManyWithoutUpdatedByAdminNestedInput
+  musicLibraryTracks?: Prisma.MusicLibraryTrackUncheckedUpdateManyWithoutUploadedByAdminNestedInput
 }
 
 export type AdminCreateManyInput = {
@@ -392,6 +399,20 @@ export type AdminUpdateOneWithoutTemplateCatalogUpdatesNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.AdminUpdateToOneWithWhereWithoutTemplateCatalogUpdatesInput, Prisma.AdminUpdateWithoutTemplateCatalogUpdatesInput>, Prisma.AdminUncheckedUpdateWithoutTemplateCatalogUpdatesInput>
 }
 
+export type AdminCreateNestedOneWithoutMusicLibraryTracksInput = {
+  create?: Prisma.XOR<Prisma.AdminCreateWithoutMusicLibraryTracksInput, Prisma.AdminUncheckedCreateWithoutMusicLibraryTracksInput>
+  connectOrCreate?: Prisma.AdminCreateOrConnectWithoutMusicLibraryTracksInput
+  connect?: Prisma.AdminWhereUniqueInput
+}
+
+export type AdminUpdateOneRequiredWithoutMusicLibraryTracksNestedInput = {
+  create?: Prisma.XOR<Prisma.AdminCreateWithoutMusicLibraryTracksInput, Prisma.AdminUncheckedCreateWithoutMusicLibraryTracksInput>
+  connectOrCreate?: Prisma.AdminCreateOrConnectWithoutMusicLibraryTracksInput
+  upsert?: Prisma.AdminUpsertWithoutMusicLibraryTracksInput
+  connect?: Prisma.AdminWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AdminUpdateToOneWithWhereWithoutMusicLibraryTracksInput, Prisma.AdminUpdateWithoutMusicLibraryTracksInput>, Prisma.AdminUncheckedUpdateWithoutMusicLibraryTracksInput>
+}
+
 export type AdminCreateNestedOneWithoutSessionsInput = {
   create?: Prisma.XOR<Prisma.AdminCreateWithoutSessionsInput, Prisma.AdminUncheckedCreateWithoutSessionsInput>
   connectOrCreate?: Prisma.AdminCreateOrConnectWithoutSessionsInput
@@ -417,6 +438,7 @@ export type AdminCreateWithoutTemplateVisibilitiesInput = {
   updatedAt?: Date | string
   sessions?: Prisma.SessionCreateNestedManyWithoutAdminInput
   templateCatalogUpdates?: Prisma.TemplateCatalogCreateNestedManyWithoutUpdatedByAdminInput
+  musicLibraryTracks?: Prisma.MusicLibraryTrackCreateNestedManyWithoutUploadedByAdminInput
 }
 
 export type AdminUncheckedCreateWithoutTemplateVisibilitiesInput = {
@@ -428,6 +450,7 @@ export type AdminUncheckedCreateWithoutTemplateVisibilitiesInput = {
   updatedAt?: Date | string
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutAdminInput
   templateCatalogUpdates?: Prisma.TemplateCatalogUncheckedCreateNestedManyWithoutUpdatedByAdminInput
+  musicLibraryTracks?: Prisma.MusicLibraryTrackUncheckedCreateNestedManyWithoutUploadedByAdminInput
 }
 
 export type AdminCreateOrConnectWithoutTemplateVisibilitiesInput = {
@@ -455,6 +478,7 @@ export type AdminUpdateWithoutTemplateVisibilitiesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sessions?: Prisma.SessionUpdateManyWithoutAdminNestedInput
   templateCatalogUpdates?: Prisma.TemplateCatalogUpdateManyWithoutUpdatedByAdminNestedInput
+  musicLibraryTracks?: Prisma.MusicLibraryTrackUpdateManyWithoutUploadedByAdminNestedInput
 }
 
 export type AdminUncheckedUpdateWithoutTemplateVisibilitiesInput = {
@@ -466,6 +490,7 @@ export type AdminUncheckedUpdateWithoutTemplateVisibilitiesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutAdminNestedInput
   templateCatalogUpdates?: Prisma.TemplateCatalogUncheckedUpdateManyWithoutUpdatedByAdminNestedInput
+  musicLibraryTracks?: Prisma.MusicLibraryTrackUncheckedUpdateManyWithoutUploadedByAdminNestedInput
 }
 
 export type AdminCreateWithoutTemplateCatalogUpdatesInput = {
@@ -477,6 +502,7 @@ export type AdminCreateWithoutTemplateCatalogUpdatesInput = {
   updatedAt?: Date | string
   sessions?: Prisma.SessionCreateNestedManyWithoutAdminInput
   templateVisibilities?: Prisma.TemplateVisibilityCreateNestedManyWithoutUpdatedByAdminInput
+  musicLibraryTracks?: Prisma.MusicLibraryTrackCreateNestedManyWithoutUploadedByAdminInput
 }
 
 export type AdminUncheckedCreateWithoutTemplateCatalogUpdatesInput = {
@@ -488,6 +514,7 @@ export type AdminUncheckedCreateWithoutTemplateCatalogUpdatesInput = {
   updatedAt?: Date | string
   sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutAdminInput
   templateVisibilities?: Prisma.TemplateVisibilityUncheckedCreateNestedManyWithoutUpdatedByAdminInput
+  musicLibraryTracks?: Prisma.MusicLibraryTrackUncheckedCreateNestedManyWithoutUploadedByAdminInput
 }
 
 export type AdminCreateOrConnectWithoutTemplateCatalogUpdatesInput = {
@@ -515,6 +542,7 @@ export type AdminUpdateWithoutTemplateCatalogUpdatesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sessions?: Prisma.SessionUpdateManyWithoutAdminNestedInput
   templateVisibilities?: Prisma.TemplateVisibilityUpdateManyWithoutUpdatedByAdminNestedInput
+  musicLibraryTracks?: Prisma.MusicLibraryTrackUpdateManyWithoutUploadedByAdminNestedInput
 }
 
 export type AdminUncheckedUpdateWithoutTemplateCatalogUpdatesInput = {
@@ -526,6 +554,71 @@ export type AdminUncheckedUpdateWithoutTemplateCatalogUpdatesInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   sessions?: Prisma.SessionUncheckedUpdateManyWithoutAdminNestedInput
   templateVisibilities?: Prisma.TemplateVisibilityUncheckedUpdateManyWithoutUpdatedByAdminNestedInput
+  musicLibraryTracks?: Prisma.MusicLibraryTrackUncheckedUpdateManyWithoutUploadedByAdminNestedInput
+}
+
+export type AdminCreateWithoutMusicLibraryTracksInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  sessions?: Prisma.SessionCreateNestedManyWithoutAdminInput
+  templateVisibilities?: Prisma.TemplateVisibilityCreateNestedManyWithoutUpdatedByAdminInput
+  templateCatalogUpdates?: Prisma.TemplateCatalogCreateNestedManyWithoutUpdatedByAdminInput
+}
+
+export type AdminUncheckedCreateWithoutMusicLibraryTracksInput = {
+  id?: string
+  email: string
+  passwordHash: string
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutAdminInput
+  templateVisibilities?: Prisma.TemplateVisibilityUncheckedCreateNestedManyWithoutUpdatedByAdminInput
+  templateCatalogUpdates?: Prisma.TemplateCatalogUncheckedCreateNestedManyWithoutUpdatedByAdminInput
+}
+
+export type AdminCreateOrConnectWithoutMusicLibraryTracksInput = {
+  where: Prisma.AdminWhereUniqueInput
+  create: Prisma.XOR<Prisma.AdminCreateWithoutMusicLibraryTracksInput, Prisma.AdminUncheckedCreateWithoutMusicLibraryTracksInput>
+}
+
+export type AdminUpsertWithoutMusicLibraryTracksInput = {
+  update: Prisma.XOR<Prisma.AdminUpdateWithoutMusicLibraryTracksInput, Prisma.AdminUncheckedUpdateWithoutMusicLibraryTracksInput>
+  create: Prisma.XOR<Prisma.AdminCreateWithoutMusicLibraryTracksInput, Prisma.AdminUncheckedCreateWithoutMusicLibraryTracksInput>
+  where?: Prisma.AdminWhereInput
+}
+
+export type AdminUpdateToOneWithWhereWithoutMusicLibraryTracksInput = {
+  where?: Prisma.AdminWhereInput
+  data: Prisma.XOR<Prisma.AdminUpdateWithoutMusicLibraryTracksInput, Prisma.AdminUncheckedUpdateWithoutMusicLibraryTracksInput>
+}
+
+export type AdminUpdateWithoutMusicLibraryTracksInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sessions?: Prisma.SessionUpdateManyWithoutAdminNestedInput
+  templateVisibilities?: Prisma.TemplateVisibilityUpdateManyWithoutUpdatedByAdminNestedInput
+  templateCatalogUpdates?: Prisma.TemplateCatalogUpdateManyWithoutUpdatedByAdminNestedInput
+}
+
+export type AdminUncheckedUpdateWithoutMusicLibraryTracksInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.StringFieldUpdateOperationsInput | string
+  passwordHash?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutAdminNestedInput
+  templateVisibilities?: Prisma.TemplateVisibilityUncheckedUpdateManyWithoutUpdatedByAdminNestedInput
+  templateCatalogUpdates?: Prisma.TemplateCatalogUncheckedUpdateManyWithoutUpdatedByAdminNestedInput
 }
 
 export type AdminCreateWithoutSessionsInput = {
@@ -537,6 +630,7 @@ export type AdminCreateWithoutSessionsInput = {
   updatedAt?: Date | string
   templateVisibilities?: Prisma.TemplateVisibilityCreateNestedManyWithoutUpdatedByAdminInput
   templateCatalogUpdates?: Prisma.TemplateCatalogCreateNestedManyWithoutUpdatedByAdminInput
+  musicLibraryTracks?: Prisma.MusicLibraryTrackCreateNestedManyWithoutUploadedByAdminInput
 }
 
 export type AdminUncheckedCreateWithoutSessionsInput = {
@@ -548,6 +642,7 @@ export type AdminUncheckedCreateWithoutSessionsInput = {
   updatedAt?: Date | string
   templateVisibilities?: Prisma.TemplateVisibilityUncheckedCreateNestedManyWithoutUpdatedByAdminInput
   templateCatalogUpdates?: Prisma.TemplateCatalogUncheckedCreateNestedManyWithoutUpdatedByAdminInput
+  musicLibraryTracks?: Prisma.MusicLibraryTrackUncheckedCreateNestedManyWithoutUploadedByAdminInput
 }
 
 export type AdminCreateOrConnectWithoutSessionsInput = {
@@ -575,6 +670,7 @@ export type AdminUpdateWithoutSessionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   templateVisibilities?: Prisma.TemplateVisibilityUpdateManyWithoutUpdatedByAdminNestedInput
   templateCatalogUpdates?: Prisma.TemplateCatalogUpdateManyWithoutUpdatedByAdminNestedInput
+  musicLibraryTracks?: Prisma.MusicLibraryTrackUpdateManyWithoutUploadedByAdminNestedInput
 }
 
 export type AdminUncheckedUpdateWithoutSessionsInput = {
@@ -586,6 +682,7 @@ export type AdminUncheckedUpdateWithoutSessionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   templateVisibilities?: Prisma.TemplateVisibilityUncheckedUpdateManyWithoutUpdatedByAdminNestedInput
   templateCatalogUpdates?: Prisma.TemplateCatalogUncheckedUpdateManyWithoutUpdatedByAdminNestedInput
+  musicLibraryTracks?: Prisma.MusicLibraryTrackUncheckedUpdateManyWithoutUploadedByAdminNestedInput
 }
 
 
@@ -597,12 +694,14 @@ export type AdminCountOutputType = {
   sessions: number
   templateVisibilities: number
   templateCatalogUpdates: number
+  musicLibraryTracks: number
 }
 
 export type AdminCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   sessions?: boolean | AdminCountOutputTypeCountSessionsArgs
   templateVisibilities?: boolean | AdminCountOutputTypeCountTemplateVisibilitiesArgs
   templateCatalogUpdates?: boolean | AdminCountOutputTypeCountTemplateCatalogUpdatesArgs
+  musicLibraryTracks?: boolean | AdminCountOutputTypeCountMusicLibraryTracksArgs
 }
 
 /**
@@ -636,6 +735,13 @@ export type AdminCountOutputTypeCountTemplateCatalogUpdatesArgs<ExtArgs extends 
   where?: Prisma.TemplateCatalogWhereInput
 }
 
+/**
+ * AdminCountOutputType without action
+ */
+export type AdminCountOutputTypeCountMusicLibraryTracksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.MusicLibraryTrackWhereInput
+}
+
 
 export type AdminSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -647,6 +753,7 @@ export type AdminSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   sessions?: boolean | Prisma.Admin$sessionsArgs<ExtArgs>
   templateVisibilities?: boolean | Prisma.Admin$templateVisibilitiesArgs<ExtArgs>
   templateCatalogUpdates?: boolean | Prisma.Admin$templateCatalogUpdatesArgs<ExtArgs>
+  musicLibraryTracks?: boolean | Prisma.Admin$musicLibraryTracksArgs<ExtArgs>
   _count?: boolean | Prisma.AdminCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["admin"]>
 
@@ -682,6 +789,7 @@ export type AdminInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   sessions?: boolean | Prisma.Admin$sessionsArgs<ExtArgs>
   templateVisibilities?: boolean | Prisma.Admin$templateVisibilitiesArgs<ExtArgs>
   templateCatalogUpdates?: boolean | Prisma.Admin$templateCatalogUpdatesArgs<ExtArgs>
+  musicLibraryTracks?: boolean | Prisma.Admin$musicLibraryTracksArgs<ExtArgs>
   _count?: boolean | Prisma.AdminCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type AdminIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -693,6 +801,7 @@ export type $AdminPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs 
     sessions: Prisma.$SessionPayload<ExtArgs>[]
     templateVisibilities: Prisma.$TemplateVisibilityPayload<ExtArgs>[]
     templateCatalogUpdates: Prisma.$TemplateCatalogPayload<ExtArgs>[]
+    musicLibraryTracks: Prisma.$MusicLibraryTrackPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1098,6 +1207,7 @@ export interface Prisma__AdminClient<T, Null = never, ExtArgs extends runtime.Ty
   sessions<T extends Prisma.Admin$sessionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Admin$sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   templateVisibilities<T extends Prisma.Admin$templateVisibilitiesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Admin$templateVisibilitiesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TemplateVisibilityPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   templateCatalogUpdates<T extends Prisma.Admin$templateCatalogUpdatesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Admin$templateCatalogUpdatesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$TemplateCatalogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  musicLibraryTracks<T extends Prisma.Admin$musicLibraryTracksArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Admin$musicLibraryTracksArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$MusicLibraryTrackPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1595,6 +1705,30 @@ export type Admin$templateCatalogUpdatesArgs<ExtArgs extends runtime.Types.Exten
   take?: number
   skip?: number
   distinct?: Prisma.TemplateCatalogScalarFieldEnum | Prisma.TemplateCatalogScalarFieldEnum[]
+}
+
+/**
+ * Admin.musicLibraryTracks
+ */
+export type Admin$musicLibraryTracksArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the MusicLibraryTrack
+   */
+  select?: Prisma.MusicLibraryTrackSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the MusicLibraryTrack
+   */
+  omit?: Prisma.MusicLibraryTrackOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.MusicLibraryTrackInclude<ExtArgs> | null
+  where?: Prisma.MusicLibraryTrackWhereInput
+  orderBy?: Prisma.MusicLibraryTrackOrderByWithRelationInput | Prisma.MusicLibraryTrackOrderByWithRelationInput[]
+  cursor?: Prisma.MusicLibraryTrackWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.MusicLibraryTrackScalarFieldEnum | Prisma.MusicLibraryTrackScalarFieldEnum[]
 }
 
 /**
