@@ -245,7 +245,7 @@ export type InvitationGroupByOutputType = {
   templateVersion: number
   contentSchemaVersion: number
   paletteKey: string
-  slug: string
+  slug: string | null
   status: $Enums.InvitationStatus
   editingEnabled: boolean
   publishedAt: Date | null
@@ -285,7 +285,7 @@ export type InvitationWhereInput = {
   templateVersion?: Prisma.IntFilter<"Invitation"> | number
   contentSchemaVersion?: Prisma.IntFilter<"Invitation"> | number
   paletteKey?: Prisma.StringFilter<"Invitation"> | string
-  slug?: Prisma.StringFilter<"Invitation"> | string
+  slug?: Prisma.StringNullableFilter<"Invitation"> | string | null
   status?: Prisma.EnumInvitationStatusFilter<"Invitation"> | $Enums.InvitationStatus
   editingEnabled?: Prisma.BoolFilter<"Invitation"> | boolean
   publishedAt?: Prisma.DateTimeNullableFilter<"Invitation"> | Date | string | null
@@ -310,7 +310,7 @@ export type InvitationOrderByWithRelationInput = {
   templateVersion?: Prisma.SortOrder
   contentSchemaVersion?: Prisma.SortOrder
   paletteKey?: Prisma.SortOrder
-  slug?: Prisma.SortOrder
+  slug?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   editingEnabled?: Prisma.SortOrder
   publishedAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -363,7 +363,7 @@ export type InvitationOrderByWithAggregationInput = {
   templateVersion?: Prisma.SortOrder
   contentSchemaVersion?: Prisma.SortOrder
   paletteKey?: Prisma.SortOrder
-  slug?: Prisma.SortOrder
+  slug?: Prisma.SortOrderInput | Prisma.SortOrder
   status?: Prisma.SortOrder
   editingEnabled?: Prisma.SortOrder
   publishedAt?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -388,7 +388,7 @@ export type InvitationScalarWhereWithAggregatesInput = {
   templateVersion?: Prisma.IntWithAggregatesFilter<"Invitation"> | number
   contentSchemaVersion?: Prisma.IntWithAggregatesFilter<"Invitation"> | number
   paletteKey?: Prisma.StringWithAggregatesFilter<"Invitation"> | string
-  slug?: Prisma.StringWithAggregatesFilter<"Invitation"> | string
+  slug?: Prisma.StringNullableWithAggregatesFilter<"Invitation"> | string | null
   status?: Prisma.EnumInvitationStatusWithAggregatesFilter<"Invitation"> | $Enums.InvitationStatus
   editingEnabled?: Prisma.BoolWithAggregatesFilter<"Invitation"> | boolean
   publishedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"Invitation"> | Date | string | null
@@ -403,7 +403,7 @@ export type InvitationCreateInput = {
   templateVersion: number
   contentSchemaVersion: number
   paletteKey: string
-  slug: string
+  slug?: string | null
   status?: $Enums.InvitationStatus
   editingEnabled?: boolean
   publishedAt?: Date | string | null
@@ -428,7 +428,7 @@ export type InvitationUncheckedCreateInput = {
   templateVersion: number
   contentSchemaVersion: number
   paletteKey: string
-  slug: string
+  slug?: string | null
   status?: $Enums.InvitationStatus
   editingEnabled?: boolean
   publishedAt?: Date | string | null
@@ -449,7 +449,7 @@ export type InvitationUpdateInput = {
   templateVersion?: Prisma.IntFieldUpdateOperationsInput | number
   contentSchemaVersion?: Prisma.IntFieldUpdateOperationsInput | number
   paletteKey?: Prisma.StringFieldUpdateOperationsInput | string
-  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumInvitationStatusFieldUpdateOperationsInput | $Enums.InvitationStatus
   editingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -474,7 +474,7 @@ export type InvitationUncheckedUpdateInput = {
   templateVersion?: Prisma.IntFieldUpdateOperationsInput | number
   contentSchemaVersion?: Prisma.IntFieldUpdateOperationsInput | number
   paletteKey?: Prisma.StringFieldUpdateOperationsInput | string
-  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumInvitationStatusFieldUpdateOperationsInput | $Enums.InvitationStatus
   editingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -497,7 +497,7 @@ export type InvitationCreateManyInput = {
   templateVersion: number
   contentSchemaVersion: number
   paletteKey: string
-  slug: string
+  slug?: string | null
   status?: $Enums.InvitationStatus
   editingEnabled?: boolean
   publishedAt?: Date | string | null
@@ -512,7 +512,7 @@ export type InvitationUpdateManyMutationInput = {
   templateVersion?: Prisma.IntFieldUpdateOperationsInput | number
   contentSchemaVersion?: Prisma.IntFieldUpdateOperationsInput | number
   paletteKey?: Prisma.StringFieldUpdateOperationsInput | string
-  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumInvitationStatusFieldUpdateOperationsInput | $Enums.InvitationStatus
   editingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -529,7 +529,7 @@ export type InvitationUncheckedUpdateManyInput = {
   templateVersion?: Prisma.IntFieldUpdateOperationsInput | number
   contentSchemaVersion?: Prisma.IntFieldUpdateOperationsInput | number
   paletteKey?: Prisma.StringFieldUpdateOperationsInput | string
-  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumInvitationStatusFieldUpdateOperationsInput | $Enums.InvitationStatus
   editingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -787,7 +787,7 @@ export type InvitationCreateWithoutCustomerInput = {
   templateVersion: number
   contentSchemaVersion: number
   paletteKey: string
-  slug: string
+  slug?: string | null
   status?: $Enums.InvitationStatus
   editingEnabled?: boolean
   publishedAt?: Date | string | null
@@ -810,7 +810,7 @@ export type InvitationUncheckedCreateWithoutCustomerInput = {
   templateVersion: number
   contentSchemaVersion: number
   paletteKey: string
-  slug: string
+  slug?: string | null
   status?: $Enums.InvitationStatus
   editingEnabled?: boolean
   publishedAt?: Date | string | null
@@ -862,7 +862,7 @@ export type InvitationScalarWhereInput = {
   templateVersion?: Prisma.IntFilter<"Invitation"> | number
   contentSchemaVersion?: Prisma.IntFilter<"Invitation"> | number
   paletteKey?: Prisma.StringFilter<"Invitation"> | string
-  slug?: Prisma.StringFilter<"Invitation"> | string
+  slug?: Prisma.StringNullableFilter<"Invitation"> | string | null
   status?: Prisma.EnumInvitationStatusFilter<"Invitation"> | $Enums.InvitationStatus
   editingEnabled?: Prisma.BoolFilter<"Invitation"> | boolean
   publishedAt?: Prisma.DateTimeNullableFilter<"Invitation"> | Date | string | null
@@ -877,7 +877,7 @@ export type InvitationCreateWithoutOrderInput = {
   templateVersion: number
   contentSchemaVersion: number
   paletteKey: string
-  slug: string
+  slug?: string | null
   status?: $Enums.InvitationStatus
   editingEnabled?: boolean
   publishedAt?: Date | string | null
@@ -900,7 +900,7 @@ export type InvitationUncheckedCreateWithoutOrderInput = {
   templateVersion: number
   contentSchemaVersion: number
   paletteKey: string
-  slug: string
+  slug?: string | null
   status?: $Enums.InvitationStatus
   editingEnabled?: boolean
   publishedAt?: Date | string | null
@@ -937,7 +937,7 @@ export type InvitationUpdateWithoutOrderInput = {
   templateVersion?: Prisma.IntFieldUpdateOperationsInput | number
   contentSchemaVersion?: Prisma.IntFieldUpdateOperationsInput | number
   paletteKey?: Prisma.StringFieldUpdateOperationsInput | string
-  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumInvitationStatusFieldUpdateOperationsInput | $Enums.InvitationStatus
   editingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -960,7 +960,7 @@ export type InvitationUncheckedUpdateWithoutOrderInput = {
   templateVersion?: Prisma.IntFieldUpdateOperationsInput | number
   contentSchemaVersion?: Prisma.IntFieldUpdateOperationsInput | number
   paletteKey?: Prisma.StringFieldUpdateOperationsInput | string
-  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumInvitationStatusFieldUpdateOperationsInput | $Enums.InvitationStatus
   editingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -981,7 +981,7 @@ export type InvitationCreateWithoutContentInput = {
   templateVersion: number
   contentSchemaVersion: number
   paletteKey: string
-  slug: string
+  slug?: string | null
   status?: $Enums.InvitationStatus
   editingEnabled?: boolean
   publishedAt?: Date | string | null
@@ -1005,7 +1005,7 @@ export type InvitationUncheckedCreateWithoutContentInput = {
   templateVersion: number
   contentSchemaVersion: number
   paletteKey: string
-  slug: string
+  slug?: string | null
   status?: $Enums.InvitationStatus
   editingEnabled?: boolean
   publishedAt?: Date | string | null
@@ -1041,7 +1041,7 @@ export type InvitationUpdateWithoutContentInput = {
   templateVersion?: Prisma.IntFieldUpdateOperationsInput | number
   contentSchemaVersion?: Prisma.IntFieldUpdateOperationsInput | number
   paletteKey?: Prisma.StringFieldUpdateOperationsInput | string
-  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumInvitationStatusFieldUpdateOperationsInput | $Enums.InvitationStatus
   editingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1065,7 +1065,7 @@ export type InvitationUncheckedUpdateWithoutContentInput = {
   templateVersion?: Prisma.IntFieldUpdateOperationsInput | number
   contentSchemaVersion?: Prisma.IntFieldUpdateOperationsInput | number
   paletteKey?: Prisma.StringFieldUpdateOperationsInput | string
-  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumInvitationStatusFieldUpdateOperationsInput | $Enums.InvitationStatus
   editingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1085,7 +1085,7 @@ export type InvitationCreateWithoutSnapshotInput = {
   templateVersion: number
   contentSchemaVersion: number
   paletteKey: string
-  slug: string
+  slug?: string | null
   status?: $Enums.InvitationStatus
   editingEnabled?: boolean
   publishedAt?: Date | string | null
@@ -1109,7 +1109,7 @@ export type InvitationUncheckedCreateWithoutSnapshotInput = {
   templateVersion: number
   contentSchemaVersion: number
   paletteKey: string
-  slug: string
+  slug?: string | null
   status?: $Enums.InvitationStatus
   editingEnabled?: boolean
   publishedAt?: Date | string | null
@@ -1145,7 +1145,7 @@ export type InvitationUpdateWithoutSnapshotInput = {
   templateVersion?: Prisma.IntFieldUpdateOperationsInput | number
   contentSchemaVersion?: Prisma.IntFieldUpdateOperationsInput | number
   paletteKey?: Prisma.StringFieldUpdateOperationsInput | string
-  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumInvitationStatusFieldUpdateOperationsInput | $Enums.InvitationStatus
   editingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1169,7 +1169,7 @@ export type InvitationUncheckedUpdateWithoutSnapshotInput = {
   templateVersion?: Prisma.IntFieldUpdateOperationsInput | number
   contentSchemaVersion?: Prisma.IntFieldUpdateOperationsInput | number
   paletteKey?: Prisma.StringFieldUpdateOperationsInput | string
-  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumInvitationStatusFieldUpdateOperationsInput | $Enums.InvitationStatus
   editingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1189,7 +1189,7 @@ export type InvitationCreateWithoutAssetsInput = {
   templateVersion: number
   contentSchemaVersion: number
   paletteKey: string
-  slug: string
+  slug?: string | null
   status?: $Enums.InvitationStatus
   editingEnabled?: boolean
   publishedAt?: Date | string | null
@@ -1213,7 +1213,7 @@ export type InvitationUncheckedCreateWithoutAssetsInput = {
   templateVersion: number
   contentSchemaVersion: number
   paletteKey: string
-  slug: string
+  slug?: string | null
   status?: $Enums.InvitationStatus
   editingEnabled?: boolean
   publishedAt?: Date | string | null
@@ -1249,7 +1249,7 @@ export type InvitationUpdateWithoutAssetsInput = {
   templateVersion?: Prisma.IntFieldUpdateOperationsInput | number
   contentSchemaVersion?: Prisma.IntFieldUpdateOperationsInput | number
   paletteKey?: Prisma.StringFieldUpdateOperationsInput | string
-  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumInvitationStatusFieldUpdateOperationsInput | $Enums.InvitationStatus
   editingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1273,7 +1273,7 @@ export type InvitationUncheckedUpdateWithoutAssetsInput = {
   templateVersion?: Prisma.IntFieldUpdateOperationsInput | number
   contentSchemaVersion?: Prisma.IntFieldUpdateOperationsInput | number
   paletteKey?: Prisma.StringFieldUpdateOperationsInput | string
-  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumInvitationStatusFieldUpdateOperationsInput | $Enums.InvitationStatus
   editingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1293,7 +1293,7 @@ export type InvitationCreateWithoutMagicLinksInput = {
   templateVersion: number
   contentSchemaVersion: number
   paletteKey: string
-  slug: string
+  slug?: string | null
   status?: $Enums.InvitationStatus
   editingEnabled?: boolean
   publishedAt?: Date | string | null
@@ -1317,7 +1317,7 @@ export type InvitationUncheckedCreateWithoutMagicLinksInput = {
   templateVersion: number
   contentSchemaVersion: number
   paletteKey: string
-  slug: string
+  slug?: string | null
   status?: $Enums.InvitationStatus
   editingEnabled?: boolean
   publishedAt?: Date | string | null
@@ -1353,7 +1353,7 @@ export type InvitationUpdateWithoutMagicLinksInput = {
   templateVersion?: Prisma.IntFieldUpdateOperationsInput | number
   contentSchemaVersion?: Prisma.IntFieldUpdateOperationsInput | number
   paletteKey?: Prisma.StringFieldUpdateOperationsInput | string
-  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumInvitationStatusFieldUpdateOperationsInput | $Enums.InvitationStatus
   editingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1377,7 +1377,7 @@ export type InvitationUncheckedUpdateWithoutMagicLinksInput = {
   templateVersion?: Prisma.IntFieldUpdateOperationsInput | number
   contentSchemaVersion?: Prisma.IntFieldUpdateOperationsInput | number
   paletteKey?: Prisma.StringFieldUpdateOperationsInput | string
-  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumInvitationStatusFieldUpdateOperationsInput | $Enums.InvitationStatus
   editingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1397,7 +1397,7 @@ export type InvitationCreateWithoutRsvpsInput = {
   templateVersion: number
   contentSchemaVersion: number
   paletteKey: string
-  slug: string
+  slug?: string | null
   status?: $Enums.InvitationStatus
   editingEnabled?: boolean
   publishedAt?: Date | string | null
@@ -1421,7 +1421,7 @@ export type InvitationUncheckedCreateWithoutRsvpsInput = {
   templateVersion: number
   contentSchemaVersion: number
   paletteKey: string
-  slug: string
+  slug?: string | null
   status?: $Enums.InvitationStatus
   editingEnabled?: boolean
   publishedAt?: Date | string | null
@@ -1457,7 +1457,7 @@ export type InvitationUpdateWithoutRsvpsInput = {
   templateVersion?: Prisma.IntFieldUpdateOperationsInput | number
   contentSchemaVersion?: Prisma.IntFieldUpdateOperationsInput | number
   paletteKey?: Prisma.StringFieldUpdateOperationsInput | string
-  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumInvitationStatusFieldUpdateOperationsInput | $Enums.InvitationStatus
   editingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1481,7 +1481,7 @@ export type InvitationUncheckedUpdateWithoutRsvpsInput = {
   templateVersion?: Prisma.IntFieldUpdateOperationsInput | number
   contentSchemaVersion?: Prisma.IntFieldUpdateOperationsInput | number
   paletteKey?: Prisma.StringFieldUpdateOperationsInput | string
-  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumInvitationStatusFieldUpdateOperationsInput | $Enums.InvitationStatus
   editingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1501,7 +1501,7 @@ export type InvitationCreateWithoutWishesInput = {
   templateVersion: number
   contentSchemaVersion: number
   paletteKey: string
-  slug: string
+  slug?: string | null
   status?: $Enums.InvitationStatus
   editingEnabled?: boolean
   publishedAt?: Date | string | null
@@ -1525,7 +1525,7 @@ export type InvitationUncheckedCreateWithoutWishesInput = {
   templateVersion: number
   contentSchemaVersion: number
   paletteKey: string
-  slug: string
+  slug?: string | null
   status?: $Enums.InvitationStatus
   editingEnabled?: boolean
   publishedAt?: Date | string | null
@@ -1561,7 +1561,7 @@ export type InvitationUpdateWithoutWishesInput = {
   templateVersion?: Prisma.IntFieldUpdateOperationsInput | number
   contentSchemaVersion?: Prisma.IntFieldUpdateOperationsInput | number
   paletteKey?: Prisma.StringFieldUpdateOperationsInput | string
-  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumInvitationStatusFieldUpdateOperationsInput | $Enums.InvitationStatus
   editingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1585,7 +1585,7 @@ export type InvitationUncheckedUpdateWithoutWishesInput = {
   templateVersion?: Prisma.IntFieldUpdateOperationsInput | number
   contentSchemaVersion?: Prisma.IntFieldUpdateOperationsInput | number
   paletteKey?: Prisma.StringFieldUpdateOperationsInput | string
-  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumInvitationStatusFieldUpdateOperationsInput | $Enums.InvitationStatus
   editingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1606,7 +1606,7 @@ export type InvitationCreateManyCustomerInput = {
   templateVersion: number
   contentSchemaVersion: number
   paletteKey: string
-  slug: string
+  slug?: string | null
   status?: $Enums.InvitationStatus
   editingEnabled?: boolean
   publishedAt?: Date | string | null
@@ -1621,7 +1621,7 @@ export type InvitationUpdateWithoutCustomerInput = {
   templateVersion?: Prisma.IntFieldUpdateOperationsInput | number
   contentSchemaVersion?: Prisma.IntFieldUpdateOperationsInput | number
   paletteKey?: Prisma.StringFieldUpdateOperationsInput | string
-  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumInvitationStatusFieldUpdateOperationsInput | $Enums.InvitationStatus
   editingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1644,7 +1644,7 @@ export type InvitationUncheckedUpdateWithoutCustomerInput = {
   templateVersion?: Prisma.IntFieldUpdateOperationsInput | number
   contentSchemaVersion?: Prisma.IntFieldUpdateOperationsInput | number
   paletteKey?: Prisma.StringFieldUpdateOperationsInput | string
-  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumInvitationStatusFieldUpdateOperationsInput | $Enums.InvitationStatus
   editingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1666,7 +1666,7 @@ export type InvitationUncheckedUpdateManyWithoutCustomerInput = {
   templateVersion?: Prisma.IntFieldUpdateOperationsInput | number
   contentSchemaVersion?: Prisma.IntFieldUpdateOperationsInput | number
   paletteKey?: Prisma.StringFieldUpdateOperationsInput | string
-  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   status?: Prisma.EnumInvitationStatusFieldUpdateOperationsInput | $Enums.InvitationStatus
   editingEnabled?: Prisma.BoolFieldUpdateOperationsInput | boolean
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -1855,7 +1855,7 @@ export type $InvitationPayload<ExtArgs extends runtime.Types.Extensions.Internal
     templateVersion: number
     contentSchemaVersion: number
     paletteKey: string
-    slug: string
+    slug: string | null
     status: $Enums.InvitationStatus
     editingEnabled: boolean
     publishedAt: Date | null

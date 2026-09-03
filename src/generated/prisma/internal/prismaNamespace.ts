@@ -1956,6 +1956,7 @@ export const OrderScalarFieldEnum = {
   templateVersion: 'templateVersion',
   contentSchemaVersion: 'contentSchemaVersion',
   paletteKey: 'paletteKey',
+  requestedInvitationSlug: 'requestedInvitationSlug',
   priceInRupiah: 'priceInRupiah',
   photoLimit: 'photoLimit',
   storageQuotaBytes: 'storageQuotaBytes',

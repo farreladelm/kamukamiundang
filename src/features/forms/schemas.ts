@@ -2,6 +2,20 @@ import { z } from "zod";
 
 const optionalText = z.string().trim().optional().or(z.literal(""));
 
+export const invitationSlugSchema = z
+  .string()
+  .trim()
+  .min(3, "URL publik minimal 3 karakter.")
+  .max(80, "URL publik maksimal 80 karakter.")
+  .regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, "Gunakan huruf kecil, angka, dan tanda hubung tunggal.");
+
+const optionalInvitationSlugSchema = z
+  .string()
+  .trim()
+  .transform((value) => value || undefined)
+  .pipe(invitationSlugSchema.optional())
+  .optional();
+
 export const adminLoginSchema = z.object({
   email: z.string().trim().email("Masukkan alamat email yang valid."),
   password: z
@@ -21,6 +35,7 @@ export const orderIntakeSchema = z.object({
     (value) => value == null || value === "" || z.email().safeParse(value ?? "").success,
     "Masukkan alamat email yang valid.",
   ),
+  requestedInvitationSlug: optionalInvitationSlugSchema,
   templateSelection: z.string().trim().min(1, "Template dan palette wajib dipilih."),
   photoLimit: z.coerce.number().int("Batas foto harus berupa angka bulat.").nonnegative("Batas foto tidak boleh negatif."),
 });

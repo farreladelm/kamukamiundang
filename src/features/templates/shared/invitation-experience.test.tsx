@@ -23,11 +23,7 @@ describe("InvitationExperience", () => {
 
   it("locks desktop invitation rail until cover is opened", () => {
     const Renderer = templateTwoV1.renderer;
-    render(
-      <div data-testid="invitation-scroll">
-        <Renderer content={templateTwoV1.demo.content} palette={templateTwoV1.palettes[0]} />
-      </div>,
-    );
+    render(<Renderer content={templateTwoV1.demo.content} palette={templateTwoV1.palettes[0]} />);
 
     const rail = screen.getByTestId("invitation-scroll");
     expect(rail).toHaveStyle({ overflowY: "hidden" });

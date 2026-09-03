@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import { TemplateDetail } from "@/features/showroom/template-detail";
 import { templateRegistry } from "@/features/templates/registry";
@@ -34,16 +34,23 @@ describe("TemplateDetail", () => {
 
     const demo = screen.getByTestId("template-demo");
     const renderedTemplate = demo.firstElementChild;
+    const desktopPanel = screen.getByTestId("invitation-desktop-panel");
 
-    expect(screen.getByRole("heading", { name: "Larasati" })).toBeInTheDocument();
-    expect(screen.getByText("Aruna")).toBeInTheDocument();
+    expect(renderedTemplate).toHaveClass("w-full");
+    expect(renderedTemplate).not.toHaveClass("mx-auto", "max-w-[120rem]");
+    expect(renderedTemplate).toHaveClass("@container");
+    expect(screen.getByTestId("invitation-layout")).toHaveClass("@[64rem]:flex-row");
+    expect(within(desktopPanel).getByText("Aruna")).toBeInTheDocument();
+    expect(within(desktopPanel).getByText("Sabtu, 14 November 2026", { exact: false })).toBeInTheDocument();
+    expect(within(desktopPanel).queryByText("Larasati")).not.toBeInTheDocument();
+    expect(within(desktopPanel).queryByText("Klasik Jawa")).not.toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Buka pilihan palet" }));
     expect(screen.getByRole("button", { name: /^Gading/ })).toHaveAttribute(
       "aria-pressed",
       "true",
     );
     expect(screen.queryByRole("button", { name: "Terakota" })).not.toBeInTheDocument();
-    expect(renderedTemplate).toHaveStyle({ backgroundColor: "rgb(246, 240, 229)" });
+    expect(screen.getByTestId("invitation-scroll")).toHaveStyle({ backgroundColor: "rgb(246, 240, 229)" });
 
     fireEvent.click(screen.getByRole("button", { name: "Soga" }));
 
@@ -54,7 +61,7 @@ describe("TemplateDetail", () => {
       "true",
     );
     expect(demo.firstElementChild).toBe(renderedTemplate);
-    expect(renderedTemplate).toHaveStyle({ backgroundColor: "rgb(240, 231, 217)" });
+    expect(screen.getByTestId("invitation-scroll")).toHaveStyle({ backgroundColor: "rgb(240, 231, 217)" });
     expect(screen.queryByRole("link", { name: "Pesan via WhatsApp" })).not.toBeInTheDocument();
   }, 15_000);
 
@@ -63,17 +70,19 @@ describe("TemplateDetail", () => {
       <TemplateDetail template={catalogTemplate} />,
     );
 
-    expect(screen.getByTestId("preview-cover")).toBeInTheDocument();
+    expect(screen.getByTestId("invitation-desktop-panel")).toBeInTheDocument();
     expect(screen.queryByRole("link", { name: "Kembali ke koleksi" })).not.toBeInTheDocument();
-    expect(screen.getByTestId("preview-cover").className).toContain("lg:h-screen");
-    expect(screen.getByTestId("preview-cover").className).toContain("lg:sticky");
-    expect(screen.getByTestId("preview-cover").className).toContain("hidden");
+    expect(screen.getByTestId("invitation-desktop-panel").className).toContain("@[64rem]:h-screen");
+    expect(screen.getByTestId("invitation-desktop-panel").className).toContain("@[64rem]:sticky");
+    expect(screen.getByTestId("invitation-desktop-panel").className).toContain("hidden");
     expect(screen.getByTestId("invitation-frame")).toBeInTheDocument();
     expect(screen.getByTestId("invitation-scroll")).toHaveStyle({
       backgroundColor: "rgb(246, 240, 229)",
     });
     expect(screen.getByTestId("invitation-scroll").className).not.toContain("px-3");
     expect(screen.getByTestId("invitation-scroll").className).not.toContain("py-5");
+    expect(screen.getByTestId("invitation-experience")).toHaveClass("w-full");
+    expect(screen.getByTestId("invitation-experience")).not.toHaveClass("mx-auto", "max-w-[30rem]");
     expect(screen.getByRole("button", { name: "Buka pilihan palet" })).toHaveAttribute(
       "aria-expanded",
       "false",
