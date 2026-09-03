@@ -41,6 +41,14 @@ describe("core schema constraints", () => {
       `INSERT INTO "InvitationContent" ("id", "invitationId", "content", "contentSchemaVersion", "updatedByActorType", "updatedByActorId", "createdAt", "updatedAt") VALUES ('00000000-0000-0000-0000-000000000004', '${invitationId}', '{}', 1, 'CUSTOMER', '${customerId}', now(), now())`,
     );
     await expect(
+      db.$executeRawUnsafe(
+        `UPDATE "Invitation" SET "status" = 'PUBLISHED', "slug" = NULL WHERE "id" = '${invitationId}'`,
+      ),
+    ).rejects.toThrow(/Invitation_published_slug_check/);
+    await expect(
+      db.$executeRawUnsafe(`UPDATE "Invitation" SET "status" = 'PUBLISHED' WHERE "id" = '${invitationId}'`),
+    ).resolves.toBe(1);
+    await expect(
       db.$executeRawUnsafe(`UPDATE "InvitationContent" SET "content" = '{"name":"new"}' WHERE "invitationId" = '${invitationId}'`),
     ).rejects.toThrow(/content version must increment/);
     await db.$executeRawUnsafe(
