@@ -52,11 +52,11 @@ describe("core schema constraints", () => {
       db.$executeRawUnsafe(`UPDATE "InvitationContent" SET "content" = '{"name":"new"}' WHERE "invitationId" = '${invitationId}'`),
     ).rejects.toThrow(/content version must increment/);
     await db.$executeRawUnsafe(
-      `INSERT INTO "Rsvp" ("id", "invitationId", "name", "attendance", "guestCount", "idempotencyKey", "createdAt") VALUES ('00000000-0000-0000-0000-000000000005', '${invitationId}', 'Guest', 'ATTENDING', 1, 'request-1', now())`,
+      `INSERT INTO "Rsvp" ("id", "invitationId", "name", "attendance", "guestCount", "eventKeys", "idempotencyKey", "createdAt") VALUES ('00000000-0000-0000-0000-000000000005', '${invitationId}', 'Guest', 'ATTENDING', 1, '{"mainEvent"}', 'request-1', now())`,
     );
     await expect(
       db.$executeRawUnsafe(
-        `INSERT INTO "Rsvp" ("id", "invitationId", "name", "attendance", "guestCount", "idempotencyKey", "createdAt") VALUES ('00000000-0000-0000-0000-000000000006', '${invitationId}', 'Guest', 'ATTENDING', 1, 'request-1', now())`,
+        `INSERT INTO "Rsvp" ("id", "invitationId", "name", "attendance", "guestCount", "eventKeys", "idempotencyKey", "createdAt") VALUES ('00000000-0000-0000-0000-000000000006', '${invitationId}', 'Guest', 'ATTENDING', 1, '{"mainEvent"}', 'request-1', now())`,
       ),
     ).rejects.toThrow();
   });

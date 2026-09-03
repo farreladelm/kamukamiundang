@@ -3,6 +3,7 @@ import "server-only";
 import type { Prisma } from "@/generated/prisma/client";
 import { db } from "@/lib/server/db";
 import { assertWorkspaceRuntime, validateWorkspaceDraft } from "./workspace-dto";
+import { toTemplateContentViewModel } from "./content-schema";
 
 export class PublicationError extends Error {
   constructor(message: string) {
@@ -42,13 +43,18 @@ function toSnapshotContent(invitation: {
       invitation.paletteKey,
     );
     const draft = validateWorkspaceDraft(invitation.content.content);
+    const content = toTemplateContentViewModel(draft, runtime.demo.content, runtime.capabilities);
+    if (draft.rsvp.enabled && runtime.capabilities.includes("rsvp") && !content.rsvp?.events?.length) {
+      throw new PublicationError("Atur kapasitas RSVP untuk minimal satu acara.");
+    }
 
     return {
       ...draft,
       story: runtime.capabilities.includes("story") ? draft.story : null,
       gift: runtime.capabilities.includes("gift") ? draft.gift : null,
     } as Prisma.InputJsonObject;
-  } catch {
+  } catch (error) {
+    if (error instanceof PublicationError) throw error;
     throw new PublicationError("Draft invitation is incompatible with its pinned template.");
   }
 }

@@ -10,18 +10,23 @@ type OptionalSectionsProps = {
   onChange: (draft: WorkspaceDraft) => void;
   canStory: boolean;
   canGift: boolean;
+  canRsvp: boolean;
 };
 
 const emptyStory = () => ({ intro: "", entries: [] });
 const emptyGift = () => ({ accounts: [], physicalAddress: "" });
 
-export function OptionalSections({ draft, onChange, canStory, canGift }: OptionalSectionsProps) {
+export function OptionalSections({ draft, onChange, canStory, canGift, canRsvp }: OptionalSectionsProps) {
   function updateStory(story: NonNullable<WorkspaceDraft["story"]>) {
     onChange({ ...draft, story });
   }
 
   function updateGift(gift: NonNullable<WorkspaceDraft["gift"]>) {
     onChange({ ...draft, gift });
+  }
+
+  function updateRsvp(rsvp: WorkspaceDraft["rsvp"]) {
+    onChange({ ...draft, rsvp });
   }
 
   return (
@@ -87,6 +92,35 @@ export function OptionalSections({ draft, onChange, canStory, canGift }: Optiona
               <button type="button" onClick={() => onChange({ ...draft, gift: null })} className="justify-self-start text-xs font-semibold underline underline-offset-4">Hapus informasi hadiah</button>
             </>
           )}
+        </fieldset>
+      )}
+      {canRsvp && (
+        <fieldset className="grid gap-4 border border-stone-200 p-4">
+          <legend className="px-1 text-xs font-semibold tracking-[0.14em] text-stone-500 uppercase">Konfirmasi kehadiran</legend>
+          <input type="hidden" name="rsvpEnabled" value={draft.rsvp.enabled ? "true" : "false"} />
+          <label className="flex items-center gap-3 text-sm font-semibold">
+            <input
+              type="checkbox"
+              checked={draft.rsvp.enabled}
+              onChange={(event) => updateRsvp({ ...draft.rsvp, enabled: event.target.checked })}
+            />
+            Aktifkan RSVP publik
+          </label>
+          <label className="text-sm font-semibold" htmlFor="rsvp-intro">
+            Pengantar RSVP
+            <textarea id="rsvp-intro" name="rsvpIntro" value={draft.rsvp.intro} onChange={(event) => updateRsvp({ ...draft.rsvp, intro: event.target.value })} rows={3} className="mt-2 w-full border border-stone-300 bg-stone-50 px-3 py-3 text-sm leading-6" />
+          </label>
+          <label className="text-sm font-semibold" htmlFor="rsvp-max-guests">
+            Maksimal tamu per RSVP
+            <input id="rsvp-max-guests" name="rsvpMaxGuests" type="number" min={1} max={20} value={draft.rsvp.maxGuests} onChange={(event) => updateRsvp({ ...draft.rsvp, maxGuests: Number(event.target.value) })} className={inputClassName} />
+          </label>
+          <p className="text-xs leading-5 text-stone-500">Kapasitas berlaku terpisah untuk setiap acara. Satu RSVP dapat memilih satu atau dua acara.</p>
+          {(["mainEvent", "secondaryEvent"] as const).map((key) => draft[key] && (
+            <label key={key} className="text-sm font-semibold" htmlFor={`rsvp-capacity-${key}`}>
+              Kapasitas {key === "mainEvent" ? "akad nikah" : "resepsi"}
+              <input id={`rsvp-capacity-${key}`} name={`rsvpCapacity_${key}`} type="number" min={0} max={100000} value={draft.rsvp.eventCapacities[key]} onChange={(event) => updateRsvp({ ...draft.rsvp, eventCapacities: { ...draft.rsvp.eventCapacities, [key]: Number(event.target.value) } })} className={inputClassName} />
+            </label>
+          ))}
         </fieldset>
       )}
     </section>

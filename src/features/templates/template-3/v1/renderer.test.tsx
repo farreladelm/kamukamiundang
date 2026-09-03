@@ -27,7 +27,7 @@ describe("TemplateThreeRenderer", () => {
       "href",
       "https://maps.google.com/?q=Rumah+Kaca+Bumi+Sangkuriang",
     );
-    expect(container.querySelector(".sm\\:grid-cols-2")).not.toBeNull();
+    expect(container.querySelector(".\\@sm\\:grid-cols-2")).not.toBeNull();
   }, 15_000);
 
   it("keeps three named palette choices", () => {

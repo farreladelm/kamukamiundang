@@ -83,6 +83,7 @@ export async function saveWorkspaceDraftForCustomer(
       ...input.content,
       story: runtime.capabilities.includes("story") ? input.content.story : null,
       gift: runtime.capabilities.includes("gift") ? input.content.gift : null,
+      rsvp: runtime.capabilities.includes("rsvp") ? input.content.rsvp : { ...input.content.rsvp, enabled: false },
     };
     const result = await tx.invitationContent.updateMany({
       where: {
@@ -162,6 +163,15 @@ function parseWorkspaceFormData(formData: FormData) {
           accountName: formData.get(`giftAccountAccountName_${index}`),
         })),
         physicalAddress: formData.get("giftPhysicalAddress"),
+      },
+      rsvp: {
+        enabled: formData.get("rsvpEnabled") === "true",
+        intro: formData.get("rsvpIntro"),
+        maxGuests: formData.get("rsvpMaxGuests"),
+        eventCapacities: {
+          mainEvent: formData.get("rsvpCapacity_mainEvent") ?? 0,
+          secondaryEvent: formData.get("rsvpCapacity_secondaryEvent") ?? 0,
+        },
       },
     },
   });

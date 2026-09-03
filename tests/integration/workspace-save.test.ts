@@ -81,6 +81,12 @@ function workspaceDraft(): WorkspaceDraft {
       accounts: [{ bank: "Bank Nusantara", accountNumber: "123", accountName: "Rani" }],
       physicalAddress: "Jl. Taman Sari",
     },
+    rsvp: {
+      enabled: false,
+      intro: "Konfirmasi kehadiran.",
+      maxGuests: 2,
+      eventCapacities: { mainEvent: 100, secondaryEvent: 0 },
+    },
   };
 }
 

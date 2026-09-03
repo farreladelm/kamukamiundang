@@ -40,7 +40,6 @@ export type RsvpMinAggregateOutputType = {
   name: string | null
   attendance: $Enums.RsvpAttendance | null
   guestCount: number | null
-  eventKey: string | null
   idempotencyKey: string | null
   createdAt: Date | null
 }
@@ -51,7 +50,6 @@ export type RsvpMaxAggregateOutputType = {
   name: string | null
   attendance: $Enums.RsvpAttendance | null
   guestCount: number | null
-  eventKey: string | null
   idempotencyKey: string | null
   createdAt: Date | null
 }
@@ -62,7 +60,7 @@ export type RsvpCountAggregateOutputType = {
   name: number
   attendance: number
   guestCount: number
-  eventKey: number
+  eventKeys: number
   idempotencyKey: number
   createdAt: number
   _all: number
@@ -83,7 +81,6 @@ export type RsvpMinAggregateInputType = {
   name?: true
   attendance?: true
   guestCount?: true
-  eventKey?: true
   idempotencyKey?: true
   createdAt?: true
 }
@@ -94,7 +91,6 @@ export type RsvpMaxAggregateInputType = {
   name?: true
   attendance?: true
   guestCount?: true
-  eventKey?: true
   idempotencyKey?: true
   createdAt?: true
 }
@@ -105,7 +101,7 @@ export type RsvpCountAggregateInputType = {
   name?: true
   attendance?: true
   guestCount?: true
-  eventKey?: true
+  eventKeys?: true
   idempotencyKey?: true
   createdAt?: true
   _all?: true
@@ -203,7 +199,7 @@ export type RsvpGroupByOutputType = {
   name: string
   attendance: $Enums.RsvpAttendance
   guestCount: number
-  eventKey: string | null
+  eventKeys: string[]
   idempotencyKey: string
   createdAt: Date
   _count: RsvpCountAggregateOutputType | null
@@ -237,7 +233,7 @@ export type RsvpWhereInput = {
   name?: Prisma.StringFilter<"Rsvp"> | string
   attendance?: Prisma.EnumRsvpAttendanceFilter<"Rsvp"> | $Enums.RsvpAttendance
   guestCount?: Prisma.IntFilter<"Rsvp"> | number
-  eventKey?: Prisma.StringNullableFilter<"Rsvp"> | string | null
+  eventKeys?: Prisma.StringNullableListFilter<"Rsvp">
   idempotencyKey?: Prisma.StringFilter<"Rsvp"> | string
   createdAt?: Prisma.DateTimeFilter<"Rsvp"> | Date | string
   invitation?: Prisma.XOR<Prisma.InvitationScalarRelationFilter, Prisma.InvitationWhereInput>
@@ -249,7 +245,7 @@ export type RsvpOrderByWithRelationInput = {
   name?: Prisma.SortOrder
   attendance?: Prisma.SortOrder
   guestCount?: Prisma.SortOrder
-  eventKey?: Prisma.SortOrderInput | Prisma.SortOrder
+  eventKeys?: Prisma.SortOrder
   idempotencyKey?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   invitation?: Prisma.InvitationOrderByWithRelationInput
@@ -265,7 +261,7 @@ export type RsvpWhereUniqueInput = Prisma.AtLeast<{
   name?: Prisma.StringFilter<"Rsvp"> | string
   attendance?: Prisma.EnumRsvpAttendanceFilter<"Rsvp"> | $Enums.RsvpAttendance
   guestCount?: Prisma.IntFilter<"Rsvp"> | number
-  eventKey?: Prisma.StringNullableFilter<"Rsvp"> | string | null
+  eventKeys?: Prisma.StringNullableListFilter<"Rsvp">
   idempotencyKey?: Prisma.StringFilter<"Rsvp"> | string
   createdAt?: Prisma.DateTimeFilter<"Rsvp"> | Date | string
   invitation?: Prisma.XOR<Prisma.InvitationScalarRelationFilter, Prisma.InvitationWhereInput>
@@ -277,7 +273,7 @@ export type RsvpOrderByWithAggregationInput = {
   name?: Prisma.SortOrder
   attendance?: Prisma.SortOrder
   guestCount?: Prisma.SortOrder
-  eventKey?: Prisma.SortOrderInput | Prisma.SortOrder
+  eventKeys?: Prisma.SortOrder
   idempotencyKey?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.RsvpCountOrderByAggregateInput
@@ -296,7 +292,7 @@ export type RsvpScalarWhereWithAggregatesInput = {
   name?: Prisma.StringWithAggregatesFilter<"Rsvp"> | string
   attendance?: Prisma.EnumRsvpAttendanceWithAggregatesFilter<"Rsvp"> | $Enums.RsvpAttendance
   guestCount?: Prisma.IntWithAggregatesFilter<"Rsvp"> | number
-  eventKey?: Prisma.StringNullableWithAggregatesFilter<"Rsvp"> | string | null
+  eventKeys?: Prisma.StringNullableListFilter<"Rsvp">
   idempotencyKey?: Prisma.StringWithAggregatesFilter<"Rsvp"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Rsvp"> | Date | string
 }
@@ -306,7 +302,7 @@ export type RsvpCreateInput = {
   name: string
   attendance: $Enums.RsvpAttendance
   guestCount: number
-  eventKey?: string | null
+  eventKeys?: Prisma.RsvpCreateeventKeysInput | string[]
   idempotencyKey: string
   createdAt?: Date | string
   invitation: Prisma.InvitationCreateNestedOneWithoutRsvpsInput
@@ -318,7 +314,7 @@ export type RsvpUncheckedCreateInput = {
   name: string
   attendance: $Enums.RsvpAttendance
   guestCount: number
-  eventKey?: string | null
+  eventKeys?: Prisma.RsvpCreateeventKeysInput | string[]
   idempotencyKey: string
   createdAt?: Date | string
 }
@@ -328,7 +324,7 @@ export type RsvpUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   attendance?: Prisma.EnumRsvpAttendanceFieldUpdateOperationsInput | $Enums.RsvpAttendance
   guestCount?: Prisma.IntFieldUpdateOperationsInput | number
-  eventKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  eventKeys?: Prisma.RsvpUpdateeventKeysInput | string[]
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   invitation?: Prisma.InvitationUpdateOneRequiredWithoutRsvpsNestedInput
@@ -340,7 +336,7 @@ export type RsvpUncheckedUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   attendance?: Prisma.EnumRsvpAttendanceFieldUpdateOperationsInput | $Enums.RsvpAttendance
   guestCount?: Prisma.IntFieldUpdateOperationsInput | number
-  eventKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  eventKeys?: Prisma.RsvpUpdateeventKeysInput | string[]
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -351,7 +347,7 @@ export type RsvpCreateManyInput = {
   name: string
   attendance: $Enums.RsvpAttendance
   guestCount: number
-  eventKey?: string | null
+  eventKeys?: Prisma.RsvpCreateeventKeysInput | string[]
   idempotencyKey: string
   createdAt?: Date | string
 }
@@ -361,7 +357,7 @@ export type RsvpUpdateManyMutationInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   attendance?: Prisma.EnumRsvpAttendanceFieldUpdateOperationsInput | $Enums.RsvpAttendance
   guestCount?: Prisma.IntFieldUpdateOperationsInput | number
-  eventKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  eventKeys?: Prisma.RsvpUpdateeventKeysInput | string[]
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -372,7 +368,7 @@ export type RsvpUncheckedUpdateManyInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   attendance?: Prisma.EnumRsvpAttendanceFieldUpdateOperationsInput | $Enums.RsvpAttendance
   guestCount?: Prisma.IntFieldUpdateOperationsInput | number
-  eventKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  eventKeys?: Prisma.RsvpUpdateeventKeysInput | string[]
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -387,6 +383,14 @@ export type RsvpOrderByRelationAggregateInput = {
   _count?: Prisma.SortOrder
 }
 
+export type StringNullableListFilter<$PrismaModel = never> = {
+  equals?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel> | null
+  has?: string | Prisma.StringFieldRefInput<$PrismaModel> | null
+  hasEvery?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
+  hasSome?: string[] | Prisma.ListStringFieldRefInput<$PrismaModel>
+  isEmpty?: boolean
+}
+
 export type RsvpInvitationIdIdempotencyKeyCompoundUniqueInput = {
   invitationId: string
   idempotencyKey: string
@@ -398,7 +402,7 @@ export type RsvpCountOrderByAggregateInput = {
   name?: Prisma.SortOrder
   attendance?: Prisma.SortOrder
   guestCount?: Prisma.SortOrder
-  eventKey?: Prisma.SortOrder
+  eventKeys?: Prisma.SortOrder
   idempotencyKey?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
@@ -413,7 +417,6 @@ export type RsvpMaxOrderByAggregateInput = {
   name?: Prisma.SortOrder
   attendance?: Prisma.SortOrder
   guestCount?: Prisma.SortOrder
-  eventKey?: Prisma.SortOrder
   idempotencyKey?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
@@ -424,7 +427,6 @@ export type RsvpMinOrderByAggregateInput = {
   name?: Prisma.SortOrder
   attendance?: Prisma.SortOrder
   guestCount?: Prisma.SortOrder
-  eventKey?: Prisma.SortOrder
   idempotencyKey?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
@@ -475,8 +477,17 @@ export type RsvpUncheckedUpdateManyWithoutInvitationNestedInput = {
   deleteMany?: Prisma.RsvpScalarWhereInput | Prisma.RsvpScalarWhereInput[]
 }
 
+export type RsvpCreateeventKeysInput = {
+  set: string[]
+}
+
 export type EnumRsvpAttendanceFieldUpdateOperationsInput = {
   set?: $Enums.RsvpAttendance
+}
+
+export type RsvpUpdateeventKeysInput = {
+  set?: string[]
+  push?: string | string[]
 }
 
 export type RsvpCreateWithoutInvitationInput = {
@@ -484,7 +495,7 @@ export type RsvpCreateWithoutInvitationInput = {
   name: string
   attendance: $Enums.RsvpAttendance
   guestCount: number
-  eventKey?: string | null
+  eventKeys?: Prisma.RsvpCreateeventKeysInput | string[]
   idempotencyKey: string
   createdAt?: Date | string
 }
@@ -494,7 +505,7 @@ export type RsvpUncheckedCreateWithoutInvitationInput = {
   name: string
   attendance: $Enums.RsvpAttendance
   guestCount: number
-  eventKey?: string | null
+  eventKeys?: Prisma.RsvpCreateeventKeysInput | string[]
   idempotencyKey: string
   createdAt?: Date | string
 }
@@ -534,7 +545,7 @@ export type RsvpScalarWhereInput = {
   name?: Prisma.StringFilter<"Rsvp"> | string
   attendance?: Prisma.EnumRsvpAttendanceFilter<"Rsvp"> | $Enums.RsvpAttendance
   guestCount?: Prisma.IntFilter<"Rsvp"> | number
-  eventKey?: Prisma.StringNullableFilter<"Rsvp"> | string | null
+  eventKeys?: Prisma.StringNullableListFilter<"Rsvp">
   idempotencyKey?: Prisma.StringFilter<"Rsvp"> | string
   createdAt?: Prisma.DateTimeFilter<"Rsvp"> | Date | string
 }
@@ -544,7 +555,7 @@ export type RsvpCreateManyInvitationInput = {
   name: string
   attendance: $Enums.RsvpAttendance
   guestCount: number
-  eventKey?: string | null
+  eventKeys?: Prisma.RsvpCreateeventKeysInput | string[]
   idempotencyKey: string
   createdAt?: Date | string
 }
@@ -554,7 +565,7 @@ export type RsvpUpdateWithoutInvitationInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   attendance?: Prisma.EnumRsvpAttendanceFieldUpdateOperationsInput | $Enums.RsvpAttendance
   guestCount?: Prisma.IntFieldUpdateOperationsInput | number
-  eventKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  eventKeys?: Prisma.RsvpUpdateeventKeysInput | string[]
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -564,7 +575,7 @@ export type RsvpUncheckedUpdateWithoutInvitationInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   attendance?: Prisma.EnumRsvpAttendanceFieldUpdateOperationsInput | $Enums.RsvpAttendance
   guestCount?: Prisma.IntFieldUpdateOperationsInput | number
-  eventKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  eventKeys?: Prisma.RsvpUpdateeventKeysInput | string[]
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -574,7 +585,7 @@ export type RsvpUncheckedUpdateManyWithoutInvitationInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   attendance?: Prisma.EnumRsvpAttendanceFieldUpdateOperationsInput | $Enums.RsvpAttendance
   guestCount?: Prisma.IntFieldUpdateOperationsInput | number
-  eventKey?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  eventKeys?: Prisma.RsvpUpdateeventKeysInput | string[]
   idempotencyKey?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -587,7 +598,7 @@ export type RsvpSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   name?: boolean
   attendance?: boolean
   guestCount?: boolean
-  eventKey?: boolean
+  eventKeys?: boolean
   idempotencyKey?: boolean
   createdAt?: boolean
   invitation?: boolean | Prisma.InvitationDefaultArgs<ExtArgs>
@@ -599,7 +610,7 @@ export type RsvpSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   name?: boolean
   attendance?: boolean
   guestCount?: boolean
-  eventKey?: boolean
+  eventKeys?: boolean
   idempotencyKey?: boolean
   createdAt?: boolean
   invitation?: boolean | Prisma.InvitationDefaultArgs<ExtArgs>
@@ -611,7 +622,7 @@ export type RsvpSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensio
   name?: boolean
   attendance?: boolean
   guestCount?: boolean
-  eventKey?: boolean
+  eventKeys?: boolean
   idempotencyKey?: boolean
   createdAt?: boolean
   invitation?: boolean | Prisma.InvitationDefaultArgs<ExtArgs>
@@ -623,12 +634,12 @@ export type RsvpSelectScalar = {
   name?: boolean
   attendance?: boolean
   guestCount?: boolean
-  eventKey?: boolean
+  eventKeys?: boolean
   idempotencyKey?: boolean
   createdAt?: boolean
 }
 
-export type RsvpOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "invitationId" | "name" | "attendance" | "guestCount" | "eventKey" | "idempotencyKey" | "createdAt", ExtArgs["result"]["rsvp"]>
+export type RsvpOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "invitationId" | "name" | "attendance" | "guestCount" | "eventKeys" | "idempotencyKey" | "createdAt", ExtArgs["result"]["rsvp"]>
 export type RsvpInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   invitation?: boolean | Prisma.InvitationDefaultArgs<ExtArgs>
 }
@@ -650,7 +661,7 @@ export type $RsvpPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     name: string
     attendance: $Enums.RsvpAttendance
     guestCount: number
-    eventKey: string | null
+    eventKeys: string[]
     idempotencyKey: string
     createdAt: Date
   }, ExtArgs["result"]["rsvp"]>
@@ -1082,7 +1093,7 @@ export interface RsvpFieldRefs {
   readonly name: Prisma.FieldRef<"Rsvp", 'String'>
   readonly attendance: Prisma.FieldRef<"Rsvp", 'RsvpAttendance'>
   readonly guestCount: Prisma.FieldRef<"Rsvp", 'Int'>
-  readonly eventKey: Prisma.FieldRef<"Rsvp", 'String'>
+  readonly eventKeys: Prisma.FieldRef<"Rsvp", 'String[]'>
   readonly idempotencyKey: Prisma.FieldRef<"Rsvp", 'String'>
   readonly createdAt: Prisma.FieldRef<"Rsvp", 'DateTime'>
 }
