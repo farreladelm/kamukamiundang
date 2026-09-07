@@ -2,6 +2,7 @@ import "server-only";
 
 import { db } from "@/lib/server/db";
 import {
+  CUSTOMER_SESSION_TTL_MS,
   createOpaqueToken,
   hashOpaqueToken,
 } from "./session";
@@ -44,8 +45,7 @@ export async function issueMagicLink({
     if (
       !invitation ||
       invitation.status === "ARCHIVED" ||
-      invitation.archivedAt ||
-      !invitation.editingEnabled
+      invitation.archivedAt
     ) {
       throw new Error("Invitation not available");
     }
@@ -115,7 +115,7 @@ export async function consumeMagicLink(token: string, now = new Date()) {
         tokenHash: hashOpaqueToken(rawSession),
         actorType: "CUSTOMER",
         customerId: link.customerId,
-        expiresAt: new Date(now.getTime() + MAGIC_LINK_TTL_MS),
+        expiresAt: new Date(now.getTime() + CUSTOMER_SESSION_TTL_MS),
       },
     });
 

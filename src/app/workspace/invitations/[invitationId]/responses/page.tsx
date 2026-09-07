@@ -55,18 +55,37 @@ export default async function CustomerInvitationResponsesPage({
         </p>
         <div className="flex flex-wrap items-center justify-between gap-4">
           <h1 className="font-serif text-4xl sm:text-5xl">Kelola Respons</h1>
-          {data.invitation.editingEnabled && (
+          {data.invitation.editingEnabled ? (
             <Link
               href={`/workspace/invitations/${invitationId}`}
               className="text-sm font-semibold text-stone-800 underline underline-offset-4 hover:text-stone-600"
             >
               Kembali ke editor
             </Link>
+          ) : (
+            <span className="rounded-full bg-stone-100 px-3 py-1 text-xs font-medium text-stone-600">
+              Akses editing terkunci
+            </span>
           )}
         </div>
-        <p className="text-sm text-stone-600">
-          Respons untuk {data.invitation.customerName} · status: {data.invitation.status.toLowerCase()}
-        </p>
+        <div className="flex flex-wrap items-center gap-2 text-sm text-stone-600">
+          <span>
+            Respons untuk {data.invitation.customerName} · status: {data.invitation.status.toLowerCase()}
+          </span>
+          {data.invitation.slug && data.invitation.status === "PUBLISHED" && (
+            <>
+              <span>·</span>
+              <Link
+                href={`/i/${data.invitation.slug}`}
+                target="_blank"
+                rel="noreferrer"
+                className="font-medium text-stone-900 underline underline-offset-4 hover:text-stone-600"
+              >
+                Lihat undangan publik ↗
+              </Link>
+            </>
+          )}
+        </div>
       </div>
 
       <ResponseManagement

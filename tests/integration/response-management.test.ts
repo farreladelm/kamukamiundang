@@ -18,8 +18,12 @@ import {
   moderateAdminWishAction,
 } from "@/features/guests/response-actions";
 import { initialFormActionState } from "@/features/forms/action-state";
+import CustomerInvitationWorkspacePage from "@/app/workspace/invitations/[invitationId]/page";
 
-const { redirectMock, revalidatePathMock, cookieTokens } = vi.hoisted(() => ({
+const { notFoundMock, redirectMock, revalidatePathMock, cookieTokens } = vi.hoisted(() => ({
+  notFoundMock: vi.fn(() => {
+    throw new Error("NEXT_NOT_FOUND");
+  }),
   redirectMock: vi.fn((path: string) => {
     throw new Error(`REDIRECT:${path}`);
   }),
@@ -30,7 +34,10 @@ const { redirectMock, revalidatePathMock, cookieTokens } = vi.hoisted(() => ({
   },
 }));
 
-vi.mock("next/navigation", () => ({ redirect: redirectMock }));
+vi.mock("next/navigation", () => ({
+  notFound: notFoundMock,
+  redirect: redirectMock,
+}));
 vi.mock("next/cache", () => ({ revalidatePath: revalidatePathMock }));
 vi.mock("next/headers", () => ({
   cookies: vi.fn(async () => ({
@@ -49,6 +56,7 @@ vi.mock("next/headers", () => ({
 beforeEach(async () => {
   cookieTokens.admin = undefined;
   cookieTokens.customer = undefined;
+  notFoundMock.mockClear();
   redirectMock.mockClear();
   revalidatePathMock.mockClear();
 
@@ -1153,6 +1161,74 @@ describe("Response management integration tests", () => {
       );
       expect(revalidatePathMock).toHaveBeenCalledWith(`/admin/invitations/${inv.id}/responses`);
       expect(revalidatePathMock).toHaveBeenCalledWith(`/i/revalidate-slug`);
+    });
+  });
+
+  describe("Customer workspace navigation and auto-redirect", () => {
+    it("redirects customer to /responses when editingEnabled is false", async () => {
+      const { customer, token } = await createTestCustomer();
+      const inv = await createTestInvitation({
+        customerId: customer.id,
+        editingEnabled: false,
+      });
+
+      cookieTokens.customer = token;
+
+      await expect(
+        CustomerInvitationWorkspacePage({
+          params: Promise.resolve({ invitationId: inv.id }),
+        }),
+      ).rejects.toThrow(`REDIRECT:/workspace/invitations/${inv.id}/responses`);
+    });
+
+    it("triggers notFound when customer accesses an invitation owned by someone else", async () => {
+      const { token } = await createTestCustomer();
+      const otherCustomer = await db.customer.create({ data: { name: "Other Customer" } });
+      const foreignInv = await createTestInvitation({
+        customerId: otherCustomer.id,
+        editingEnabled: false,
+      });
+
+      cookieTokens.customer = token;
+
+      await expect(
+        CustomerInvitationWorkspacePage({
+          params: Promise.resolve({ invitationId: foreignInv.id }),
+        }),
+      ).rejects.toThrow("NEXT_NOT_FOUND");
+    });
+
+    it("triggers notFound when customer accesses an archived invitation", async () => {
+      const { customer, token } = await createTestCustomer();
+      const archivedInv = await createTestInvitation({
+        customerId: customer.id,
+        status: "ARCHIVED",
+      });
+
+      cookieTokens.customer = token;
+
+      await expect(
+        CustomerInvitationWorkspacePage({
+          params: Promise.resolve({ invitationId: archivedInv.id }),
+        }),
+      ).rejects.toThrow("NEXT_NOT_FOUND");
+    });
+
+    it("triggers notFound when customer session is missing or expired", async () => {
+      const { customer } = await createTestCustomer();
+      const inv = await createTestInvitation({
+        customerId: customer.id,
+        editingEnabled: false,
+      });
+
+      // No customer session cookie provided
+      cookieTokens.customer = undefined;
+
+      await expect(
+        CustomerInvitationWorkspacePage({
+          params: Promise.resolve({ invitationId: inv.id }),
+        }),
+      ).rejects.toThrow("NEXT_NOT_FOUND");
     });
   });
 });
