@@ -18,6 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Added invitation-configured RSVP forms with per-event capacity, idempotent retries, and basic abuse protection.
 - Added configurable public wishes with idempotent submissions, immediate display, and basic abuse protection.
 - Added admin-managed public invitation URL reservations, draft URL editing, and publication safeguards.
+- Added customer workspace and admin response management pages to view RSVPs, moderate guest wishes, and track deterministic paginated responses.
 
 ### Changed
 - Published invitations and previews now share responsive template presentation across desktop and mobile layouts.
