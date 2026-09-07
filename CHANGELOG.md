@@ -19,8 +19,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Added configurable public wishes with idempotent submissions, immediate display, and basic abuse protection.
 - Added admin-managed public invitation URL reservations, draft URL editing, and publication safeguards.
 - Added customer workspace and admin response management pages to view RSVPs, moderate guest wishes, and track deterministic paginated responses.
+- Added automatic redirection from customer workspace to response management when editing is locked.
 
 ### Changed
+- Extended customer session duration to a 7-day sliding window that renews on workspace or response visits.
+- Allowed administrators to issue customer magic login links for published invitations with locked editing.
 - Published invitations and previews now share responsive template presentation across desktop and mobile layouts.
 - Catalog cards now display administrator-configured marketing thumbnails while preserving runtime previews when no thumbnail is set.
 - Admin order rows now expose payment confirmation and activation actions before linking to invitation operations.
