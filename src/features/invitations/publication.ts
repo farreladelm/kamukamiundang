@@ -52,6 +52,7 @@ function toSnapshotContent(invitation: {
       ...draft,
       story: runtime.capabilities.includes("story") ? draft.story : null,
       gift: runtime.capabilities.includes("gift") ? draft.gift : null,
+      wishes: runtime.capabilities.includes("wishes") ? draft.wishes : { ...draft.wishes, enabled: false },
     } as Prisma.InputJsonObject;
   } catch (error) {
     if (error instanceof PublicationError) throw error;

@@ -108,6 +108,7 @@ export type TemplateRsvp = {
 export type TemplateWishes = {
   prompt: string;
   entries: Array<{
+    id?: string;
     name: string;
     message: string;
   }>;

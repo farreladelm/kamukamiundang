@@ -56,7 +56,7 @@ export function WorkspaceEditor({ workspace }: { workspace: WorkspaceInvitationD
           <IdentitySection draft={draft} onChange={setDraft} />
           <CopySection draft={draft} onChange={setDraft} />
           <EventSection draft={draft} onChange={setDraft} errors={fieldErrors} />
-          <OptionalSections draft={draft} onChange={setDraft} canStory={runtime.capabilities.includes("story")} canGift={runtime.capabilities.includes("gift")} canRsvp={runtime.capabilities.includes("rsvp")} />
+          <OptionalSections draft={draft} onChange={setDraft} canStory={runtime.capabilities.includes("story")} canGift={runtime.capabilities.includes("gift")} canRsvp={runtime.capabilities.includes("rsvp")} canWishes={runtime.capabilities.includes("wishes")} />
           <p className="text-xs leading-5 text-stone-500">
             Input tetap dipertahankan jika validasi atau konflik versi gagal.
           </p>

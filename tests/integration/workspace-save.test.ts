@@ -81,6 +81,7 @@ function workspaceDraft(): WorkspaceDraft {
       accounts: [{ bank: "Bank Nusantara", accountNumber: "123", accountName: "Rani" }],
       physicalAddress: "Jl. Taman Sari",
     },
+    wishes: { enabled: true, prompt: "Tinggalkan doa terbaik untuk kami." },
     rsvp: {
       enabled: false,
       intro: "Konfirmasi kehadiran.",

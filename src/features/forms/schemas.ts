@@ -55,6 +55,12 @@ export const wishDemoSchema = z.object({
     .max(1000, "Ucapan maksimal 1000 karakter."),
 });
 
+export const wishSubmissionSchema = z.object({
+  name: z.string().trim().min(1, "Nama wajib diisi.").max(100, "Nama maksimal 100 karakter."),
+  message: z.string().trim().min(1, "Ucapan wajib diisi.").max(1000, "Ucapan maksimal 1000 karakter."),
+  honeypot: z.string().max(100, "Permintaan tidak valid.").default(""),
+}).strict();
+
 export const rsvpSubmissionSchema = z.object({
   name: z.string().trim().min(1, "Nama wajib diisi.").max(100, "Nama maksimal 100 karakter."),
   attendance: z.enum(["ATTENDING", "NOT_ATTENDING", "UNDECIDED"], "Pilih status kehadiran."),

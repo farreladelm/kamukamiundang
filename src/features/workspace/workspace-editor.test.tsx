@@ -33,6 +33,7 @@ function workspaceFixture(templateKey = "template-1"): WorkspaceInvitationDto {
         secondaryEvent: null,
         story: null,
         gift: null,
+        wishes: { enabled: false, prompt: "" },
         rsvp: {
           enabled: false,
           intro: "",
@@ -106,5 +107,20 @@ describe("WorkspaceEditor", () => {
     expect(screen.getByRole("checkbox", { name: "Aktifkan RSVP publik" })).not.toBeChecked();
     expect(screen.getByRole("spinbutton", { name: "Maksimal tamu per RSVP" })).toHaveValue(2);
     expect(screen.getByRole("spinbutton", { name: "Kapasitas akad nikah" })).toHaveValue(100);
+  });
+
+  it("renders and updates wishes configuration for supported templates", () => {
+    render(<WorkspaceEditor workspace={workspaceFixture("template-2")} />);
+
+    const wishesToggle = screen.getByRole("checkbox", { name: "Aktifkan ucapan publik" });
+    expect(wishesToggle).not.toBeChecked();
+    fireEvent.click(wishesToggle);
+    const prompt = screen.getByRole("textbox", { name: "Pengantar ucapan" });
+    fireEvent.change(prompt, { target: { value: "Tulis doa untuk kami." } });
+
+    expect(wishesToggle).toBeChecked();
+    expect(prompt).toHaveValue("Tulis doa untuk kami.");
+    fireEvent.click(screen.getByRole("button", { name: "Buka undangan" }));
+    expect(screen.getByRole("heading", { name: "Kirimkan kata baik" })).toBeInTheDocument();
   });
 });

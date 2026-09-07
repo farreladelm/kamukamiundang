@@ -16,6 +16,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Added admin controls to publish, unpublish, lock, and irreversibly archive invitation snapshots.
 - Added public invitation pages that render only current published snapshots.
 - Added invitation-configured RSVP forms with per-event capacity, idempotent retries, and basic abuse protection.
+- Added configurable public wishes with idempotent submissions, immediate display, and basic abuse protection.
 - Added admin-managed public invitation URL reservations, draft URL editing, and publication safeguards.
 
 ### Changed
