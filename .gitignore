@@ -46,4 +46,5 @@ next-env.d.ts
 .claude/
 dev-*.log
 .opencode/
+.agents/
 /AGENTS.md
