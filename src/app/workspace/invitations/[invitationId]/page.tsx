@@ -19,7 +19,13 @@ export default async function CustomerInvitationWorkspacePage({
     notFound();
   }
 
-  const { customer } = await requireCustomer();
+  let customer;
+  try {
+    const actor = await requireCustomer();
+    customer = actor.customer;
+  } catch {
+    notFound();
+  }
 
   const invitation = await db.invitation.findFirst({
     where: {

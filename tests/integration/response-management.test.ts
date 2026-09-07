@@ -1213,5 +1213,22 @@ describe("Response management integration tests", () => {
         }),
       ).rejects.toThrow("NEXT_NOT_FOUND");
     });
+
+    it("triggers notFound when customer session is missing or expired", async () => {
+      const { customer } = await createTestCustomer();
+      const inv = await createTestInvitation({
+        customerId: customer.id,
+        editingEnabled: false,
+      });
+
+      // No customer session cookie provided
+      cookieTokens.customer = undefined;
+
+      await expect(
+        CustomerInvitationWorkspacePage({
+          params: Promise.resolve({ invitationId: inv.id }),
+        }),
+      ).rejects.toThrow("NEXT_NOT_FOUND");
+    });
   });
 });
