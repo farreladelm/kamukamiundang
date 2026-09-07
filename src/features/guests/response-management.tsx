@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useRef, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
@@ -78,18 +78,11 @@ export function ResponseManagement({
     wishId: string;
     intent: "hide" | "unhide" | "delete";
   } | null>(null);
-  const wasPending = useRef(false);
-
   useEffect(() => {
-    if (wasPending.current && !pending) {
-      setActiveAction(null);
-      if (state.status === "success") {
-        setConfirmingDeleteWishId(null);
-        router.refresh();
-      }
+    if (state.status === "success") {
+      router.refresh();
     }
-    wasPending.current = pending;
-  }, [pending, state.status, router]);
+  }, [state.status, router]);
 
   return (
     <div className="space-y-10">
@@ -338,9 +331,10 @@ export function ResponseManagement({
                             <button
                               type="submit"
                               disabled={pending}
-                              onClick={() =>
-                                setActiveAction({ wishId: wish.id, intent: "delete" })
-                              }
+                              onClick={() => {
+                                setConfirmingDeleteWishId(null);
+                                setActiveAction({ wishId: wish.id, intent: "delete" });
+                              }}
                               className="inline-flex items-center rounded-md bg-red-600 px-2.5 py-1 text-xs font-medium text-white hover:bg-red-700 disabled:opacity-50"
                             >
                               {isWishPending && activeAction?.intent === "delete"

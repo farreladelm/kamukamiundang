@@ -9,7 +9,6 @@ import {
 import {
   getCustomerInvitationResponses,
   getAdminInvitationResponses,
-  encodeResponseCursor,
   decodeResponseCursor,
   InvalidResponseCursorError,
   RESPONSE_PAGE_SIZE,
@@ -245,7 +244,7 @@ describe("Response management integration tests", () => {
     });
 
     it("5. Customer A cannot read invitation B by changing invitation ID", async () => {
-      const { customer: customerA, token: tokenA } = await createTestCustomer("A");
+      const { token: tokenA } = await createTestCustomer("A");
       const { customer: customerB } = await createTestCustomer("B");
 
       const invitationB = await createTestInvitation({ customerId: customerB.id });
@@ -439,7 +438,7 @@ describe("Response management integration tests", () => {
     });
 
     it("13. Customer cannot hide invitation B wish while authenticated as customer A", async () => {
-      const { customer: customerA, token: tokenA } = await createTestCustomer("A");
+      const { token: tokenA } = await createTestCustomer("A");
       const { customer: customerB } = await createTestCustomer("B");
       const invitationB = await createTestInvitation({ customerId: customerB.id });
       const wishB = await db.wish.create({
@@ -467,7 +466,7 @@ describe("Response management integration tests", () => {
     });
 
     it("14. Customer cannot unhide invitation B wish", async () => {
-      const { customer: customerA, token: tokenA } = await createTestCustomer("A");
+      const { token: tokenA } = await createTestCustomer("A");
       const { customer: customerB } = await createTestCustomer("B");
       const invitationB = await createTestInvitation({ customerId: customerB.id });
       const wishB = await db.wish.create({
@@ -493,7 +492,7 @@ describe("Response management integration tests", () => {
     });
 
     it("15. Customer cannot delete invitation B wish", async () => {
-      const { customer: customerA, token: tokenA } = await createTestCustomer("A");
+      const { token: tokenA } = await createTestCustomer("A");
       const { customer: customerB } = await createTestCustomer("B");
       const invitationB = await createTestInvitation({ customerId: customerB.id });
       const wishB = await db.wish.create({
