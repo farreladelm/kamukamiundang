@@ -26,5 +26,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Admin logout now revokes its database session before clearing the browser cookie.
 - Order intake now re-resolves current catalog price into immutable order snapshot and fails server-side if selected template status is non-visible.
 
+### Fixed
+- Template 7 previews no longer fail hydration when countdown values change between server render and browser load.
+
 ### Security
 - Admin login failures are throttled per normalized account for the MVP, with the long-term account/network policy documented for a later deployment upgrade.
