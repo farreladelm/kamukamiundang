@@ -50,11 +50,15 @@ function getRemaining(target: string) {
 }
 
 function Countdown({ target }: { target: string }) {
-  const [remaining, setRemaining] = useState(() => getRemaining(target));
+  const [remaining, setRemaining] = useState({ hari: "00", jam: "00", menit: "00", detik: "00" });
 
   useEffect(() => {
+    const initialUpdate = window.setTimeout(() => setRemaining(getRemaining(target)), 0);
     const timer = window.setInterval(() => setRemaining(getRemaining(target)), 1000);
-    return () => window.clearInterval(timer);
+    return () => {
+      window.clearTimeout(initialUpdate);
+      window.clearInterval(timer);
+    };
   }, [target]);
 
   return (
