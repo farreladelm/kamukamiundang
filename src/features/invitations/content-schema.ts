@@ -81,6 +81,11 @@ const workspaceGiftSchema = z.object({
   physicalAddress: z.string().trim().max(500, "Maksimal 500 karakter.").default(""),
 });
 
+const workspaceWishesSchema = z.object({
+  enabled: z.boolean().default(false),
+  prompt: z.string().trim().max(500, "Maksimal 500 karakter.").default(""),
+});
+
 const workspaceRsvpSchema = z.object({
   enabled: z.boolean().default(false),
   intro: z.string().trim().max(500, "Maksimal 500 karakter.").default(""),
@@ -111,6 +116,7 @@ export const workspaceDraftSchema = z.object({
   secondaryEvent: workspaceEventSchema.nullable().default(() => ({ ...defaultWeddingEvents.secondary })),
   story: workspaceStorySchema.nullable().default(null),
   gift: workspaceGiftSchema.nullable().default(null),
+  wishes: workspaceWishesSchema.default(() => ({ enabled: false, prompt: "" })),
   rsvp: workspaceRsvpSchema.default(() => ({
     enabled: false,
     intro: "",
@@ -183,8 +189,9 @@ function toTemplateEvent(event: NonNullable<WorkspaceDraft["mainEvent"]>) {
 /** Maps editable draft fields to preview while retaining source-controlled template copy. */
 export function toTemplateContentViewModel(
   draft: WorkspaceDraft,
-  templateCopy: Pick<TemplateContentViewModel, "opening" | "closing" | "gift" | "rsvp">,
+  templateCopy: Pick<TemplateContentViewModel, "opening" | "closing" | "gift" | "rsvp" | "wishes">,
   capabilities: readonly TemplateCapability[] = [],
+  wishEntries: NonNullable<TemplateContentViewModel["wishes"]>["entries"] = [],
 ): TemplateContentViewModel {
   const mainEvent = draft.mainEvent ? toTemplateEvent(draft.mainEvent) : null;
   const secondaryEvent = draft.secondaryEvent ? toTemplateEvent(draft.secondaryEvent) : null;
@@ -233,6 +240,12 @@ export function toTemplateContentViewModel(
           })),
       }
     : undefined;
+  const wishes = capabilities.includes("wishes") && draft.wishes.enabled
+    ? {
+        prompt: draft.wishes.prompt || templateCopy.wishes?.prompt || "Tinggalkan doa terbaik untuk kami.",
+        entries: wishEntries,
+      }
+    : undefined;
 
   return {
     eyebrow: "Undangan pernikahan",
@@ -272,6 +285,7 @@ export function toTemplateContentViewModel(
     story,
     gift,
     rsvp,
+    wishes,
     closing: templateCopy.closing,
     branding: "Undangan oleh Undango",
   };

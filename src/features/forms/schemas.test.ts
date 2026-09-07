@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { adminLoginSchema, orderIntakeSchema } from "./schemas";
+import { adminLoginSchema, orderIntakeSchema, wishSubmissionSchema } from "./schemas";
 
 describe("form schemas", () => {
   it("returns field errors for invalid admin credentials", () => {
@@ -51,5 +51,29 @@ describe("form schemas", () => {
     for (const requestedInvitationSlug of ["ab", "Farrel", "farrel kinan", "farrel--kinan", "-farrel", "farrel-"]) {
       expect(orderIntakeSchema.safeParse({ ...baseOrder, requestedInvitationSlug }).success).toBe(false);
     }
+  });
+
+  it("validates plain-text wish submissions at the server boundary", () => {
+    expect(wishSubmissionSchema.parse({
+      name: "  Guest  ",
+      message: "  Selamat!  ",
+      honeypot: "",
+    })).toEqual({ name: "Guest", message: "Selamat!", honeypot: "" });
+    expect(wishSubmissionSchema.safeParse({
+      name: "G".repeat(101),
+      message: "Selamat!",
+      honeypot: "",
+    }).success).toBe(false);
+    expect(wishSubmissionSchema.safeParse({
+      name: "Guest",
+      message: "M".repeat(1001),
+      honeypot: "",
+    }).success).toBe(false);
+    expect(wishSubmissionSchema.safeParse({
+      name: "Guest",
+      message: "Selamat!",
+      honeypot: "",
+      phone: "08123456789",
+    }).success).toBe(false);
   });
 });

@@ -33,6 +33,7 @@ function workspaceFixture(templateKey = "template-1"): WorkspaceInvitationDto {
         secondaryEvent: null,
         story: null,
         gift: null,
+        wishes: { enabled: false, prompt: "" },
         rsvp: {
           enabled: false,
           intro: "",

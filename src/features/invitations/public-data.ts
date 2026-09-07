@@ -20,6 +20,12 @@ export async function getPublicInvitationBySlug(slug: string) {
           publishedAt: true,
         },
       },
+        wishes: {
+          where: { visibility: "VISIBLE", deletedAt: null },
+          orderBy: [{ createdAt: "desc" }, { id: "desc" }],
+          take: 20,
+          select: { id: true, name: true, message: true },
+        },
     },
   });
 
@@ -44,7 +50,12 @@ export async function getPublicInvitationBySlug(slug: string) {
       publishedAt: invitation.snapshot.publishedAt,
       runtime,
       paletteKey: invitation.snapshot.paletteKey,
-      content: toTemplateContentViewModel(draft, runtime.demo.content, runtime.capabilities),
+      content: toTemplateContentViewModel(
+        draft,
+        runtime.demo.content,
+        runtime.capabilities,
+        invitation.wishes,
+      ),
     };
   } catch {
     return null;
