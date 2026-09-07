@@ -1,5 +1,8 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
+import { z } from "zod";
+import { db } from "@/lib/server/db";
+import { requireCustomer } from "@/features/auth/policies";
 import {
   getWorkspaceInvitationDto,
 } from "@/features/invitations/workspace-dto";
@@ -11,8 +14,34 @@ export default async function CustomerInvitationWorkspacePage({
   params: Promise<{ invitationId: string }>;
 }) {
   const { invitationId } = await params;
-  let workspace;
+  const idValidation = z.string().uuid().safeParse(invitationId);
+  if (!idValidation.success) {
+    notFound();
+  }
 
+  const { customer } = await requireCustomer();
+
+  const invitation = await db.invitation.findFirst({
+    where: {
+      id: invitationId,
+      customerId: customer.id,
+      status: { not: "ARCHIVED" },
+    },
+    select: {
+      id: true,
+      editingEnabled: true,
+    },
+  });
+
+  if (!invitation) {
+    notFound();
+  }
+
+  if (!invitation.editingEnabled) {
+    redirect(`/workspace/invitations/${invitationId}/responses`);
+  }
+
+  let workspace;
   try {
     workspace = await getWorkspaceInvitationDto(invitationId);
   } catch {
