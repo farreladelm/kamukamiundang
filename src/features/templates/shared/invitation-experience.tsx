@@ -7,7 +7,7 @@ import type {
   TemplatePalette,
   TemplatePhoto,
 } from "@/features/templates/types";
-import { rsvpDemoSchema, rsvpSubmissionSchema, wishDemoSchema } from "@/features/forms/schemas";
+import { rsvpDemoSchema, rsvpSubmissionSchema, wishDemoSchema, wishSubmissionSchema } from "@/features/forms/schemas";
 
 type InvitationVariant = "classic" | "coast" | "garden" | "crescent" | "noir" | "line";
 
@@ -126,12 +126,16 @@ export function InvitationExperience({
   const [rsvpSent, setRsvpSent] = useState(false);
   const [rsvpPending, setRsvpPending] = useState(false);
   const [wishSent, setWishSent] = useState(false);
+  const [wishPending, setWishPending] = useState(false);
   const [rsvpErrors, setRsvpErrors] = useState<Record<string, string>>({});
   const [rsvpServerError, setRsvpServerError] = useState<string | null>(null);
   const [wishErrors, setWishErrors] = useState<Record<string, string>>({});
+  const [wishServerError, setWishServerError] = useState<string | null>(null);
+  const [wishEntries, setWishEntries] = useState(content.wishes?.entries ?? []);
   const articleRef = useRef<HTMLElement>(null);
   const contentRef = useRef<HTMLElement>(null);
   const rsvpIdempotencyKey = useRef<string | null>(null);
+  const wishIdempotencyKey = useRef<string | null>(null);
   const isLocked = isEnhanced && !isOpen;
 
   useEffect(() => {
@@ -209,9 +213,27 @@ export function InvitationExperience({
     }
   }
 
-  function submitWish(event: React.FormEvent<HTMLFormElement>) {
+  async function submitWish(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    const result = wishDemoSchema.safeParse(Object.fromEntries(new FormData(event.currentTarget).entries()));
+    const formData = new FormData(event.currentTarget);
+
+    if (!publicInvitationSlug) {
+      const result = wishDemoSchema.safeParse(Object.fromEntries(formData.entries()));
+      if (!result.success) {
+        setWishErrors(Object.fromEntries(Object.entries(result.error.flatten().fieldErrors).map(([field, errors]) => [field, errors?.[0] ?? ""])),);
+        return;
+      }
+
+      setWishErrors({});
+      setWishSent(true);
+      return;
+    }
+
+    const result = wishSubmissionSchema.safeParse({
+      name: formData.get("name"),
+      message: formData.get("message"),
+      honeypot: formData.get("honeypot") ?? "",
+    });
 
     if (!result.success) {
       setWishErrors(Object.fromEntries(Object.entries(result.error.flatten().fieldErrors).map(([field, errors]) => [field, errors?.[0] ?? ""])),);
@@ -219,7 +241,36 @@ export function InvitationExperience({
     }
 
     setWishErrors({});
-    setWishSent(true);
+    setWishServerError(null);
+    const idempotencyKey = wishIdempotencyKey.current ?? window.crypto.randomUUID();
+    wishIdempotencyKey.current = idempotencyKey;
+    setWishPending(true);
+    try {
+      const response = await fetch(`/api/invitations/${encodeURIComponent(publicInvitationSlug)}/wishes`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Idempotency-Key": idempotencyKey,
+        },
+        body: JSON.stringify(result.data),
+      });
+      if (!response.ok) {
+        const body = await response.json().catch(() => null) as { message?: unknown } | null;
+        setWishServerError(typeof body?.message === "string" ? body.message : "Ucapan gagal dikirim.");
+        return;
+      }
+
+      if (!result.data.honeypot) {
+        setWishEntries((entries) => entries.some((entry) => entry.id === `local-${idempotencyKey}`)
+          ? entries
+          : [...entries, { id: `local-${idempotencyKey}`, name: result.data.name, message: result.data.message }]);
+      }
+      setWishSent(true);
+    } catch {
+      setWishServerError("Koneksi gagal. Silakan coba lagi.");
+    } finally {
+      setWishPending(false);
+    }
   }
 
   async function copyAccount(accountNumber: string) {
@@ -502,8 +553,18 @@ export function InvitationExperience({
           <section className="border-y px-7 py-14 @sm:px-12" style={{ borderColor: palette.tokens.line, backgroundColor: palette.tokens.surface }}>
             <SectionHeading eyebrow="Ucapan dan doa" title="Kirimkan kata baik" palette={palette} />
             <p className="mt-5 text-sm leading-6" style={{ color: palette.tokens.muted }}>{content.wishes.prompt}</p>
-            <div className="mt-8 grid gap-3">{content.wishes.entries.map((entry) => <blockquote key={entry.name} className="border-l-2 pl-4 text-sm leading-6" style={{ borderColor: palette.tokens.accent }}><p>&ldquo;{entry.message}&rdquo;</p><cite className="mt-2 block text-xs not-italic font-semibold">{entry.name}</cite></blockquote>)}</div>
-            {wishSent ? <p className="mt-8 text-sm" role="status">Terima kasih atas ucapan Anda.</p> : <form className="mt-8 grid gap-4" noValidate onSubmit={submitWish}><label className="grid gap-2 text-xs font-semibold" htmlFor="wish-name">Nama</label><input id="wish-name" name="name" required aria-invalid={Boolean(wishErrors.name)} aria-describedby={wishErrors.name ? "wish-name-error" : undefined} className="min-h-11 border bg-transparent px-3 text-sm aria-[invalid=true]:border-red-700" style={{ borderColor: palette.tokens.line }} />{wishErrors.name && <p id="wish-name-error" className="text-xs text-red-800" role="alert">{wishErrors.name}</p>}<label className="grid gap-2 text-xs font-semibold" htmlFor="wish-message">Ucapan</label><textarea id="wish-message" name="message" required maxLength={1000} aria-invalid={Boolean(wishErrors.message)} aria-describedby={wishErrors.message ? "wish-message-error" : undefined} className="min-h-28 border bg-transparent px-3 py-3 text-sm aria-[invalid=true]:border-red-700" style={{ borderColor: palette.tokens.line }} />{wishErrors.message && <p id="wish-message-error" className="text-xs text-red-800" role="alert">{wishErrors.message}</p>}<button type="submit" className="min-h-11 border px-4 text-xs font-semibold tracking-[0.14em] uppercase" style={{ borderColor: palette.tokens.accent }}>Kirim ucapan</button></form>}
+            <div className="mt-8 grid gap-3">{wishEntries.map((entry, index) => <blockquote key={entry.id ?? `${entry.name}-${index}`} className="border-l-2 pl-4 text-sm leading-6" style={{ borderColor: palette.tokens.accent }}><p>&ldquo;{entry.message}&rdquo;</p><cite className="mt-2 block text-xs not-italic font-semibold">{entry.name}</cite></blockquote>)}</div>
+            {wishSent ? <p className="mt-8 text-sm" role="status">Terima kasih atas ucapan Anda.</p> : <form className="mt-8 grid gap-4" noValidate onSubmit={submitWish}>
+              <label className="grid gap-2 text-xs font-semibold" htmlFor="wish-name">Nama</label>
+              <input id="wish-name" name="name" required aria-invalid={Boolean(wishErrors.name)} aria-describedby={wishErrors.name ? "wish-name-error" : undefined} className="min-h-11 border bg-transparent px-3 text-sm aria-[invalid=true]:border-red-700" style={{ borderColor: palette.tokens.line }} />
+              {wishErrors.name && <p id="wish-name-error" className="text-xs text-red-800" role="alert">{wishErrors.name}</p>}
+              <label className="grid gap-2 text-xs font-semibold" htmlFor="wish-message">Ucapan</label>
+              <textarea id="wish-message" name="message" required maxLength={1000} aria-invalid={Boolean(wishErrors.message)} aria-describedby={wishErrors.message ? "wish-message-error" : undefined} className="min-h-28 border bg-transparent px-3 py-3 text-sm aria-[invalid=true]:border-red-700" style={{ borderColor: palette.tokens.line }} />
+              {wishErrors.message && <p id="wish-message-error" className="text-xs text-red-800" role="alert">{wishErrors.message}</p>}
+              {publicInvitationSlug && <input name="honeypot" tabIndex={-1} autoComplete="off" aria-hidden="true" className="absolute -left-[10000px] h-px w-px overflow-hidden" />}
+              {wishServerError && <p className="text-xs text-red-800" role="alert">{wishServerError}</p>}
+              <button type="submit" disabled={wishPending} className="min-h-11 border px-4 text-xs font-semibold tracking-[0.14em] uppercase disabled:cursor-wait disabled:opacity-60" style={{ borderColor: palette.tokens.accent }}>{wishPending ? "Mengirim..." : "Kirim ucapan"}</button>
+            </form>}
           </section>
         )}
 

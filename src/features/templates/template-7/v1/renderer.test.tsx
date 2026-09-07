@@ -81,4 +81,31 @@ afterEach(() => {
     });
     expect(screen.getByRole("status")).toHaveTextContent("konfirmasi Anda sudah tercatat");
   });
+
+  it("submits public wishes through the invitation endpoint", async () => {
+    const fetchMock = vi.fn().mockResolvedValue({ ok: true });
+    vi.stubGlobal("fetch", fetchMock);
+    vi.stubGlobal("crypto", { randomUUID: () => "template-seven-wish-key" });
+    const Renderer = templateSevenV1.renderer;
+    const content = {
+      ...templateSevenV1.demo.content,
+      wishes: { prompt: "Tinggalkan doa.", entries: [] },
+    };
+
+    render(<Renderer content={content} palette={templateSevenV1.palettes[0]} publicInvitationSlug="template-seven-wishes" />);
+    const wishForm = screen.getByRole("button", { name: "Kirim ucapan" }).closest("form");
+    if (!wishForm) throw new Error("Wish form not found");
+    const nameInput = wishForm.querySelector("input[name='name']");
+    const messageInput = wishForm.querySelector("textarea[name='message']");
+    if (!nameInput || !messageInput) throw new Error("Wish fields not found");
+    fireEvent.change(nameInput, { target: { value: "Guest Seven" } });
+    fireEvent.change(messageInput, { target: { value: "Semoga selalu rukun." } });
+    fireEvent.click(screen.getByRole("button", { name: "Kirim ucapan" }));
+
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
+    expect(fetchMock.mock.calls[0][0]).toBe("/api/invitations/template-seven-wishes/wishes");
+    expect(fetchMock.mock.calls[0][1].headers["Idempotency-Key"]).toBe("template-seven-wish-key");
+    expect(JSON.parse(fetchMock.mock.calls[0][1].body)).toMatchObject({ name: "Guest Seven", message: "Semoga selalu rukun.", honeypot: "" });
+    expect(screen.getByText(/Semoga selalu rukun\./)).toBeInTheDocument();
+  });
 });
