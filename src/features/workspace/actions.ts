@@ -165,6 +165,10 @@ function parseWorkspaceFormData(formData: FormData) {
         })),
         physicalAddress: formData.get("giftPhysicalAddress"),
       },
+      wishes: {
+        enabled: formData.get("wishesEnabled") === "true",
+        prompt: formData.get("wishesPrompt"),
+      },
       rsvp: {
         enabled: formData.get("rsvpEnabled") === "true",
         intro: formData.get("rsvpIntro"),

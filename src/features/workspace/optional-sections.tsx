@@ -11,12 +11,13 @@ type OptionalSectionsProps = {
   canStory: boolean;
   canGift: boolean;
   canRsvp: boolean;
+  canWishes: boolean;
 };
 
 const emptyStory = () => ({ intro: "", entries: [] });
 const emptyGift = () => ({ accounts: [], physicalAddress: "" });
 
-export function OptionalSections({ draft, onChange, canStory, canGift, canRsvp }: OptionalSectionsProps) {
+export function OptionalSections({ draft, onChange, canStory, canGift, canRsvp, canWishes }: OptionalSectionsProps) {
   function updateStory(story: NonNullable<WorkspaceDraft["story"]>) {
     onChange({ ...draft, story });
   }
@@ -33,7 +34,7 @@ export function OptionalSections({ draft, onChange, canStory, canGift, canRsvp }
     <section aria-labelledby="workspace-optional-heading" className="grid gap-5 border-t border-stone-200 pt-7">
       <div>
         <p className="text-xs font-semibold tracking-[0.18em] text-stone-500 uppercase">Tambahan</p>
-        <h3 id="workspace-optional-heading" className="mt-2 font-serif text-2xl">Cerita dan hadiah</h3>
+        <h3 id="workspace-optional-heading" className="mt-2 font-serif text-2xl">Cerita, hadiah, dan ucapan</h3>
       </div>
       {canStory && (
         <fieldset className="grid gap-4 border border-stone-200 p-4">
@@ -121,6 +122,31 @@ export function OptionalSections({ draft, onChange, canStory, canGift, canRsvp }
               <input id={`rsvp-capacity-${key}`} name={`rsvpCapacity_${key}`} type="number" min={0} max={100000} value={draft.rsvp.eventCapacities[key]} onChange={(event) => updateRsvp({ ...draft.rsvp, eventCapacities: { ...draft.rsvp.eventCapacities, [key]: Number(event.target.value) } })} className={inputClassName} />
             </label>
           ))}
+        </fieldset>
+      )}
+      {canWishes && (
+        <fieldset className="grid gap-4 border border-stone-200 p-4">
+          <legend className="px-1 text-xs font-semibold tracking-[0.14em] text-stone-500 uppercase">Ucapan dan doa</legend>
+          <input type="hidden" name="wishesEnabled" value={draft.wishes.enabled ? "true" : "false"} />
+          <label className="flex items-center gap-3 text-sm font-semibold">
+            <input
+              type="checkbox"
+              checked={draft.wishes.enabled}
+              onChange={(event) => onChange({ ...draft, wishes: { ...draft.wishes, enabled: event.target.checked } })}
+            />
+            Aktifkan ucapan publik
+          </label>
+          <label className="text-sm font-semibold" htmlFor="wishes-prompt">
+            Pengantar ucapan
+            <textarea
+              id="wishes-prompt"
+              name="wishesPrompt"
+              value={draft.wishes.prompt}
+              onChange={(event) => onChange({ ...draft, wishes: { ...draft.wishes, prompt: event.target.value } })}
+              rows={3}
+              className="mt-2 w-full border border-stone-300 bg-stone-50 px-3 py-3 text-sm leading-6"
+            />
+          </label>
         </fieldset>
       )}
     </section>
