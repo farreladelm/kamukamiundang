@@ -105,6 +105,39 @@ describe("InvitationExperience", () => {
     expect(screen.getByRole("status")).toHaveTextContent("Terima kasih atas ucapan Anda.");
   });
 
+  it("reuses wish idempotency for an unchanged retry and rotates it after edits", async () => {
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce({ ok: false, json: async () => ({ message: "Koneksi gagal." }) })
+      .mockResolvedValueOnce({ ok: false, json: async () => ({ message: "Koneksi gagal." }) })
+      .mockResolvedValueOnce({ ok: true });
+    vi.stubGlobal("fetch", fetchMock);
+    vi.stubGlobal("crypto", { randomUUID: vi.fn()
+      .mockReturnValueOnce("first-wish-key")
+      .mockReturnValueOnce("second-wish-key") });
+    const Renderer = templateTwoV1.renderer;
+    const content = { ...templateTwoV1.demo.content, wishes: { prompt: "Tinggalkan doa.", entries: [] } };
+
+    render(<Renderer content={content} palette={templateTwoV1.palettes[0]} publicInvitationSlug="wish-retry" />);
+    fireEvent.click(screen.getByRole("button", { name: "Buka undangan" }));
+    const wishSection = screen.getByRole("heading", { name: "Kirimkan kata baik" }).closest("section");
+    if (!wishSection) throw new Error("Wish section not found");
+    const messageInput = wishSection.querySelector("textarea[name='message']");
+    if (!messageInput) throw new Error("Wish message field not found");
+    fireEvent.change(wishSection.querySelector("input[name='name']")!, { target: { value: "Guest" } });
+    fireEvent.change(messageInput, { target: { value: "Semoga bahagia." } });
+
+    fireEvent.click(screen.getByRole("button", { name: "Kirim ucapan" }));
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(1));
+    fireEvent.click(screen.getByRole("button", { name: "Kirim ucapan" }));
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
+    fireEvent.change(messageInput, { target: { value: "Semoga bahagia dan rukun." } });
+    fireEvent.click(screen.getByRole("button", { name: "Kirim ucapan" }));
+    await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(3));
+
+    expect(fetchMock.mock.calls[1][1].headers["Idempotency-Key"]).toBe("first-wish-key");
+    expect(fetchMock.mock.calls[2][1].headers["Idempotency-Key"]).toBe("second-wish-key");
+  });
+
   it("renders stored wish content as text instead of markup", () => {
     const Renderer = templateTwoV1.renderer;
     const content = {
