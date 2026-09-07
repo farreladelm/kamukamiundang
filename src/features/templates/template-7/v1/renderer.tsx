@@ -213,7 +213,7 @@ export function TemplateSevenRenderer({ content, palette, publicInvitationSlug }
   const [wishEntries, setWishEntries] = useState(content.wishes?.entries ?? []);
 
   const rsvpIdempotencyKey = useRef<string | null>(null);
-  const wishIdempotencyKey = useRef<string | null>(null);
+  const wishSubmission = useRef<{ payload: string; idempotencyKey: string } | null>(null);
 
   async function submitRsvp(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -300,8 +300,11 @@ export function TemplateSevenRenderer({ content, palette, publicInvitationSlug }
     }
     setWishErrors({});
     setWishServerError(null);
-    const idempotencyKey = wishIdempotencyKey.current ?? window.crypto.randomUUID();
-    wishIdempotencyKey.current = idempotencyKey;
+    const payload = JSON.stringify(result.data);
+    const idempotencyKey = wishSubmission.current?.payload === payload
+      ? wishSubmission.current.idempotencyKey
+      : window.crypto.randomUUID();
+    wishSubmission.current = { payload, idempotencyKey };
     setWishPending(true);
     try {
       const response = await fetch(`/api/invitations/${encodeURIComponent(publicInvitationSlug)}/wishes`, {
@@ -310,7 +313,7 @@ export function TemplateSevenRenderer({ content, palette, publicInvitationSlug }
           "Content-Type": "application/json",
           "Idempotency-Key": idempotencyKey,
         },
-        body: JSON.stringify(result.data),
+        body: payload,
       });
       if (!response.ok) {
         const body = await response.json().catch(() => null) as { message?: unknown } | null;
